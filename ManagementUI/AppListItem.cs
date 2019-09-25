@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,13 +18,13 @@ namespace ManagementUI
         internal string TempIcoPath { get; private set; }
 
         public AppListItem() { }
-        public AppListItem(string appName, string imagePath)
+        public AppListItem(string appName, string imagePath, int index, IntPtr handle)
         {
             this.AppName = appName;
             this.Image = new BitmapImage();
             if (!string.IsNullOrEmpty(imagePath))
             {
-                this.ExtractIcon(imagePath);
+                this.ExtractIcon(imagePath, index, handle);
                 if (!string.IsNullOrEmpty(this.TempIcoPath))
                 {
                     this.Image.BeginInit();
@@ -33,9 +34,12 @@ namespace ManagementUI
             }
         }
 
-        private void ExtractIcon(string path)
+        private void ExtractIcon(string path, int index, IntPtr handle)
         {
-            var ico = Icon.ExtractAssociatedIcon(path);
+            uint iconIndex = ExtractIconExA(path, index, new IntPtr(1), new IntPtr());
+
+            IntPtr pointer = ExtractIconA(handle, path, Convert.ToInt32(iconIndex));
+            var ico = Icon.FromHandle(pointer);
             if (ico != null)
             {
                 this.TempIcoPath = string.Format("{0}\\mui.{1}.ico", Environment.GetEnvironmentVariable("TEMP"), Path.GetRandomFileName());
@@ -58,5 +62,11 @@ namespace ManagementUI
                 }
             }
         }
+
+        [DllImport("shell32.dll")]
+        internal static extern IntPtr ExtractIconA(IntPtr hinst,string lpiconpath, int lpiicon);
+
+        [DllImport("shell32.dll")]
+        internal static extern uint ExtractIconExA(string lpszFile, int nIconIndex, IntPtr phiconLarg, IntPtr phiconSmall);
     }
 }
