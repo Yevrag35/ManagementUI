@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ManagementPicker.Properties
+namespace ManagementUI.Properties
 {
 
 

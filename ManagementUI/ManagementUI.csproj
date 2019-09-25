@@ -36,10 +36,14 @@
     <WarningLevel>4</WarningLevel>
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>ManagementUI.App</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
@@ -52,7 +56,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="ManagementUI.xaml">
+    <Page Include="MUI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -60,8 +64,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ManagementUI.xaml.cs">
-      <DependentUpon>ManagementUI.xaml</DependentUpon>
+    <Compile Include="AppListItem.cs" />
+    <Compile Include="MUI.xaml.cs">
+      <DependentUpon>MUI.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

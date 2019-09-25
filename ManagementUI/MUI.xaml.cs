@@ -13,16 +13,21 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace ManagementPicker
+namespace ManagementUI
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class ManagementUI : Window
+    public partial class MUI : Window
     {
-        public ManagementUI()
+
+        public MUI()
         {
             InitializeComponent();
+            var ali = new AppListItem("Active Directory Users and Computers", @"C:\Windows\System32\dsadmin.dll");
+            App._items.Add(ali);
+            this.AppListView.Items.Add(ali);
+            this.AppListView.Items.Refresh();
         }
     }
 }
