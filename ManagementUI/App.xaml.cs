@@ -16,7 +16,7 @@ namespace ManagementUI
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            AppListItem.PerformIconCleanup(Environment.GetEnvironmentVariable("TEMP"));
+            //AppListItem.PerformIconCleanup(Environment.GetEnvironmentVariable("TEMP"));
             _items = new List<AppListItem>();
             var main = new MUI();
             main.Show();

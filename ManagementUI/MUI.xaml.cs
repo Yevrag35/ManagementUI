@@ -11,6 +11,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Drawing.Imaging;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -29,44 +30,46 @@ namespace ManagementUI
         public MUI()
         {
             InitializeComponent();
-            //IntPtr handle = new WindowInteropHelper(Application.Current.MainWindow).Handle;
-            
-
-            //var ali = new AppListItem("Active Directory Users and Computers", @"C:\Windows\System32\dsadmin.dll", 5, handle);
-            
-            //App._items.Add(ali);
-            //this.AppListView.Items.Add(ali);
-            //this.AppListView.Items.Refresh();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            IntPtr handle = new WindowInteropHelper(this).Handle;
-            string path = this.ExtractIcon(@"C:\Windows\System32\dsadmin.dll", 2, handle);
+            IntPtr handle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+            IntPtr dsaHandle = ExtractIconA(handle, @"C:\Windows\System32\dsadmin.dll", 0);
+            var dsaIcon = System.Drawing.Icon.FromHandle(dsaHandle);
+
+            BitmapSource bmi = this.Bitmap2BitmapImage(dsaIcon.ToBitmap());
+            var ali = new AppListItem("Active Directory Users and Computers", bmi);
+            this.AppListView.Items.Add(ali);
+            this.AppListView.Items.Refresh();
         }
 
-        private string ExtractIcon(string path, int index, IntPtr handle)
+        private BitmapSource Bitmap2BitmapImage(Bitmap bitmap)
         {
-            IntPtr pointer = ExtractIconA(handle, path, index);
-            var ico = System.Drawing.Icon.FromHandle(pointer);
-            if (ico != null)
+            IntPtr hBitmap = bitmap.GetHbitmap();
+            BitmapSource retval;
+
+            try
             {
-                string tempPath = string.Format("{0}\\mui.{1}.ico", Environment.GetEnvironmentVariable("TEMP"), System.IO.Path.GetRandomFileName());
-                using (var stream = new FileStream(tempPath, FileMode.CreateNew))
-                {
-                    ico.Save(stream);
-                }
-                return tempPath;
+                retval = Imaging.CreateBitmapSourceFromHBitmap(
+                             hBitmap,
+                             IntPtr.Zero,
+                             Int32Rect.Empty,
+                             BitmapSizeOptions.FromEmptyOptions());
+                
             }
-            else
-                return null;
+            finally
+            {
+                DeleteObject(hBitmap);
+            }
+
+            return retval;
         }
 
-        [DllImport("shell32.dll")]
-        internal static extern IntPtr ExtractIconA(IntPtr hinst, string lpiconpath, int lpiicon);
+        [DllImport("gdi32.dll")]
+        public static extern bool DeleteObject(IntPtr hObject);
 
         [DllImport("shell32.dll")]
-        unsafe
-        internal static extern uint ExtractIconExA(string lpszFile, int nIconIndex, IntPtr phiconLarg, IntPtr phiconSmall);
+        internal static extern IntPtr ExtractIconA(IntPtr hInst, string pszExeFileName, uint nIconIndex);
     }
 }
