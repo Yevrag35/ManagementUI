@@ -12,12 +12,12 @@ namespace ManagementUI
     /// </summary>
     public partial class App : Application
     {
-        internal static List<AppListItem> _items;
+        internal static IntPtr MyHandle { get; set; }
+        internal static SettingsJson Settings { get; set; }
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            //AppListItem.PerformIconCleanup(Environment.GetEnvironmentVariable("TEMP"));
-            _items = new List<AppListItem>();
+            Settings = SettingsJson.ReadFromFile(Environment.GetEnvironmentVariable("LOCALAPPDATA") + "\\Mike Garvey\\ManagementUI\\settings.json");
             var main = new MUI();
             main.Show();
         }

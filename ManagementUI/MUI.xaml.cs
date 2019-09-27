@@ -1,23 +1,10 @@
-﻿using System;
+﻿using Ookii.Dialogs.Wpf;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
+using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Drawing.Imaging;
-using System.Windows.Input;
-using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ManagementUI
 {
@@ -26,6 +13,7 @@ namespace ManagementUI
     /// </summary>
     public partial class MUI : Window
     {
+        internal static NetworkCredential Creds { get; set; }
 
         public MUI()
         {
@@ -34,42 +22,32 @@ namespace ManagementUI
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            IntPtr handle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
-            IntPtr dsaHandle = ExtractIconA(handle, @"C:\Windows\System32\dsadmin.dll", 0);
-            var dsaIcon = System.Drawing.Icon.FromHandle(dsaHandle);
-
-            BitmapSource bmi = this.Bitmap2BitmapImage(dsaIcon.ToBitmap());
-            var ali = new AppListItem("Active Directory Users and Computers", bmi);
-            this.AppListView.Items.Add(ali);
-            this.AppListView.Items.Refresh();
+            App.MyHandle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+            for (int i = 0; i < App.Settings.Settings.Icons.Count; i++)
+            {
+                AppIconSetting ais = App.Settings.Settings.Icons[i];
+                AppListItem ali = ais.ToListItem();
+                this.AppListView.Items.Add(ali);
+            }
         }
 
-        private BitmapSource Bitmap2BitmapImage(Bitmap bitmap)
+        private void CredButton_Click(object sender, RoutedEventArgs e)
         {
-            IntPtr hBitmap = bitmap.GetHbitmap();
-            BitmapSource retval;
-
-            try
+            using (var dialog = new CredentialDialog
             {
-                retval = Imaging.CreateBitmapSourceFromHBitmap(
-                             hBitmap,
-                             IntPtr.Zero,
-                             Int32Rect.Empty,
-                             BitmapSizeOptions.FromEmptyOptions());
-                
-            }
-            finally
+                Content = "Enter the executing credentials",
+                MainInstruction = "Enter the executing credentials",
+                ShowSaveCheckBox = true,
+                Target = "ThisWindow",
+                WindowTitle = "ManagementUI Credentials"
+            })
             {
-                DeleteObject(hBitmap);
+                bool done = dialog.ShowDialog();
+                if (done)
+                {
+                    Creds = new NetworkCredential(dialog.UserName, dialog.Password);
+                }
             }
-
-            return retval;
         }
-
-        [DllImport("gdi32.dll")]
-        public static extern bool DeleteObject(IntPtr hObject);
-
-        [DllImport("shell32.dll")]
-        internal static extern IntPtr ExtractIconA(IntPtr hInst, string pszExeFileName, uint nIconIndex);
     }
 }
