@@ -20,6 +20,7 @@ namespace ManagementUI
             Settings = SettingsJson.ReadFromFile(Environment.GetEnvironmentVariable("LOCALAPPDATA") + "\\Mike Garvey\\ManagementUI\\settings.json");
             var main = new MUI();
             main.Show();
+            App.MyHandle = new System.Windows.Interop.WindowInteropHelper(main).Handle;
         }
     }
 }

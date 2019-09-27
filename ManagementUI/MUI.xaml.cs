@@ -22,13 +22,8 @@ namespace ManagementUI
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            App.MyHandle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
-            for (int i = 0; i < App.Settings.Settings.Icons.Count; i++)
-            {
-                AppIconSetting ais = App.Settings.Settings.Icons[i];
-                AppListItem ali = ais.ToListItem();
-                this.AppListView.Items.Add(ali);
-            }
+            
+            
         }
 
         private void CredButton_Click(object sender, RoutedEventArgs e)
