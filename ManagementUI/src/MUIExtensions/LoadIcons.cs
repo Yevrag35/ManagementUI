@@ -19,18 +19,20 @@ namespace ManagementUI
             return string.Format(RELATIVE_PATH, temp);
         }
 
-        private void LoadIcons(IntPtr windowHandle, SettingsJson settings)
+        private void LoadIcons(IntPtr windowHandle, SettingsJson settings, out AppList outList)
         {
+            outList = new AppList(settings.Settings.Icons.Count);
             for (int i = 0; i < settings.Settings.Icons.Count; i++)
             {
-                var app = settings.Settings.Icons[i];
+                AppIconSetting app = settings.Settings.Icons[i];
                 AppListItem ali = app.ToListItem(App.MyHandle);
                 if (!string.IsNullOrEmpty(app.Arguments))
                 {
                     ali.Arguments = app.Arguments;
                 }
-                this.AppListView.Items.Add(ali);
+                outList.Add(ali);
             }
+            this.AppListView.ItemsSource = outList.AppView;
             this.AppListView.Items.Refresh();
         }
 

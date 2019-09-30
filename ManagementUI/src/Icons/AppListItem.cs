@@ -38,11 +38,6 @@ namespace ManagementUI
             this.Image = this.Bitmap2BitmapImage(appIcon.ToBitmap());
         }
 
-        private async void AppListItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            await this.LaunchAsync();
-        }
-
         #endregion
 
         #region METHODS
@@ -67,7 +62,7 @@ namespace ManagementUI
             return retval;
         }
 
-        private async Task LaunchAsync()
+        internal async Task LaunchAsync()
         {
             await Task.Run(() =>
             {

@@ -1,6 +1,7 @@
 ﻿using Ookii.Dialogs.Wpf;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
@@ -16,13 +17,24 @@ namespace ManagementUI
     public partial class MUI : Window
     {
         internal static NetworkCredential Creds { get; set; }
+        private AppList AppList { get; set; }
 
         public MUI() => InitializeComponent();
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             App.MyHandle = new WindowInteropHelper(this).Handle;
-            this.LoadIcons(App.MyHandle, App.Settings);
+            this.LoadIcons(App.MyHandle, App.Settings, out AppList outList);
+            this.AppList = outList;
+        }
+
+        private async void AppList_Changed(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                ((MUI)Application.Current.MainWindow).AppList.UpdateListView();
+                ((MUI)Application.Current.MainWindow).AppListView.Items.Refresh();
+            });
         }
 
         private void CredButton_Click(object sender, RoutedEventArgs e)
@@ -64,6 +76,11 @@ namespace ManagementUI
             SettingsJson old = App.Settings;
             SettingsJson newJson = SettingsJson.ReadFromFile(path);
             App.Settings = newJson;
+        }
+
+        private async void ListViewItem_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            await ((AppListItem)sender).LaunchAsync();
         }
     }
 }
