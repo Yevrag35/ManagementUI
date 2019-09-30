@@ -17,22 +17,19 @@ namespace ManagementUI
         public SettingsEditor(SettingsJson currentSettings) => 
             this.Current = currentSettings.Editor;
 
-        public async Task LaunchAsync()
+        public void Launch()
         {
-            await Task.Run(() =>
-            {
-                string launchPath = this.GetLaunchPath(this.Current);
-                ProcessStartInfo psi = this.NewPSI(launchPath);
+            string launchPath = this.GetLaunchPath(this.Current);
+            ProcessStartInfo psi = this.NewPSI(launchPath);
 
-                using (var process = new Process
-                {
-                    StartInfo = psi
-                })
-                {
-                    process.Start();
-                    process.WaitForExit();
-                }
-            });
+            using (var process = new Process
+            {
+                StartInfo = psi
+            })
+            {
+                process.Start();
+                process.WaitForExit();
+            }
         }
 
         private string GetLaunchPath(SettingsLauncher currentLauncher)

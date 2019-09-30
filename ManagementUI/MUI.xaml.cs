@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Interop;
 
 namespace ManagementUI
@@ -46,7 +47,23 @@ namespace ManagementUI
         private async void SettsButton_Click(object sender, RoutedEventArgs e)
         {
             var editor = new SettingsEditor(App.Settings);
-            await editor.LaunchAsync();
+            await Task.Run(() =>
+            {
+                editor.Launch();
+                var click = new RoutedEventArgs(Button.ClickEvent);
+                this.Dispatcher.Invoke(() =>
+                {
+                    ((MUI)Application.Current.MainWindow).SettingsUpdateBtn.RaiseEvent(click);
+                });
+            });
+        }
+
+        private void SettingsUpdateBtn_Click(object sender, RoutedEventArgs e)
+        {
+            string path = Environment.GetEnvironmentVariable("LOCALAPPDATA") + "\\Mike Garvey\\ManagementUI\\settings.json";
+            SettingsJson old = App.Settings;
+            SettingsJson newJson = SettingsJson.ReadFromFile(path);
+            App.Settings = newJson;
         }
     }
 }
