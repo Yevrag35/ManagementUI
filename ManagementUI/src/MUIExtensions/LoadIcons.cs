@@ -25,6 +25,10 @@ namespace ManagementUI
             {
                 var app = settings.Settings.Icons[i];
                 AppListItem ali = app.ToListItem(App.MyHandle);
+                if (!string.IsNullOrEmpty(app.Arguments))
+                {
+                    ali.Arguments = app.Arguments;
+                }
                 this.AppListView.Items.Add(ali);
             }
             this.AppListView.Items.Refresh();
