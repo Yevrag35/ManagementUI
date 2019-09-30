@@ -33,6 +33,6 @@ namespace ManagementUI
             };
         }
         public AppListItem ToListItem(IntPtr handle) => 
-            new AppListItem(this.Name, handle, this.Path, this.Index);
+            new AppListItem(this.Name, handle, this.Path, this.ExePath, this.Index);
     }
 }

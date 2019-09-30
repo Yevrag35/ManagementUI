@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -20,6 +21,7 @@ namespace ManagementUI
         {
             string path = Environment.GetEnvironmentVariable("LOCALAPPDATA") + 
                 "\\Mike Garvey\\ManagementUI\\settings.json";
+
             Settings = SettingsJson.ReadFromFile(path);
             var main = new MUI();
             main.Show();

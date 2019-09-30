@@ -29,11 +29,20 @@ namespace ManagementUI
 
         #region CONSTRUCTORS
         public AppListItem() { }
-        public AppListItem(string appName, IntPtr handle, string appPath, int iconIndex)
+        public AppListItem(string appName, IntPtr handle, string iconPath, string appPath, int iconIndex)
         {
             this.AppName = appName;
-            IntPtr appHandle = ExtractIconA(handle, appPath, Convert.ToUInt32(iconIndex));
-            var appIcon = Icon.FromHandle(appHandle);
+            this.Path = appPath;
+            IntPtr appHandle = ExtractIconA(handle, iconPath, Convert.ToUInt32(iconIndex));
+            Icon appIcon = null;
+            try
+            {
+                appIcon = Icon.FromHandle(appHandle);
+            }
+            catch(ArgumentException)
+            {
+                appIcon = Icon.ExtractAssociatedIcon(iconPath);
+            }
 
             this.Image = this.Bitmap2BitmapImage(appIcon.ToBitmap());
         }
@@ -70,10 +79,14 @@ namespace ManagementUI
                 {
                     FileName = this.Path,
                     CreateNoWindow = true,
-                    UseShellExecute = false
+                    Verb = "runas",
+                    UseShellExecute = true
                 };
                 if (MUI.Creds != null)
                 {
+                    if (!string.IsNullOrEmpty(MUI.Creds.Domain))
+                        psi.Domain = MUI.Creds.Domain;
+
                     psi.UserName = MUI.Creds.UserName;
                     psi.Password = MUI.Creds.SecurePassword;
                 }
@@ -86,7 +99,19 @@ namespace ManagementUI
                     StartInfo = psi
                 })
                 {
-                    proc.Start();
+                    try
+                    {
+                        proc.Start();
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show(
+                            string.Format("{0}{1}{1}{2}", "An error occurred.", Environment.NewLine, e.Message),
+                            "ERROR",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error
+                        );
+                    }
                 }
             }); 
         }

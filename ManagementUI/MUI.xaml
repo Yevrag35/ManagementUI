@@ -35,7 +35,6 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="30"/>
                 <ColumnDefinition />
-                <ColumnDefinition />
                 <ColumnDefinition Width="30"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -43,9 +42,7 @@
                 <RowDefinition />
                 <RowDefinition Height="20"/>
             </Grid.RowDefinitions>
-            <Button x:Name="CredButton" Grid.Column="1" Grid.Row="1" Content="CREDS"
-                    Click="CredButton_Click"/>
-            <Button x:Name="SettsButton" Grid.Column="2" Grid.Row="1" Content="SETTINGS"
+            <Button x:Name="SettsButton" Grid.Column="1" Grid.Row="1" Content="SETTINGS"
                     Click="SettsButton_Click"/>
         </Grid>
         
@@ -57,7 +54,24 @@
                 <ColumnDefinition Width="10"/>
             </Grid.ColumnDefinitions>
             <ListView x:Name="AppListView" Grid.Column="0">
-                <ListView.ItemContainerStyle>
+                <ListView.Resources>
+                    <Style TargetType="{x:Type ListViewItem}">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="ToolTip" Value="{Binding Path=Url}" />
+                        <Setter Property="FontFamily" Value="Global Sans Serif" />
+                        <Setter Property="FontSize" Value="20" />
+                        <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"/>
+                        <Style.Triggers>
+                            <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                                <Setter Property="Background" Value="White" />
+                            </Trigger>
+                            <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                                <Setter Property="Background" Value="LightGray" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.Resources>
+                <!--<ListView.ItemContainerStyle>
                     <Style TargetType="{x:Type ListViewItem}">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                         <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -65,7 +79,7 @@
                         <Setter Property="FontFamily" Value="Global Sans Serif"/>
                         <Setter Property="FontSize" Value="15"/>
                     </Style>
-                </ListView.ItemContainerStyle>
+                </ListView.ItemContainerStyle>-->
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" Height="100">
@@ -75,7 +89,6 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <ScrollBar Grid.Column="1" />
         </Grid>
     </Grid>
 </Window>

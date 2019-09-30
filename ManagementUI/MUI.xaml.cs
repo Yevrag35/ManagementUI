@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
@@ -52,6 +53,20 @@ namespace ManagementUI
                 if (done)
                 {
                     Creds = new NetworkCredential(dialog.UserName, dialog.Password);
+                    if (Creds.UserName.Contains(@"\"))
+                    {
+                        string[] splitBack = Creds.UserName.Split(
+                            new string[1] { @"\" }, StringSplitOptions.RemoveEmptyEntries);
+                        Creds.Domain = splitBack.First();
+                        Creds.UserName = splitBack.Last();
+                    }
+                    else if (Creds.UserName.Contains("@"))
+                    { 
+                        string[] splitAt = Creds.UserName.Split(
+                            new string[1] { "@" }, StringSplitOptions.RemoveEmptyEntries);
+                        Creds.Domain = splitAt.Last();
+                        Creds.UserName = splitAt.First();
+                    }
                 }
             }
         }
@@ -80,7 +95,10 @@ namespace ManagementUI
 
         private async void ListViewItem_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            await ((AppListItem)sender).LaunchAsync();
+            if (sender is ListViewItem lvi && lvi.DataContext is AppListItem ali)
+            {
+                await ali.LaunchAsync();
+            }
         }
     }
 }

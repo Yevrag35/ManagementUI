@@ -47,7 +47,7 @@ namespace ManagementUI
                     break;
 
                 default:
-                    launchPath = string.Format(NOTEPAD, pf);
+                    launchPath = string.Format(NOTEPAD, Environment.GetEnvironmentVariable("WINDIR"));
                     break;
             }
             return launchPath;
