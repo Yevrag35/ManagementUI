@@ -13,15 +13,21 @@ namespace ManagementUI
     {
         private const string RELATIVE_PATH = @"{0}\Mike Garvey\ManagementUI\settings.json";
 
-        private string GetSettingsFile()
+        private string GetSettings()
         {
             string temp = Environment.GetEnvironmentVariable("LOCALAPPDATA");
             return string.Format(RELATIVE_PATH, temp);
         }
 
-        private void LoadIcons(IntPtr windowHandle)
+        private void LoadIcons(IntPtr windowHandle, SettingsJson settings)
         {
-            
+            for (int i = 0; i < settings.Settings.Icons.Count; i++)
+            {
+                var app = settings.Settings.Icons[i];
+                AppListItem ali = app.ToListItem(App.MyHandle);
+                this.AppListView.Items.Add(ali);
+            }
+            this.AppListView.Items.Refresh();
         }
 
     }

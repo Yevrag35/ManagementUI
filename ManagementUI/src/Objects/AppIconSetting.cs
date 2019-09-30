@@ -32,6 +32,7 @@ namespace ManagementUI
                 UseShellExecute = false
             };
         }
-        public AppListItem ToListItem() => new AppListItem(this.Name, App.MyHandle, this.Path, this.Index);
+        public AppListItem ToListItem(IntPtr handle) => 
+            new AppListItem(this.Name, handle, this.Path, this.Index);
     }
 }

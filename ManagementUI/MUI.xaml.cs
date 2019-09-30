@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interop;
 
 namespace ManagementUI
 {
@@ -15,15 +16,12 @@ namespace ManagementUI
     {
         internal static NetworkCredential Creds { get; set; }
 
-        public MUI()
-        {
-            InitializeComponent();
-        }
+        public MUI() => InitializeComponent();
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            
-            
+            App.MyHandle = new WindowInteropHelper(this).Handle;
+            this.LoadIcons(App.MyHandle, App.Settings);
         }
 
         private void CredButton_Click(object sender, RoutedEventArgs e)
@@ -43,6 +41,12 @@ namespace ManagementUI
                     Creds = new NetworkCredential(dialog.UserName, dialog.Password);
                 }
             }
+        }
+
+        private async void SettsButton_Click(object sender, RoutedEventArgs e)
+        {
+            var editor = new SettingsEditor(App.Settings);
+            await editor.LaunchAsync();
         }
     }
 }

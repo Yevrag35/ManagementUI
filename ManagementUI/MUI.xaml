@@ -22,10 +22,14 @@
             <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
         
+        <!-- SETTING UPDATE HIDDEN BUTTON -->
+        <Button x:Name="SettingsUpdateBtn" Height="0" Width="0" Click="SettingsUpdateBtn_Click"/>
+
         <!-- Credential Grid -->
         <Grid Grid.Column="2" Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="30"/>
+                <ColumnDefinition />
                 <ColumnDefinition />
                 <ColumnDefinition Width="30"/>
             </Grid.ColumnDefinitions>
@@ -34,8 +38,10 @@
                 <RowDefinition />
                 <RowDefinition Height="20"/>
             </Grid.RowDefinitions>
-            <Button x:Name="CredButton" Grid.Column="1" Grid.Row="1" Content="SET CREDENTIALS"
+            <Button x:Name="CredButton" Grid.Column="1" Grid.Row="1" Content="CREDS"
                     Click="CredButton_Click"/>
+            <Button x:Name="SettsButton" Grid.Column="2" Grid.Row="1" Content="SETTINGS"
+                    Click="SettsButton_Click"/>
         </Grid>
         
         <!-- App Grid -->
