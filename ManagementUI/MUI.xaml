@@ -35,6 +35,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="30"/>
                 <ColumnDefinition />
+                <ColumnDefinition />
                 <ColumnDefinition Width="30"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -42,7 +43,9 @@
                 <RowDefinition />
                 <RowDefinition Height="20"/>
             </Grid.RowDefinitions>
-            <Button x:Name="SettsButton" Grid.Column="1" Grid.Row="1" Content="SETTINGS"
+            <Button x:Name="CredsButton" Grid.Column="1" Grid.Row="1" Content="CREDS"
+                    Click="CredButton_Click"/>
+            <Button x:Name="SettsButton" Grid.Column="2" Grid.Row="1" Content="SETTINGS"
                     Click="SettsButton_Click"/>
         </Grid>
         
