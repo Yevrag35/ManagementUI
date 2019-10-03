@@ -3,8 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,6 +26,7 @@ namespace ManagementUI
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            this.IdentityBlock.Text = WindowsIdentity.GetCurrent().Name;
             App.MyHandle = new WindowInteropHelper(this).Handle;
             this.LoadIcons(App.MyHandle, App.Settings, out AppList outList);
             this.AppList = outList;
@@ -38,36 +41,69 @@ namespace ManagementUI
             });
         }
 
-        private void CredButton_Click(object sender, RoutedEventArgs e)
+        private async void CredButton_Click(object sender, RoutedEventArgs e)
         {
-            using (var dialog = new CredentialDialog
+            var click = new RoutedEventArgs(Button.ClickEvent);
+            if ((string)this.CredsButton.Content == "RUN AS")
             {
-                Content = "Enter the executing credentials",
-                MainInstruction = "Enter the executing credentials",
-                ShowSaveCheckBox = true,
-                Target = "ThisWindow",
-                WindowTitle = "ManagementUI Credentials"
-            })
-            {
-                bool done = dialog.ShowDialog();
-                if (done)
+                await Task.Run(() =>
                 {
-                    Creds = new NetworkCredential(dialog.UserName, dialog.Password);
-                    if (Creds.UserName.Contains(@"\"))
+                    using (var dialog = new CredentialDialog
                     {
-                        string[] splitBack = Creds.UserName.Split(
-                            new string[1] { @"\" }, StringSplitOptions.RemoveEmptyEntries);
-                        Creds.Domain = splitBack.First();
-                        Creds.UserName = splitBack.Last();
+                        MainInstruction = "Relaunch Credentials",
+                        Content = "Enter the executing credentials",
+                        ShowSaveCheckBox = true,
+                        Target = "ThisWindow",
+                        WindowTitle = "ManagementUI Credentials"
+                    })
+                    {
+                        bool done = dialog.ShowDialog();
+                        if (done)
+                        {
+                            Creds = new NetworkCredential(dialog.UserName, dialog.Password);
+                            if (Creds.UserName.Contains(@"\"))
+                            {
+                                string[] splitBack = Creds.UserName.Split(
+                                    new string[1] { @"\" }, StringSplitOptions.RemoveEmptyEntries);
+                                Creds.Domain = splitBack.First();
+                                Creds.UserName = splitBack.Last();
+                            }
+                            else if (Creds.UserName.Contains("@"))
+                            {
+                                string[] splitAt = Creds.UserName.Split(
+                                    new string[1] { "@" }, StringSplitOptions.RemoveEmptyEntries);
+                                Creds.Domain = splitAt.Last();
+                                Creds.UserName = splitAt.First();
+                            }
+                            MessageBoxResult answer = MessageBox.Show("Would you like to relaunch as this user?", "RUN AS", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Cancel);
+                            switch (answer)
+                            {
+                                case MessageBoxResult.Yes:
+                                    this.Dispatcher.Invoke(() =>
+                                    {
+                                        ((MUI)Application.Current.MainWindow).RelaunchBtn.RaiseEvent(click);
+                                    });
+                                    break;
+                                case MessageBoxResult.No:
+                                    this.Dispatcher.Invoke(() =>
+                                    {
+                                        ((MUI)Application.Current.MainWindow).CredsButton.Content = "RELAUNCH";
+                                    });
+                                    break;
+
+                                default:
+                                    break;
+                            }
+                        }
                     }
-                    else if (Creds.UserName.Contains("@"))
-                    { 
-                        string[] splitAt = Creds.UserName.Split(
-                            new string[1] { "@" }, StringSplitOptions.RemoveEmptyEntries);
-                        Creds.Domain = splitAt.Last();
-                        Creds.UserName = splitAt.First();
-                    }
-                }
+                });
+            }
+            else
+            {
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    ((MUI)Application.Current.MainWindow).RelaunchBtn.RaiseEvent(click);
+                });
             }
         }
 
@@ -104,6 +140,31 @@ namespace ManagementUI
             {
                 await ali.LaunchAsync();
             }
+        }
+
+        private void RelaunchBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var appId = AppDomain.CurrentDomain;
+            string appPath = Path.Combine(appId.BaseDirectory, appId.FriendlyName);
+            var psi = new ProcessStartInfo
+            {
+                FileName = appPath,
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                UserName = Creds.UserName,
+                Password = Creds.SecurePassword
+            };
+            if (!string.IsNullOrEmpty(Creds.Domain))
+                psi.Domain = Creds.Domain;
+
+            using (var relaunch = new Process
+            {
+                StartInfo = psi
+            })
+            {
+                relaunch.Start();
+            }
+            this.Close();
         }
     }
 }

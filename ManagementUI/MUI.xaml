@@ -3,35 +3,137 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+        xmlns:ctrl="clr-namespace:Itenso.Windows.Controls.ListViewLayout;assembly=Itenso.Windows.Controls.ListViewLayout"
         xmlns:local="clr-namespace:ManagementUI"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Loaded="Window_Loaded"
         mc:Ignorable="d"
         Title="Management App" Height="450" Width="800">
-    <!--<Window.Resources>
-        <Style TargetType="{x:Type local:AppListItem}">
-            <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"/>
+    <Window.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0.45,0">
+            <LinearGradientBrush.GradientStops>
+                <GradientStop Color="#FFFFFF" Offset="0" />
+                <GradientStop Color="#E2E2E4" Offset="0.6" />
+                <GradientStop Color="#C6C6CA" Offset="0.7" />
+                <GradientStop Color="#ABABB1" Offset="0.8" />
+                <GradientStop Color="#909098" Offset="0.85" />
+            </LinearGradientBrush.GradientStops>
+        </LinearGradientBrush>
+    </Window.Background>
+    <Window.Resources>
+        <!--Control colors.-->
+        <Color x:Key="ControlNormalColor">#000000</Color>
+        <Color x:Key="ControlMouseOverColor">#5E5E5E</Color>
+        <Color x:Key="DisabledControlColor">#FFF2F2F2</Color>
+        <Color x:Key="DisabledForegroundColor">#909098</Color>
+        <Color x:Key="ControlPressedColor">#878787</Color>
+
+        <Style x:Key="ButtonFocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border>
+                            <Rectangle Margin="2" StrokeThickness="1" Stroke="#60000000" StrokeDashArray="1 2" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
-    </Window.Resources>-->
+
+        <!-- Button -->
+        <Style TargetType="Button">
+            <Setter Property="SnapsToDevicePixels" Value="true" />
+            <Setter Property="OverridesDefaultStyle" Value="False" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource ButtonFocusVisual}" />
+            <!--<Setter Property="MinHeight" Value="29px" />
+            <Setter Property="MinWidth"  Value="103px" />-->
+            <Setter Property="Foreground" Value="#FFFFFFFF" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border TextBlock.Foreground="{TemplateBinding Foreground}" x:Name="Border">
+                            <Border.Background>
+                                <SolidColorBrush  Color="{DynamicResource ControlNormalColor}" />
+                            </Border.Background>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualStateGroup.Transitions>
+                                        <VisualTransition GeneratedDuration="0:0:0.5" />
+                                        <VisualTransition GeneratedDuration="0" To="Pressed" />
+                                    </VisualStateGroup.Transitions>
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="MouseOver">
+                                        <Storyboard>
+                                            <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)"
+                                                Storyboard.TargetName="Border">
+                                                <EasingColorKeyFrame KeyTime="0" Value="{StaticResource ControlMouseOverColor}" />
+                                            </ColorAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)"
+                                                Storyboard.TargetName="Border">
+                                                <EasingColorKeyFrame KeyTime="0" Value="{StaticResource ControlPressedColor}" />
+                                            </ColorAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Disabled">
+                                        <Storyboard>
+                                            <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)"
+                                                Storyboard.TargetName="Border">
+                                                <EasingColorKeyFrame KeyTime="0" Value="{StaticResource DisabledControlColor}" />
+                                            </ColorAnimationUsingKeyFrames>
+                                            <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                                Storyboard.TargetName="Border">
+                                                <EasingColorKeyFrame KeyTime="0" Value="{StaticResource DisabledForegroundColor}" />
+                                            </ColorAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <ContentPresenter Margin="2"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            RecognizesAccessKey="True" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="5"/>
-            <RowDefinition Height="80" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="50" />
             <RowDefinition />
             <RowDefinition Height="10"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="92"/>
             <ColumnDefinition />
             <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="100"/>
             <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
         
-        <!-- SETTING UPDATE HIDDEN BUTTON -->
+        <!-- SETTING UPDATE AND RELAUNCH HIDDEN BUTTONS -->
         <Button x:Name="SettingsUpdateBtn" Height="0" Width="0" Click="SettingsUpdateBtn_Click"/>
+        <Button x:Name="RelaunchBtn" Height="0" Width="0" Click="RelaunchBtn_Click"/>
+        
+        <!-- IDENTITY BANNER -->
+        <Label x:Name="IdentityLbl" Content="Current User:" Grid.Row="1" Grid.Column="1" 
+               FontFamily="Global Sans Serif" FontSize="14" VerticalContentAlignment="Center"/>
+        <TextBox x:Name="IdentityBlock" Text="ReplaceMe" Grid.Column="2" Grid.Row="1" Width="200"
+               HorizontalAlignment="Left"
+               FontFamily="Global Sans Serif" FontSize="15" VerticalContentAlignment="Center"
+               Background="Transparent" BorderBrush="Transparent" FontWeight="Bold" IsReadOnly="True"/>
 
         <!-- Credential Grid -->
-        <Grid Grid.Column="2" Grid.Row="1">
+        <Grid Grid.Column="3" Grid.Row="1" Grid.RowSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="30"/>
                 <ColumnDefinition />
@@ -43,26 +145,56 @@
                 <RowDefinition />
                 <RowDefinition Height="20"/>
             </Grid.RowDefinitions>
-            <Button x:Name="CredsButton" Grid.Column="1" Grid.Row="1" Content="CREDS"
+            <Button x:Name="CredsButton" Grid.Column="1" Grid.Row="1" Content="RUN AS"
                     Click="CredButton_Click"/>
             <Button x:Name="SettsButton" Grid.Column="2" Grid.Row="1" Content="SETTINGS"
                     Click="SettsButton_Click"/>
         </Grid>
         
         <!-- App Grid -->
-        <Grid Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2">
+        <Grid Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition Width="26"/>
                 <ColumnDefinition Width="10"/>
             </Grid.ColumnDefinitions>
-            <ListView x:Name="AppListView" Grid.Column="0">
+            <ListView x:Name="AppListView" Grid.Column="0" Background="Transparent" BorderBrush="Transparent" BorderThickness="0">
                 <ListView.Resources>
+                    <Style TargetType="{x:Type GridViewColumnHeader}">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type GridViewColumnHeader}">
+                                    <Border BorderThickness="0,0,0,0" BorderBrush="Transparent">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <LinearGradientBrush.GradientStops>
+                                                    <GradientStop Color="#909098" Offset="0" />
+                                                    <GradientStop Color="#6C6A6F" Offset="0.05" />
+                                                    <GradientStop Color="#494649" Offset="0.1" />
+                                                    <GradientStop Color="#272526" Offset="0.3" />
+                                                    <GradientStop Color="Black" Offset="1" />
+                                                </LinearGradientBrush.GradientStops>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                        <TextBlock x:Name="ContentHeader" Text="{TemplateBinding Content}" Foreground="White"
+                                               FontFamily="Trebuchet MS" FontSize="16" VerticalAlignment="Bottom"
+                                               Padding="5,5,5,0" Width="{TemplateBinding Width}" TextAlignment="Center" />
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                    <DataTemplate x:Key="CellTemplate">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{Binding Path=Image}"/>
+                        </StackPanel>
+                    </DataTemplate>
                     <Style TargetType="{x:Type ListViewItem}">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                        <Setter Property="ToolTip" Value="{Binding Path=Url}" />
+                        <!--<Setter Property="ToolTip" Value="{Binding Path=Url}" />-->
                         <Setter Property="FontFamily" Value="Global Sans Serif" />
                         <Setter Property="FontSize" Value="20" />
+                        <Setter Property="Background" Value="Transparent"/>
                         <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"/>
                         <Style.Triggers>
                             <Trigger Property="ItemsControl.AlternationIndex" Value="0">
@@ -74,6 +206,15 @@
                         </Style.Triggers>
                     </Style>
                 </ListView.Resources>
+                <ListView.View>
+                    <GridView>
+                        <GridView.Columns>
+                            <GridViewColumn Header="" CellTemplate="{StaticResource CellTemplate}" />
+                            <GridViewColumn Header="Application Name" DisplayMemberBinding="{Binding Path=AppName}" 
+                                            ctrl:ProportionalColumn.Width="1"/>
+                        </GridView.Columns>
+                    </GridView>
+                </ListView.View>
                 <!--<ListView.ItemContainerStyle>
                     <Style TargetType="{x:Type ListViewItem}">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -83,14 +224,15 @@
                         <Setter Property="FontSize" Value="15"/>
                     </Style>
                 </ListView.ItemContainerStyle>-->
-                <ListView.ItemTemplate>
+                <!--<ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" Height="100">
+                            
                             <Image Source="{Binding Image}" Width="175" Height="75" VerticalAlignment="Center"/>
                             <TextBlock Text="{Binding AppName}" Background="Transparent" Focusable="False" VerticalAlignment="Center" />
                         </StackPanel>
                     </DataTemplate>
-                </ListView.ItemTemplate>
+                </ListView.ItemTemplate>-->
             </ListView>
         </Grid>
     </Grid>
