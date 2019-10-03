@@ -24,6 +24,14 @@ namespace ManagementUI
 
         public MUI() => InitializeComponent();
 
+        internal static bool IsElevated()
+        {
+            var winId = WindowsIdentity.GetCurrent();
+            var prinId = new WindowsPrincipal(winId);
+            return prinId.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
+        #region EVENT HANDLERS
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             this.IdentityBlock.Text = WindowsIdentity.GetCurrent().Name;
@@ -166,5 +174,7 @@ namespace ManagementUI
             }
             this.Close();
         }
+
+        #endregion
     }
 }

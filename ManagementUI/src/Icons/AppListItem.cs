@@ -80,7 +80,7 @@ namespace ManagementUI
                     FileName = this.Path,
                     CreateNoWindow = true,
                     Verb = "runas",
-                    UseShellExecute = false
+                    UseShellExecute = !MUI.IsElevated()
                 };
                 if (MUI.Creds != null)
                 {
