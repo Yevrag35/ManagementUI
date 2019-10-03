@@ -91,6 +91,11 @@ namespace ManagementUI
             SettingsJson old = App.Settings;
             SettingsJson newJson = SettingsJson.ReadFromFile(path);
             App.Settings = newJson;
+            if (AppList.Count != newJson.Settings.Icons.Count)
+            {
+                this.LoadIcons(App.MyHandle, newJson, out AppList list);
+                this.AppList = list;
+            }
         }
 
         private async void ListViewItem_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
