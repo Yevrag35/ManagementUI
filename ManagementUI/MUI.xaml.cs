@@ -21,6 +21,9 @@ namespace ManagementUI
     {
         internal static NetworkCredential Creds { get; set; }
         private AppList AppList { get; set; }
+        internal IEnumerable<string> AllTags => AppList != null
+            ? AppList.Where(x => x.Tags != null).SelectMany(x => x.Tags).Distinct()
+            : null;
 
         public MUI() => InitializeComponent();
 
@@ -38,6 +41,7 @@ namespace ManagementUI
             App.MyHandle = new WindowInteropHelper(this).Handle;
             this.LoadIcons(App.MyHandle, App.Settings, out AppList outList);
             this.AppList = outList;
+            var strings = this.AppList.Where(x => x.Tags != null).SelectMany(x => x.Tags).ToArray();
         }
 
         private async void AppList_Changed(object sender, NotifyCollectionChangedEventArgs e)

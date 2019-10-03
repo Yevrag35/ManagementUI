@@ -9,7 +9,7 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Loaded="Window_Loaded"
         mc:Ignorable="d"
-        Title="Management App" Height="450" Width="800">
+        Title="Management UI" Height="450" Width="800">
     <Window.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="0.45,0">
             <LinearGradientBrush.GradientStops>
@@ -128,7 +128,7 @@
         <Label x:Name="IdentityLbl" Content="Current User:" Grid.Row="1" Grid.Column="1" 
                FontFamily="Global Sans Serif" FontSize="14" VerticalContentAlignment="Center"/>
         <TextBox x:Name="IdentityBlock" Text="ReplaceMe" Grid.Column="2" Grid.Row="1" Width="200"
-               HorizontalAlignment="Left"
+               HorizontalAlignment="Left" BorderThickness="0"
                FontFamily="Global Sans Serif" FontSize="15" VerticalContentAlignment="Center"
                Background="Transparent" BorderBrush="Transparent" FontWeight="Bold" IsReadOnly="True"/>
 

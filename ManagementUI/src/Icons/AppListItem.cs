@@ -24,6 +24,7 @@ namespace ManagementUI
         public string Path { get; set; }
         public string Arguments { get; set; }
         public BitmapSource Image { get; set; }
+        public List<string> Tags { get; set; }
 
         #endregion
 
