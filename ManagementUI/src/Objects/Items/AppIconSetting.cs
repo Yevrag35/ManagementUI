@@ -64,7 +64,7 @@ namespace ManagementUI
             var ali = new AppListItem(this.Name, handle, this.Path, this.ExePath, this.Index);
 
             if (this.Tags != null && this.Tags.Count > 0)
-                ali.Tags = this.Tags;
+                ali.TagList = this.Tags;
 
             return ali;
         }

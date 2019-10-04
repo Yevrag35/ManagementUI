@@ -23,7 +23,7 @@ namespace ManagementUI
         internal static NetworkCredential Creds { get; set; }
         private AppListCollection AppList { get; set; }
         internal IEnumerable<string> AllTags => AppList != null
-            ? AppList.Where(x => x.Tags != null).SelectMany(x => x.Tags).Distinct()
+            ? AppList.Where(x => x.TagList != null).SelectMany(x => x.TagList).Distinct()
             : null;
 
         public MUI() => InitializeComponent();
@@ -43,6 +43,13 @@ namespace ManagementUI
             this.LoadIcons(App.MyHandle, App.JsonSettings, out AppListCollection outList);
             this.AppList = outList;
             this.AppList.CollectionChanged += this.AppList_Changed;
+            string[] tags = this.AppList.Tags;
+            for (int i = 0; i < tags.Length; i++)
+            {
+                string tag = tags[i];
+                var ft = new FilterTag(tag, false);
+                this.FilterTags.Items.Add(ft);
+            }
         }
 
         private async void AppList_Changed(object sender, NotifyCollectionChangedEventArgs e)

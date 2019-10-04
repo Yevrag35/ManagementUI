@@ -81,9 +81,6 @@
     <Compile Include="NewApp.xaml.cs">
       <DependentUpon>NewApp.xaml</DependentUpon>
     </Compile>
-    <None Include="Settings.xaml.cs">
-      <DependentUpon>Settings.xaml</DependentUpon>
-    </None>
     <Compile Include="src\MUIExtensions\ErrorHandling.cs" />
     <Compile Include="src\MUIExtensions\LoadIcons.cs" />
     <Compile Include="src\Objects\Collections\AppListCollection.cs" />
@@ -91,6 +88,7 @@
     <Compile Include="src\Objects\Items\AppIconSetting.cs" />
     <Compile Include="src\Objects\Collections\AppSettingCollection.cs" />
     <Compile Include="src\Objects\Collections\BaseMuiCollection.cs" />
+    <Compile Include="src\Objects\Items\FilterTag.cs" />
     <Compile Include="src\Objects\Settings\Settings.cs" />
     <Compile Include="src\Objects\Settings\SettingsEditor.cs" />
     <Compile Include="src\Objects\Settings\SettingsJson.cs" />
@@ -111,10 +109,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <None Include="Settings.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

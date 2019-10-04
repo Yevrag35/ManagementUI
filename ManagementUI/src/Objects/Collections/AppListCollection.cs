@@ -17,7 +17,7 @@ namespace ManagementUI
         /// <summary>
         /// Gets the unique tags from each <see cref="AppListItem"/> in the collection.
         /// </summary>
-        public string[] Tags => this.Where(x => x.Tags != null).SelectMany(x => x.Tags).Distinct().ToArray();
+        public string[] Tags => this.Where(x => x.TagList != null).SelectMany(x => x.TagList).Distinct().ToArray();
 
         #endregion
 
@@ -56,18 +56,18 @@ namespace ManagementUI
         {
             public int Compare(AppListItem x, AppListItem y)
             {
-                if (x.Tags == null && y.Tags == null)
+                if (x.TagList == null && y.TagList == null)
                     return 0;
 
-                else if (x.Tags != null && y.Tags == null)
+                else if (x.TagList != null && y.TagList == null)
                     return 1;
 
-                else if (x.Tags == null && y.Tags != null)
+                else if (x.TagList == null && y.TagList != null)
                     return -1;
 
                 else
                 {
-                    return x.Tags.Count.CompareTo(y.Tags.Count);
+                    return x.TagList.Count.CompareTo(y.TagList.Count);
                 }
             }
         }

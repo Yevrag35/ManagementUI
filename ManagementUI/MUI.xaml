@@ -154,6 +154,37 @@
                     Click="SettsButton_Click"/>
         </Grid>
         
+        <!-- Filter Grid -->
+        <Grid x:Name="FilterGrid" Grid.Column="4" Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="35"/>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Label Content="Filter Tags" FontFamily="Impact" FontSize="19"
+                   HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                   Grid.Row="0"/>
+
+            <ListView x:Name="FilterTags" Grid.Row="1" Grid.RowSpan="3">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <CheckBox IsChecked="{Binding IsChecked}" Grid.Column="0"/>
+                                <TextBlock Text="{Binding Tag}" Grid.Column="1"
+                                         Background="Transparent" Focusable="False" />
+                            </Grid>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+
         <!-- App Grid -->
         <Grid Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="3">
             <Grid.ColumnDefinitions>
@@ -216,6 +247,7 @@
                             <GridViewColumn Header="" CellTemplate="{StaticResource CellTemplate}" />
                             <GridViewColumn Header="Application Name" DisplayMemberBinding="{Binding Path=AppName}" 
                                             ctrl:ProportionalColumn.Width="1"/>
+                            <GridViewColumn Header="Tags" DisplayMemberBinding="{Binding Path=Tags}"/>
                         </GridView.Columns>
                     </GridView>
                 </ListView.View>

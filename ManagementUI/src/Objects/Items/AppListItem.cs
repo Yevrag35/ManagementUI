@@ -24,12 +24,26 @@ namespace ManagementUI
     /// </summary>
     public class AppListItem : ICloneable
     {
+        private string _tags;
+
         #region PROPERTIES
         public string AppName { get; set; }
         public string Path { get; set; }
         public string Arguments { get; set; }
         public BitmapSource Image { get; set; }
-        public List<string> Tags { get; set; }
+        public string Tags
+        {
+            get
+            {
+                if (_tags == null && this.TagList != null)
+                {
+                    _tags = string.Join(", ", this.TagList);
+                }
+                return _tags;
+            }
+            set => _tags = value;
+        }
+        internal List<string> TagList { get; set; }
 
         #endregion
 
@@ -83,7 +97,7 @@ namespace ManagementUI
             Arguments = this.Arguments,
             Image = this.Image,
             Path = this.Path,
-            Tags = this.Tags
+            TagList = this.TagList
         };
         object ICloneable.Clone() => this.Clone();
 
