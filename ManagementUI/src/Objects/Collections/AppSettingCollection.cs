@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace ManagementUI
 {
-    public class AppSettingList : List<AppIconSetting>, INotifyCollectionChanged
+    public class AppSettingCollection : List<AppIconSetting>, INotifyCollectionChanged
     {
         #region FIELDS/CONSTANTS
 
@@ -19,7 +19,7 @@ namespace ManagementUI
         #endregion
 
         #region CONSTRUCTORS
-        public AppSettingList()
+        public AppSettingCollection()
         {
 
         }
