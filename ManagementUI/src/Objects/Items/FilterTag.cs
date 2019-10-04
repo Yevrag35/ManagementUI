@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace ManagementUI
 {
-    public class FilterTag
+    public class FilterTag : ICloneable
     {
         #region PROPERTIES
         public bool IsChecked { get; set; }
@@ -21,7 +21,12 @@ namespace ManagementUI
         #endregion
 
         #region PUBLIC METHODS
-
+        public FilterTag Clone() => new FilterTag
+        {
+            Tag = this.Tag,
+            IsChecked = this.IsChecked
+        };
+        object ICloneable.Clone() => this.Clone();
 
         #endregion
     }

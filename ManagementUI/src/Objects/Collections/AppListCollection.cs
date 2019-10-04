@@ -34,6 +34,7 @@ namespace ManagementUI
             var newList = new AppListCollection(this);
             return newList;
         }
+        public AppListItem Find(Predicate<AppListItem> match) => base.InnerList.Find(match);
         public override void Sort() => base.Sort(new AppListItemSorter());
 
         #endregion

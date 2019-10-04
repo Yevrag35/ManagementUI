@@ -175,7 +175,8 @@
                                     <ColumnDefinition Width="20"/>
                                     <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
-                                <CheckBox IsChecked="{Binding IsChecked}" Grid.Column="0"/>
+                                <CheckBox IsChecked="{Binding IsChecked}" Grid.Column="0" Checked="CheckBox_Checked"
+                                          Unchecked="CheckBox_Unchecked"/>
                                 <TextBlock Text="{Binding Tag}" Grid.Column="1"
                                          Background="Transparent" Focusable="False" />
                             </Grid>
@@ -247,12 +248,14 @@
                             <GridViewColumn Header="" CellTemplate="{StaticResource CellTemplate}" />
                             <GridViewColumn Header="Application Name" DisplayMemberBinding="{Binding Path=AppName}" 
                                             ctrl:ProportionalColumn.Width="1"/>
-                            <GridViewColumn Header="Tags" DisplayMemberBinding="{Binding Path=Tags}"/>
+                            <!--<GridViewColumn Header="Tags" DisplayMemberBinding="{Binding Path=Tags}"
+                                            ctrl:FixedColumn.Width="300"/>-->
                         </GridView.Columns>
                     </GridView>
                 </ListView.View>
                 <ListView.ContextMenu>
                     <ContextMenu x:Name="AppListContextMenu">
+                        <MenuItem x:Name="EditTagsBtn" Header="Edit Tags..." InputGestureText="E" Click="EditTagsBtn_Click"/>
                         <MenuItem x:Name="ALMIRemove" Header="Remove from List"
                                   InputGestureText="Delete" Click="ALMIRemove_Click"/>
                     </ContextMenu>
