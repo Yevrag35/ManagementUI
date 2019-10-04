@@ -47,13 +47,23 @@ namespace ManagementUI
 
         private async void AppList_Changed(object sender, NotifyCollectionChangedEventArgs e)
         {
+            await Task.Run(() =>
+            {
+                if (e.Action == NotifyCollectionChangedAction.Remove)
+                {
+                    IEnumerable<AppListItem> alis = e.OldItems.Cast<AppListItem>();
+                    int index = App.Settings.Settings.Icons
+                        .FindIndex(x => alis
+                            .Any(ali => ali.AppName.Equals(x.Name)));
+                    App.Settings.Settings.Icons.RemoveAt(index);
+                    App.Settings.WriteSettings();
+                }
+            });
             await this.Dispatcher.InvokeAsync(() =>
             {
                 ((MUI)Application.Current.MainWindow).AppList.UpdateListView();
                 ((MUI)Application.Current.MainWindow).AppListView.Items.Refresh();
             });
-
-
         }
 
         private async void CredButton_Click(object sender, RoutedEventArgs e)
@@ -165,7 +175,7 @@ namespace ManagementUI
             {
                 FileName = appPath,
                 CreateNoWindow = true,
-                UseShellExecute = false,
+                UseShellExecute = !IsElevated(),
                 UserName = Creds.UserName,
                 Password = Creds.SecurePassword
             };
@@ -207,6 +217,30 @@ namespace ManagementUI
                 App.Settings.Settings.Icons.Sort(new AppIconSettingSorter());
                 App.Settings.WriteSettings();
             });
+        }
+
+        private void ALMIRemove_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem mi && mi.DataContext is MUI mui &&
+                mui.AppListView.SelectedItem is AppListItem ali)
+            {
+                this.AppList.Remove(ali);
+            }
+        }
+
+        private void AppListView_MouseRightButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            int count = this.AppListView.SelectedItems.Count;
+            switch (count)
+            {
+                case 1:
+                    this.ALMIRemove.IsEnabled = true;
+                    break;
+
+                default:
+                    this.ALMIRemove.IsEnabled = false;
+                    break;
+            }
         }
     }
 }

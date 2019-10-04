@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows;
 
 namespace ManagementUI
 {
@@ -32,9 +33,12 @@ namespace ManagementUI
         #region PUBLIC METHODS
         public static SettingsJson ReadFromFile(string path)
         {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException("Path cannot be null.");
+
             if (!File.Exists(path))
             {
-                CreateAppFolders(path);
+                CreateAppFolders();
                 var job = new JObject
                 {
                     new JProperty("version", "1.0"),
@@ -70,14 +74,27 @@ namespace ManagementUI
         #endregion
 
         #region BACKEND/PRIVATE METHODS
-        private static void CreateAppFolders(string path)
+        private static void CreateAppFolders()
         {
-            string dir1 = Environment.GetEnvironmentVariable("LOCALAPPDATA");
-            string dir2 = dir1 + "\\Mike Garvey";
-            string dir3 = dir2 + "\\ManagementUI";
-            Directory.CreateDirectory(dir1);
-            Directory.CreateDirectory(dir2);
-            Directory.CreateDirectory(dir3);
+            string dir1 = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            try
+            {
+                string dir2 = dir1 + "\\Mike Garvey";
+                string dir3 = dir2 + "\\ManagementUI";
+                Directory.CreateDirectory(dir1);
+                Directory.CreateDirectory(dir2);
+                Directory.CreateDirectory(dir3);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(string.Format(
+                    "An error occurred: {0}{1}{1}{2}{1}{1}{3}",
+                    e.GetType().FullName,
+                    Environment.NewLine,
+                    e.Message,
+                    string.Format("LOCALAPPDATA: {0}", dir1)),            
+                    "ERROR", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         #endregion

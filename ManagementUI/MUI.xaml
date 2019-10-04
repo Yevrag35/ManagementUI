@@ -161,7 +161,8 @@
                 <ColumnDefinition Width="26"/>
                 <ColumnDefinition Width="10"/>
             </Grid.ColumnDefinitions>
-            <ListView x:Name="AppListView" Grid.Column="0" Background="Transparent" BorderBrush="Transparent" BorderThickness="0">
+            <ListView x:Name="AppListView" Grid.Column="0" Background="Transparent" BorderBrush="Transparent" BorderThickness="0"
+                      MouseRightButtonUp="AppListView_MouseRightButtonUp">
                 <ListView.Resources>
                     <Style TargetType="{x:Type GridViewColumnHeader}">
                         <Setter Property="Template">
@@ -218,24 +219,12 @@
                         </GridView.Columns>
                     </GridView>
                 </ListView.View>
-                <!--<ListView.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListViewItem}">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                        <Setter Property="VerticalContentAlignment" Value="Center" />
-                        <Setter Property="VerticalAlignment" Value="Center" />
-                        <Setter Property="FontFamily" Value="Global Sans Serif"/>
-                        <Setter Property="FontSize" Value="15"/>
-                    </Style>
-                </ListView.ItemContainerStyle>-->
-                <!--<ListView.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Height="100">
-                            
-                            <Image Source="{Binding Image}" Width="175" Height="75" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding AppName}" Background="Transparent" Focusable="False" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>-->
+                <ListView.ContextMenu>
+                    <ContextMenu x:Name="AppListContextMenu">
+                        <MenuItem x:Name="ALMIRemove" Header="Remove from List"
+                                  InputGestureText="Delete" Click="ALMIRemove_Click"/>
+                    </ContextMenu>
+                </ListView.ContextMenu>
             </ListView>
         </Grid>
     </Grid>
