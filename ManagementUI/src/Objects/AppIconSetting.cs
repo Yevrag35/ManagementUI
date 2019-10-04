@@ -9,8 +9,12 @@ using System.Windows.Controls;
 namespace ManagementUI
 {
     [Serializable]
-    public class AppIconSetting
+    public class AppIconSetting : ICloneable
     {
+        private const string MMC = "MMC";
+        private const string MMC_EXE = "\\mmc.exe";
+        private static readonly string MMC_PATH = Environment.GetFolderPath(Environment.SpecialFolder.System) + MMC_EXE;
+
         [JsonProperty("arguments")]
         public string Arguments { get; set; }
         [JsonProperty("exePath")]
@@ -24,6 +28,23 @@ namespace ManagementUI
         [JsonProperty("tags")]
         public List<string> Tags { get; set; }
 
+        #region METHODS
+        public AppIconSetting Clone() => new AppIconSetting
+        {
+            Arguments = this.Arguments,
+            ExePath = this.ExePath,
+            Index = this.Index,
+            Name = this.Name,
+            Path = this.Path,
+            Tags = this.Tags
+        };
+        object ICloneable.Clone() => this.Clone();
+
+        public static AppIconSetting NewMmcTemplate() => new AppIconSetting
+        {
+            ExePath = MMC_PATH,
+            Tags = new List<string>(new string[1] { MMC })
+        };
         public ProcessStartInfo NewStartInfo()
         {
             return new ProcessStartInfo
@@ -46,6 +67,8 @@ namespace ManagementUI
 
             return ali;
         }
+
+        #endregion
     }
 
     public class AppIconSettingSorter : IComparer<AppIconSetting>

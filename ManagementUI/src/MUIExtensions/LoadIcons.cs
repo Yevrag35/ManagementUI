@@ -19,9 +19,9 @@ namespace ManagementUI
             return string.Format(RELATIVE_PATH, temp);
         }
 
-        private void LoadIcons(IntPtr windowHandle, SettingsJson settings, out AppList outList)
+        private void LoadIcons(IntPtr windowHandle, SettingsJson settings, out AppListCollection outList)
         {
-            outList = new AppList(settings.Settings.Icons.Count);
+            outList = new AppListCollection(settings.Settings.Icons.Count);
             for (int i = 0; i < settings.Settings.Icons.Count; i++)
             {
                 AppIconSetting app = settings.Settings.Icons[i];

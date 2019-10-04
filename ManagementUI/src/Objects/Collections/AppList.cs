@@ -14,7 +14,7 @@ using System.Windows.Data;
 
 namespace ManagementUI
 {
-    public class AppList : IList<AppListItem>, IList, INotifyCollectionChanged
+    public class AppListCollection : ICloneable, IList<AppListItem>, IList, INotifyCollectionChanged
     {
         #region PRIVATE FIELDS/CONSTANTS
         private List<AppListItem> _list;
@@ -37,19 +37,19 @@ namespace ManagementUI
         #endregion
 
         #region CONSTRUCTORS
-        public AppList()
+        public AppListCollection()
         {
             _list = new List<AppListItem>();
             _view = CollectionViewSource.GetDefaultView(_list) as ListCollectionView;
             _view.IsLiveSorting = true;
         }
-        public AppList(int capacity)
+        public AppListCollection(int capacity)
         {
             _list = new List<AppListItem>(capacity);
             _view = CollectionViewSource.GetDefaultView(_list) as ListCollectionView;
             _view.IsLiveSorting = true;
         }
-        public AppList(IEnumerable<AppListItem> items)
+        public AppListCollection(IEnumerable<AppListItem> items)
         {
             _list = new List<AppListItem>(items);
             _view = CollectionViewSource.GetDefaultView(_list) as ListCollectionView;
@@ -115,6 +115,11 @@ namespace ManagementUI
             _list.Clear();
             this.OnCollectionChanged(NotifyCollectionChangedAction.Reset, oldItems);
         }
+        public AppListCollection Clone()
+        {
+            var newList = new AppListCollection(this);
+            return newList;
+        }
         public bool Contains(AppListItem item) => _list.Contains(item);
         public bool Contains(Predicate<AppListItem> match) => _list.Exists(match);
         public void CopyTo(AppListItem[] array, int arrayIndex) => _list.CopyTo(array, arrayIndex);
@@ -161,6 +166,11 @@ namespace ManagementUI
         #region GENERIC ILIST METHODS
         void IList<AppListItem>.Insert(int index, AppListItem item) => _list.Insert(index, item);
         void IList<AppListItem>.RemoveAt(int index) => _list.RemoveAt(index);
+
+        #endregion
+
+        #region ICLONEABLE METHOD
+        object ICloneable.Clone() => this.Clone();
 
         #endregion
 

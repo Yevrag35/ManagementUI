@@ -21,7 +21,7 @@ namespace ManagementUI
     public partial class MUI : Window
     {
         internal static NetworkCredential Creds { get; set; }
-        private AppList AppList { get; set; }
+        private AppListCollection AppList { get; set; }
         internal IEnumerable<string> AllTags => AppList != null
             ? AppList.Where(x => x.Tags != null).SelectMany(x => x.Tags).Distinct()
             : null;
@@ -40,7 +40,7 @@ namespace ManagementUI
         {
             this.IdentityBlock.Text = WindowsIdentity.GetCurrent().Name;
             App.MyHandle = new WindowInteropHelper(this).Handle;
-            this.LoadIcons(App.MyHandle, App.Settings, out AppList outList);
+            this.LoadIcons(App.MyHandle, App.Settings, out AppListCollection outList);
             this.AppList = outList;
             this.AppList.CollectionChanged += this.AppList_Changed;
         }
@@ -185,7 +185,7 @@ namespace ManagementUI
             App.Settings = newJson;
             if (AppList.Count != newJson.Settings.Icons.Count)
             {
-                this.LoadIcons(App.MyHandle, newJson, out AppList list);
+                this.LoadIcons(App.MyHandle, newJson, out AppListCollection list);
                 this.AppList = list;
             }
         }
