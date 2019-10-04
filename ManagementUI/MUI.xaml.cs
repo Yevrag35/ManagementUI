@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.DirectoryServices;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -42,7 +43,6 @@ namespace ManagementUI
             this.LoadIcons(App.MyHandle, App.Settings, out AppList outList);
             this.AppList = outList;
             this.AppList.CollectionChanged += this.AppList_Changed;
-            string[] strings = this.AppList.Where(x => x.Tags != null).SelectMany(x => x.Tags).ToArray();
         }
 
         private async void AppList_Changed(object sender, NotifyCollectionChangedEventArgs e)
@@ -82,42 +82,62 @@ namespace ManagementUI
                         WindowTitle = "ManagementUI Credentials"
                     })
                     {
-                        bool done = dialog.ShowDialog();
-                        if (done)
+                        while (true)
                         {
-                            Creds = new NetworkCredential(dialog.UserName, dialog.Password);
-                            if (Creds.UserName.Contains(@"\"))
+                            bool done = dialog.ShowDialog();
+                            if (done)
                             {
-                                string[] splitBack = Creds.UserName.Split(
-                                    new string[1] { @"\" }, StringSplitOptions.RemoveEmptyEntries);
-                                Creds.Domain = splitBack.First();
-                                Creds.UserName = splitBack.Last();
-                            }
-                            else if (Creds.UserName.Contains("@"))
-                            {
-                                string[] splitAt = Creds.UserName.Split(
-                                    new string[1] { "@" }, StringSplitOptions.RemoveEmptyEntries);
-                                Creds.Domain = splitAt.Last();
-                                Creds.UserName = splitAt.First();
-                            }
-                            MessageBoxResult answer = MessageBox.Show("Would you like to relaunch as this user?", "RUN AS", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Cancel);
-                            switch (answer)
-                            {
-                                case MessageBoxResult.Yes:
-                                    this.Dispatcher.Invoke(() =>
-                                    {
-                                        ((MUI)Application.Current.MainWindow).RelaunchBtn.RaiseEvent(click);
-                                    });
-                                    break;
-                                case MessageBoxResult.No:
-                                    this.Dispatcher.Invoke(() =>
-                                    {
-                                        ((MUI)Application.Current.MainWindow).CredsButton.Content = "RELAUNCH";
-                                    });
-                                    break;
+                                Creds = new NetworkCredential(dialog.UserName, dialog.Password);
+                                if (Creds.UserName.Contains(@"\"))
+                                {
+                                    string[] splitBack = Creds.UserName.Split(
+                                        new string[1] { @"\" }, StringSplitOptions.RemoveEmptyEntries);
+                                    Creds.Domain = splitBack.First();
+                                    Creds.UserName = splitBack.Last();
+                                }
+                                else if (Creds.UserName.Contains("@"))
+                                {
+                                    string[] splitAt = Creds.UserName.Split(
+                                        new string[1] { "@" }, StringSplitOptions.RemoveEmptyEntries);
+                                    Creds.Domain = splitAt.Last();
+                                    Creds.UserName = splitAt.First();
+                                }
 
-                                default:
-                                    break;
+                                // Validate Credentials if Domain is specified.
+                                try
+                                {
+                                    this.VerifyCredentials(Creds);
+                                }
+                                catch (Exception ex)
+                                {
+                                    bool res = ShowErrorMessage(ex, true);
+                                    if (res)
+                                        continue;
+
+                                    else
+                                        break;
+                                }
+
+                                MessageBoxResult answer = MessageBox.Show("Would you like to relaunch as this user?", "RUN AS", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Cancel);
+                                switch (answer)
+                                {
+                                    case MessageBoxResult.Yes:
+                                        this.Dispatcher.Invoke(() =>
+                                        {
+                                            ((MUI)Application.Current.MainWindow).RelaunchBtn.RaiseEvent(click);
+                                        });
+                                        break;
+                                    case MessageBoxResult.No:
+                                        this.Dispatcher.Invoke(() =>
+                                        {
+                                            ((MUI)Application.Current.MainWindow).CredsButton.Content = "RELAUNCH";
+                                        });
+                                        break;
+
+                                    default:
+                                        break;
+                                }
+                                break;
                             }
                         }
                     }
@@ -129,6 +149,17 @@ namespace ManagementUI
                 {
                     ((MUI)Application.Current.MainWindow).RelaunchBtn.RaiseEvent(click);
                 });
+            }
+        }
+
+        private void VerifyCredentials(NetworkCredential netCreds)
+        {
+            if (!string.IsNullOrEmpty(netCreds.Domain))
+            {
+                using (var de = new DirectoryEntry("LDAP://RootDSE", netCreds.UserName, netCreds.Password, AuthenticationTypes.Secure))
+                {
+                    de.RefreshCache();
+                }
             }
         }
 
@@ -175,7 +206,8 @@ namespace ManagementUI
             {
                 FileName = appPath,
                 CreateNoWindow = true,
-                UseShellExecute = !IsElevated(),
+                UseShellExecute = false,
+                LoadUserProfile = true,
                 UserName = Creds.UserName,
                 Password = Creds.SecurePassword
             };
@@ -187,7 +219,14 @@ namespace ManagementUI
                 StartInfo = psi
             })
             {
-                relaunch.Start();
+                try
+                {
+                    relaunch.Start();
+                }
+                catch (Exception ex)
+                {
+                    ShowErrorMessage(ex);
+                }
             }
             this.Close();
         }
@@ -219,12 +258,28 @@ namespace ManagementUI
             });
         }
 
-        private void ALMIRemove_Click(object sender, RoutedEventArgs e)
+        private async void ALMIRemove_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem mi && mi.DataContext is MUI mui &&
                 mui.AppListView.SelectedItem is AppListItem ali)
             {
-                this.AppList.Remove(ali);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    ((MUI)Application.Current.MainWindow).AppList.Remove(ali);
+                });
+            }
+        }
+
+        private async void AppListView_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Delete)
+            {
+                var click = new RoutedEventArgs(Button.ClickEvent);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var ali = ((MUI)Application.Current.MainWindow).AppListView.SelectedItem as AppListItem;
+                    ((MUI)Application.Current.MainWindow).AppList.Remove(ali);
+                });
             }
         }
 
@@ -242,5 +297,7 @@ namespace ManagementUI
                     break;
             }
         }
+
+        
     }
 }

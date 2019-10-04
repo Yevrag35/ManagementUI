@@ -162,7 +162,7 @@
                 <ColumnDefinition Width="10"/>
             </Grid.ColumnDefinitions>
             <ListView x:Name="AppListView" Grid.Column="0" Background="Transparent" BorderBrush="Transparent" BorderThickness="0"
-                      MouseRightButtonUp="AppListView_MouseRightButtonUp">
+                      MouseRightButtonUp="AppListView_MouseRightButtonUp" KeyDown="AppListView_KeyDown">
                 <ListView.Resources>
                     <Style TargetType="{x:Type GridViewColumnHeader}">
                         <Setter Property="Template">

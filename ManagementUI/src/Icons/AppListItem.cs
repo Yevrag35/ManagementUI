@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -115,14 +116,14 @@ namespace ManagementUI
                     {
                         proc.Start();
                     }
-                    catch (Exception e)
+                    catch (Win32Exception win32)
                     {
-                        MessageBox.Show(
-                            string.Format("{0}{1}{1}{2}", "An error occurred.", Environment.NewLine, e.Message),
-                            "ERROR",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Error
-                        );
+                        if (!win32.Message.Contains("operation was canceled by the user"))
+                            MUI.ShowErrorMessage(win32);
+                    }
+                    catch (Exception ex)
+                    {
+                        MUI.ShowErrorMessage(ex);
                     }
                 }
             }); 
