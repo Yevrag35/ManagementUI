@@ -41,7 +41,8 @@ namespace ManagementUI
             App.MyHandle = new WindowInteropHelper(this).Handle;
             this.LoadIcons(App.MyHandle, App.Settings, out AppList outList);
             this.AppList = outList;
-            var strings = this.AppList.Where(x => x.Tags != null).SelectMany(x => x.Tags).ToArray();
+            this.AppList.CollectionChanged += this.AppList_Changed;
+            string[] strings = this.AppList.Where(x => x.Tags != null).SelectMany(x => x.Tags).ToArray();
         }
 
         private async void AppList_Changed(object sender, NotifyCollectionChangedEventArgs e)
@@ -51,6 +52,8 @@ namespace ManagementUI
                 ((MUI)Application.Current.MainWindow).AppList.UpdateListView();
                 ((MUI)Application.Current.MainWindow).AppListView.Items.Refresh();
             });
+
+
         }
 
         private async void CredButton_Click(object sender, RoutedEventArgs e)
@@ -180,5 +183,30 @@ namespace ManagementUI
         }
 
         #endregion
+
+        private void NewAppButton_Click(object sender, RoutedEventArgs e)
+        {
+            var newApp = new NewApp
+            {
+                Owner = this
+            };
+            bool? result = newApp.ShowDialog();
+            if (result.HasValue && result.Value)
+            {
+                this.WriteAppToFile(newApp.CreatedApp);
+                AppListItem ali = newApp.CreatedApp.ToListItem(App.MyHandle);
+                AppList.Add(ali);
+            }
+        }
+
+        private async void WriteAppToFile(AppIconSetting ais)
+        {
+            await Task.Run(() =>
+            {
+                App.Settings.Settings.Icons.Add(ais);
+                App.Settings.Settings.Icons.Sort(new AppIconSettingSorter());
+                App.Settings.WriteSettings();
+            });
+        }
     }
 }

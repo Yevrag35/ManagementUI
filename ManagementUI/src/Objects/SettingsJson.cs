@@ -12,6 +12,8 @@ namespace ManagementUI
     [Serializable]
     public class SettingsJson
     {
+        private string _path;
+
         #region PROPERTIES
         [JsonProperty("version")]
         public string Version { get; set; }
@@ -48,7 +50,21 @@ namespace ManagementUI
             var resolver = new JsonSerializerSettings();
             resolver.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy()));
             SettingsJson sj = JsonConvert.DeserializeObject<SettingsJson>(text, resolver);
+            sj._path = path;
             return sj;
+        }
+
+        public void WriteSettings()
+        {
+            var resolver = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                NullValueHandling = NullValueHandling.Include,
+                DefaultValueHandling = DefaultValueHandling.Include
+            };
+            resolver.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy()));
+            string jsonStr = JsonConvert.SerializeObject(this, resolver);
+            File.WriteAllText(_path, jsonStr);
         }
 
         #endregion

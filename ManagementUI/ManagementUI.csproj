@@ -76,6 +76,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="NewApp.xaml.cs">
+      <DependentUpon>NewApp.xaml</DependentUpon>
+    </Compile>
     <Compile Include="src\MUIExtensions\LoadIcons.cs" />
     <Compile Include="src\Objects\AppIconSetting.cs" />
     <Compile Include="src\Objects\AppList.cs" />
@@ -95,6 +98,10 @@
       <DependentUpon>MUI.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="NewApp.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

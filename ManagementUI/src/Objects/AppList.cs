@@ -83,17 +83,55 @@ namespace ManagementUI
 
         #endregion
 
-        public void Add(AppListItem item) => _list.Add(item);
-        public void Clear() => _list.Clear();
+        public void Add(AppListItem item)
+        {
+            _list.Add(item);
+            this.OnCollectionChanged(NotifyCollectionChangedAction.Add, item);
+        }
+        void ICollection<AppListItem>.Add(AppListItem item) => _list.Add(item);
+        public void AddRange(IEnumerable<AppListItem> apps, bool notify = true)
+        {
+            var listOfApps = apps.ToList();
+            _list.AddRange(listOfApps);
+            if (notify)
+                this.OnCollectionChanged(NotifyCollectionChangedAction.Add, listOfApps);
+        }
+        public void Clear()
+        {
+            var oldItems = _list.ToList();
+            _list.Clear();
+            this.OnCollectionChanged(NotifyCollectionChangedAction.Reset, oldItems);
+        }
+        void ICollection<AppListItem>.Clear() => _list.Clear();
         public bool Contains(AppListItem item) => _list.Contains(item);
         public void CopyTo(AppListItem[] array, int arrayIndex) => _list.CopyTo(array, arrayIndex);
         public IEnumerator<AppListItem> GetEnumerator() => _list.GetEnumerator();
-        public int IndexOf(AppListItem item) => _list.IndexOf(item);
-        public void Insert(int index, AppListItem item) => _list.Insert(index, item);
-        public bool Remove(AppListItem item) => _list.Remove(item);
-        public void RemoveAt(int index) => _list.RemoveAt(index);
         IEnumerator IEnumerable.GetEnumerator() => _list.GetEnumerator();
+        public int IndexOf(AppListItem item) => _list.IndexOf(item);
+        public void Insert(int index, AppListItem item)
+        {
+            _list.Insert(index, item);
+            this.OnCollectionChanged(NotifyCollectionChangedAction.Add, item);
+        }
+        void IList<AppListItem>.Insert(int index, AppListItem item) => _list.Insert(index, item);
+        public bool Remove(AppListItem item)
+        {
+            var removing = item.Clone();
+            bool result = _list.Remove(item);
+            if (result)
+                this.OnCollectionChanged(NotifyCollectionChangedAction.Remove, removing);
 
+            return result;
+        }
+        bool ICollection<AppListItem>.Remove(AppListItem item) => _list.Remove(item);
+        public void RemoveAt(int index)
+        {
+            var removing = _list[index].Clone();
+            _list.RemoveAt(index);
+            this.OnCollectionChanged(NotifyCollectionChangedAction.Remove, removing);
+        }
+        void IList<AppListItem>.RemoveAt(int index) => _list.RemoveAt(index);
+        
         private class AppListItemComparer : IComparer<AppListItem>
         {
             public int Compare(AppListItem x, AppListItem y) => x.AppName.CompareTo(y.AppName);

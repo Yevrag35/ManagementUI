@@ -133,9 +133,10 @@
                Background="Transparent" BorderBrush="Transparent" FontWeight="Bold" IsReadOnly="True"/>
 
         <!-- Credential Grid -->
-        <Grid Grid.Column="3" Grid.Row="1" Grid.RowSpan="2">
+        <Grid Grid.Column="3" Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="30"/>
+                <ColumnDefinition />
                 <ColumnDefinition />
                 <ColumnDefinition />
                 <ColumnDefinition Width="30"/>
@@ -145,7 +146,9 @@
                 <RowDefinition />
                 <RowDefinition Height="20"/>
             </Grid.RowDefinitions>
-            <Button x:Name="CredsButton" Grid.Column="1" Grid.Row="1" Content="RUN AS"
+            <Button x:Name="NewAppButton" Grid.Column="1" Grid.Row="1" Content="NEW APP" 
+                    Click="NewAppButton_Click"/>
+            <Button x:Name="CredsButton" Grid.Column="3" Grid.Row="1" Content="RUN AS"
                     Click="CredButton_Click"/>
             <Button x:Name="SettsButton" Grid.Column="2" Grid.Row="1" Content="SETTINGS"
                     Click="SettsButton_Click"/>

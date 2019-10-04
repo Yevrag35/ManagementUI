@@ -17,7 +17,7 @@ using System.Windows.Media.Imaging;
 
 namespace ManagementUI
 {
-    public class AppListItem
+    public class AppListItem : ICloneable
     {
         #region PROPERTIES
         public string AppName { get; set; }
@@ -71,6 +71,17 @@ namespace ManagementUI
 
             return retval;
         }
+
+        public AppListItem Clone() => new AppListItem
+        {
+            AppName = this.AppName,
+            Arguments = this.Arguments,
+            Image = this.Image,
+            Path = this.Path,
+            Tags = this.Tags
+        };
+
+        object ICloneable.Clone() => this.Clone();
 
         internal async Task LaunchAsync()
         {
