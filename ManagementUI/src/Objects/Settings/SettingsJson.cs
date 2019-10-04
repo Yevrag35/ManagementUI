@@ -45,7 +45,9 @@ namespace ManagementUI
                 CreateAppFolders();
                 var job = new JObject
                 {
+                    JValue.CreateComment("Reserved for later use."),
                     new JProperty("version", "1.0"),
+                    JValue.CreateComment("Possible enumeration values are: [ \"notepad\", \"notepadplusplus\", \"vscode\" ]"),
                     new JProperty("editor", "notepad"),
                     new JProperty("settings", new JObject
                     {

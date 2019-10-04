@@ -81,6 +81,9 @@
     <Compile Include="NewApp.xaml.cs">
       <DependentUpon>NewApp.xaml</DependentUpon>
     </Compile>
+    <None Include="Settings.xaml.cs">
+      <DependentUpon>Settings.xaml</DependentUpon>
+    </None>
     <Compile Include="src\MUIExtensions\ErrorHandling.cs" />
     <Compile Include="src\MUIExtensions\LoadIcons.cs" />
     <Compile Include="src\Objects\Collections\AppListCollection.cs" />
@@ -108,6 +111,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <None Include="Settings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
