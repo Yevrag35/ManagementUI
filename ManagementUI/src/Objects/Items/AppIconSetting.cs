@@ -71,8 +71,5 @@ namespace ManagementUI
         #endregion
     }
 
-    public class AppIconSettingSorter : IComparer<AppIconSetting>
-    {
-        public int Compare(AppIconSetting x, AppIconSetting y) => x.Name.CompareTo(y.Name);
-    }
+    
 }

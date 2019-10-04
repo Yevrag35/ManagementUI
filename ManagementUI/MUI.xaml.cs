@@ -253,7 +253,7 @@ namespace ManagementUI
             await Task.Run(() =>
             {
                 App.Settings.Settings.Icons.Add(ais);
-                App.Settings.Settings.Icons.Sort(new AppIconSettingSorter());
+                App.Settings.Settings.Icons.Sort(new AppSettingCollection.AppIconSettingDefaultSorter());
                 App.Settings.WriteSettings();
             });
         }

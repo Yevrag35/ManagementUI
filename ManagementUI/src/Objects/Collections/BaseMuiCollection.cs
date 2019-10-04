@@ -5,28 +5,35 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Windows.Controls;
 using System.Windows.Data;
 
 namespace ManagementUI
 {
-    public abstract class BaseMuiCollection<T> : IList<T>, IList, INotifyCollectionChanged where T : ICloneable
+    /// <summary>
+    /// The base <see cref="List{T}"/> class for MUI cloneable items which supports attaching to <see cref="ListView"/> as an ItemsSource
+    /// while also implementing <see cref="INotifyCollectionChanged"/>.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public abstract class BaseMuiCollection<T> : ICollection<T>, IIndex<T>, IIndex, IList, INotifyCollectionChanged, ISorter<T> where T : ICloneable
     {
         #region PRIVATE FIELDS/CONSTANTS
+        protected List<T> InnerList;
         protected ListCollectionView InnerView;
-        private List<T> _list;
 
         #endregion
 
         #region INDEXERS
-        public virtual T this[int index]
+        public T this[int index]
         {
-            get => _list[index];
-            set => _list[index] = value;
+            get => this.InnerList[index];
+            set => this.InnerList[index] = value;
         }
+        object IIndex.this[int index] => this[index];
         object IList.this[int index]
         {
             get => this[index];
-            set => this[index] = (T)value;
+            set => this.InnerList[index] = (T)value;
         }
 
         #endregion
@@ -34,29 +41,29 @@ namespace ManagementUI
         #region CONSTRUCTORS
         public BaseMuiCollection()
         {
-            _list = new List<T>();
-            InnerView = CollectionViewSource.GetDefaultView(_list) as ListCollectionView;
+            InnerList = new List<T>();
+            InnerView = CollectionViewSource.GetDefaultView(InnerList) as ListCollectionView;
             InnerView.IsLiveSorting = true;
         }
         public BaseMuiCollection(int capacity)
         {
-            _list = new List<T>(capacity);
-            InnerView = CollectionViewSource.GetDefaultView(_list) as ListCollectionView;
+            InnerList = new List<T>(capacity);
+            InnerView = CollectionViewSource.GetDefaultView(InnerList) as ListCollectionView;
             InnerView.IsLiveSorting = true;
         }
         public BaseMuiCollection(IEnumerable<T> items)
         {
-            _list = new List<T>(items);
-            InnerView = CollectionViewSource.GetDefaultView(_list) as ListCollectionView;
+            InnerList = new List<T>(items);
+            InnerView = CollectionViewSource.GetDefaultView(InnerList) as ListCollectionView;
             InnerView.IsLiveSorting = true;
         }
 
         #endregion
 
         #region BASE PROPERTIES
+        public int Count => this.InnerList.Count;
+        public virtual bool IsReadOnly => false;
         public ListCollectionView View => InnerView;
-        public int Count => _list.Count;
-        public virtual bool IsReadOnly => ((IList<T>)_list).IsReadOnly;
 
         #endregion
 
@@ -91,39 +98,39 @@ namespace ManagementUI
         #region BASE METHODS
         public void Add(T item)
         {
-            _list.Add(item);
+            InnerList.Add(item);
             this.OnCollectionChanged(NotifyCollectionChangedAction.Add, item);
         }
         public void AddRange(IEnumerable<T> apps, bool notify = true)
         {
             var listOfItems = apps.ToList();
-            _list.AddRange(listOfItems);
+            InnerList.AddRange(listOfItems);
             if (notify)
                 this.OnCollectionChanged(NotifyCollectionChangedAction.Add, listOfItems);
         }
         public void Clear()
         {
-            var oldItems = _list.ToList();
-            _list.Clear();
+            var oldItems = InnerList.ToList();
+            InnerList.Clear();
             this.OnCollectionChanged(NotifyCollectionChangedAction.Reset, oldItems);
         }
-        public bool Contains(T item) => _list.Contains(item);
-        public bool Contains(Predicate<T> match) => _list.Exists(match);
-        public void CopyTo(T[] array, int arrayIndex) => _list.CopyTo(array, arrayIndex);
-        public IEnumerator<T> GetEnumerator() => _list.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => _list.GetEnumerator();
-        public int IndexOf(T item) => _list.IndexOf(item);
+        public bool Contains(T item) => InnerList.Contains(item);
+        public bool Contains(Predicate<T> match) => InnerList.Exists(match);
+        public void CopyTo(T[] array, int arrayIndex) => InnerList.CopyTo(array, arrayIndex);
+        public IEnumerator<T> GetEnumerator() => InnerList.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => InnerList.GetEnumerator();
+        public int IndexOf(T item) => InnerList.IndexOf(item);
         public void Insert(int index, T item)
         {
-            _list.Insert(index, item);
+            InnerList.Insert(index, item);
             this.OnCollectionChanged(NotifyCollectionChangedAction.Add, item);
         }
-        public virtual void Sort() => _list.Sort();
-        public void Sort(IComparer<T> comparer) => _list.Sort(comparer);
+        public virtual void Sort() => InnerList.Sort();
+        public void Sort(IComparer<T> comparer) => InnerList.Sort(comparer);
         public bool Remove(T item)
         {
             var removing = item.Clone();
-            bool result = _list.Remove(item);
+            bool result = InnerList.Remove(item);
             if (result)
                 this.OnCollectionChanged(NotifyCollectionChangedAction.Remove, removing);
 
@@ -131,8 +138,8 @@ namespace ManagementUI
         }
         public void RemoveAt(int index)
         {
-            var removing = _list[index].Clone();
-            _list.RemoveAt(index);
+            var removing = InnerList[index].Clone();
+            InnerList.RemoveAt(index);
             this.OnCollectionChanged(NotifyCollectionChangedAction.Remove, removing);
         }
 
@@ -141,37 +148,31 @@ namespace ManagementUI
         #region INTERFACE IMPLEMENTATIONS
 
         #region INTERFACE-ONLY PROPERTIES
-        bool IList.IsFixedSize => ((IList)_list).IsFixedSize;
-        bool ICollection.IsSynchronized => ((ICollection)_list).IsSynchronized;
-        object ICollection.SyncRoot => ((ICollection)_list).SyncRoot;
+        bool IList.IsFixedSize => ((IList)InnerList).IsFixedSize;
+        bool ICollection.IsSynchronized => ((ICollection)InnerList).IsSynchronized;
+        object ICollection.SyncRoot => ((ICollection)InnerList).SyncRoot;
 
         #endregion
 
         #region GENERIC ICOLLECTION METHODS
-        void ICollection<T>.Add(T item) => _list.Add(item);
-        void ICollection<T>.Clear() => _list.Clear();
-        bool ICollection<T>.Remove(T item) => _list.Remove(item);
-
-        #endregion
-
-        #region GENERIC ILIST METHODS
-        void IList<T>.Insert(int index, T item) => _list.Insert(index, item);
-        void IList<T>.RemoveAt(int index) => _list.RemoveAt(index);
+        void ICollection<T>.Add(T item) => InnerList.Add(item);
+        void ICollection<T>.Clear() => InnerList.Clear();
+        bool ICollection<T>.Remove(T item) => InnerList.Remove(item);
 
         #endregion
 
         #region NON-GENERIC ICOLLECTION METHODS
-        void ICollection.CopyTo(Array array, int index) => ((ICollection)_list).CopyTo(array, index);
+        void ICollection.CopyTo(Array array, int index) => ((ICollection)InnerList).CopyTo(array, index);
 
         #endregion
 
         #region NON-GENERIC ILIST METHODS
-        int IList.Add(object value) => ((IList)_list).Add(value);
-        bool IList.Contains(object value) => ((IList)_list).Contains(value);
-        int IList.IndexOf(object value) => ((IList)_list).IndexOf(value);
-        void IList.Insert(int index, object value) => ((IList)_list).Insert(index, value);
-        void IList.Remove(object value) => ((IList)_list).Remove(value);
-        void IList.RemoveAt(int index) => ((IList)_list).RemoveAt(index);
+        int IList.Add(object value) => ((IList)InnerList).Add(value);
+        bool IList.Contains(object value) => ((IList)InnerList).Contains(value);
+        int IList.IndexOf(object value) => ((IList)InnerList).IndexOf(value);
+        void IList.Insert(int index, object value) => ((IList)InnerList).Insert(index, value);
+        void IList.Remove(object value) => ((IList)InnerList).Remove(value);
+        void IList.RemoveAt(int index) => this.InnerList.RemoveAt(index);
 
         #endregion
 
@@ -185,12 +186,12 @@ namespace ManagementUI
         }
         public void UpdateView(IComparer<T> sortBy, bool useLiveSorting = true)
         {
-            _list.Sort(sortBy);
+            InnerList.Sort(sortBy);
             this.UpdateView(useLiveSorting, true);
         }
         private void UpdateView(bool useLiveSorting, bool isPrivate)
         {
-            InnerView = CollectionViewSource.GetDefaultView(_list) as ListCollectionView;
+            InnerView = CollectionViewSource.GetDefaultView(InnerList) as ListCollectionView;
             InnerView.IsLiveSorting = useLiveSorting;
         }
 

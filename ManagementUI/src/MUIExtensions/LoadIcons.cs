@@ -32,9 +32,8 @@ namespace ManagementUI
                 }
                 outList.Add(ali);
             }
-            this.AppListView.ItemsSource = outList.AppView;
+            this.AppListView.ItemsSource = outList.View;
             this.AppListView.Items.Refresh();
         }
-
     }
 }

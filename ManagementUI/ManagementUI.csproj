@@ -83,8 +83,8 @@
     </Compile>
     <Compile Include="src\MUIExtensions\ErrorHandling.cs" />
     <Compile Include="src\MUIExtensions\LoadIcons.cs" />
-    <Compile Include="src\Objects\Items\AppIconSetting.cs" />
     <Compile Include="src\Objects\Collections\AppListCollection.cs" />
+    <Compile Include="src\Objects\Items\AppIconSetting.cs" />
     <Compile Include="src\Objects\Collections\AppSettingCollection.cs" />
     <Compile Include="src\Objects\Collections\BaseMuiCollection.cs" />
     <Compile Include="src\Objects\Settings\Settings.cs" />

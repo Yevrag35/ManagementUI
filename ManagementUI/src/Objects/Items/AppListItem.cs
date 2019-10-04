@@ -18,6 +18,9 @@ using System.Windows.Media.Imaging;
 
 namespace ManagementUI
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class AppListItem : ICloneable
     {
         #region PROPERTIES
