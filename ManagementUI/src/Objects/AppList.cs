@@ -14,17 +14,29 @@ using System.Windows.Data;
 
 namespace ManagementUI
 {
-    public class AppList : IList<AppListItem>, INotifyCollectionChanged
+    public class AppList : IList<AppListItem>, IList, INotifyCollectionChanged
     {
+        #region PRIVATE FIELDS/CONSTANTS
         private List<AppListItem> _list;
         private ListCollectionView _view;
 
+        #endregion
+
+        #region INDEXERS
         public AppListItem this[int index]
         {
             get => _list[index];
             set => _list[index] = value;
         }
+        object IList.this[int index]
+        {
+            get => this[index];
+            set => this[index] = value as AppListItem;
+        }
 
+        #endregion
+
+        #region CONSTRUCTORS
         public AppList()
         {
             _list = new List<AppListItem>();
@@ -44,19 +56,20 @@ namespace ManagementUI
             _view.IsLiveSorting = true;
         }
 
-        public int Count => _list.Count;
-        public bool IsReadOnly => false;
+        #endregion
+
+        #region PROPERTIES
         public ListCollectionView AppView => _view;
+        public int Count => _list.Count;
+        bool IList.IsFixedSize => ((IList)_list).IsFixedSize;
+        public bool IsReadOnly => ((IList<AppListItem>)_list).IsReadOnly;
+        bool ICollection.IsSynchronized => ((ICollection)_list).IsSynchronized;
+        object ICollection.SyncRoot => ((ICollection)_list).SyncRoot;
+
+        #endregion
 
         #region EVENT HANDLERS
         public event NotifyCollectionChangedEventHandler CollectionChanged;
-
-        public void UpdateListView()
-        {
-            _list.Sort(new AppListItemComparer());
-            _view = CollectionViewSource.GetDefaultView(_list) as ListCollectionView;
-            _view.IsLiveSorting = true;
-        }
 
         private void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
@@ -83,12 +96,12 @@ namespace ManagementUI
 
         #endregion
 
+        #region APPLIST METHODS
         public void Add(AppListItem item)
         {
             _list.Add(item);
             this.OnCollectionChanged(NotifyCollectionChangedAction.Add, item);
         }
-        void ICollection<AppListItem>.Add(AppListItem item) => _list.Add(item);
         public void AddRange(IEnumerable<AppListItem> apps, bool notify = true)
         {
             var listOfApps = apps.ToList();
@@ -102,8 +115,8 @@ namespace ManagementUI
             _list.Clear();
             this.OnCollectionChanged(NotifyCollectionChangedAction.Reset, oldItems);
         }
-        void ICollection<AppListItem>.Clear() => _list.Clear();
         public bool Contains(AppListItem item) => _list.Contains(item);
+        public bool Contains(Predicate<AppListItem> match) => _list.Exists(match);
         public void CopyTo(AppListItem[] array, int arrayIndex) => _list.CopyTo(array, arrayIndex);
         public IEnumerator<AppListItem> GetEnumerator() => _list.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => _list.GetEnumerator();
@@ -113,7 +126,7 @@ namespace ManagementUI
             _list.Insert(index, item);
             this.OnCollectionChanged(NotifyCollectionChangedAction.Add, item);
         }
-        void IList<AppListItem>.Insert(int index, AppListItem item) => _list.Insert(index, item);
+        public void Sort() => _list.Sort(new AppListItemComparer());
         public bool Remove(AppListItem item)
         {
             var removing = item.Clone();
@@ -123,18 +136,55 @@ namespace ManagementUI
 
             return result;
         }
-        bool ICollection<AppListItem>.Remove(AppListItem item) => _list.Remove(item);
         public void RemoveAt(int index)
         {
             var removing = _list[index].Clone();
             _list.RemoveAt(index);
             this.OnCollectionChanged(NotifyCollectionChangedAction.Remove, removing);
         }
+        public void UpdateView()
+        {
+            this.Sort();
+            _view = CollectionViewSource.GetDefaultView(_list) as ListCollectionView;
+            _view.IsLiveSorting = true;
+        }
+
+        #endregion
+
+        #region GENERIC ICOLLECTION METHODS
+        void ICollection<AppListItem>.Add(AppListItem item) => _list.Add(item);
+        void ICollection<AppListItem>.Clear() => _list.Clear();
+        bool ICollection<AppListItem>.Remove(AppListItem item) => _list.Remove(item);
+
+        #endregion
+
+        #region GENERIC ILIST METHODS
+        void IList<AppListItem>.Insert(int index, AppListItem item) => _list.Insert(index, item);
         void IList<AppListItem>.RemoveAt(int index) => _list.RemoveAt(index);
-        
+
+        #endregion
+
+        #region NON-GENERIC ICOLLECTION METHODS
+        void ICollection.CopyTo(Array array, int index) => ((ICollection)_list).CopyTo(array, index);
+
+        #endregion
+
+        #region NON-GENERIC ILIST METHODS
+        int IList.Add(object value) => ((IList)_list).Add(value);
+        bool IList.Contains(object value) => ((IList)_list).Contains(value);
+        int IList.IndexOf(object value) => ((IList)_list).IndexOf(value);
+        void IList.Insert(int index, object value) => ((IList)_list).Insert(index, value);
+        void IList.Remove(object value) => ((IList)_list).Remove(value);
+        void IList.RemoveAt(int index) => ((IList)_list).RemoveAt(index);
+
+        #endregion
+
+        #region COMPARERS
         private class AppListItemComparer : IComparer<AppListItem>
         {
             public int Compare(AppListItem x, AppListItem y) => x.AppName.CompareTo(y.AppName);
         }
+
+        #endregion
     }
 }

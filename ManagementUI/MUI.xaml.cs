@@ -61,7 +61,7 @@ namespace ManagementUI
             });
             await this.Dispatcher.InvokeAsync(() =>
             {
-                ((MUI)Application.Current.MainWindow).AppList.UpdateListView();
+                ((MUI)Application.Current.MainWindow).AppList.UpdateView();
                 ((MUI)Application.Current.MainWindow).AppListView.Items.Refresh();
             });
         }
