@@ -9,6 +9,7 @@ using System.Windows.Controls;
 namespace ManagementUI
 {
     [Serializable]
+    [JsonObject(MemberSerialization.OptIn)]
     public class AppIconSetting : ICloneable
     {
         private const string MMC = "MMC";

@@ -22,6 +22,8 @@ namespace ManagementUI
 
         #region PUBLIC METHODS
         public AppSettingCollection Clone() => new AppSettingCollection(this);
+        public AppIconSetting Find(Predicate<AppIconSetting> match) => base.InnerList.Find(match);
+        public int FindIndex(Predicate<AppIconSetting> match) => base.InnerList.FindIndex(match);
 
         #endregion
 

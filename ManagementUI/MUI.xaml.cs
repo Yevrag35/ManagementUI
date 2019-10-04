@@ -40,7 +40,7 @@ namespace ManagementUI
         {
             this.IdentityBlock.Text = WindowsIdentity.GetCurrent().Name;
             App.MyHandle = new WindowInteropHelper(this).Handle;
-            this.LoadIcons(App.MyHandle, App.Settings, out AppListCollection outList);
+            this.LoadIcons(App.MyHandle, App.JsonSettings, out AppListCollection outList);
             this.AppList = outList;
             this.AppList.CollectionChanged += this.AppList_Changed;
         }
@@ -52,11 +52,11 @@ namespace ManagementUI
                 if (e.Action == NotifyCollectionChangedAction.Remove)
                 {
                     IEnumerable<AppListItem> alis = e.OldItems.Cast<AppListItem>();
-                    int index = App.Settings.Settings.Icons
+                    int index = App.JsonSettings.Settings.Apps
                         .FindIndex(x => alis
                             .Any(ali => ali.AppName.Equals(x.Name)));
-                    App.Settings.Settings.Icons.RemoveAt(index);
-                    App.Settings.WriteSettings();
+                    App.JsonSettings.Settings.Apps.RemoveAt(index);
+                    App.JsonSettings.WriteSettings();
                 }
             });
             await this.Dispatcher.InvokeAsync(() =>
@@ -165,7 +165,7 @@ namespace ManagementUI
 
         private async void SettsButton_Click(object sender, RoutedEventArgs e)
         {
-            var editor = new SettingsEditor(App.Settings);
+            var editor = new SettingsEditor(App.JsonSettings);
             await Task.Run(() =>
             {
                 editor.Launch();
@@ -180,10 +180,10 @@ namespace ManagementUI
         private void SettingsUpdateBtn_Click(object sender, RoutedEventArgs e)
         {
             string path = Environment.GetEnvironmentVariable("LOCALAPPDATA") + "\\Mike Garvey\\ManagementUI\\settings.json";
-            SettingsJson old = App.Settings;
+            SettingsJson old = App.JsonSettings;
             SettingsJson newJson = SettingsJson.ReadFromFile(path);
-            App.Settings = newJson;
-            if (AppList.Count != newJson.Settings.Icons.Count)
+            App.JsonSettings = newJson;
+            if (AppList.Count != newJson.Settings.Apps.Count)
             {
                 this.LoadIcons(App.MyHandle, newJson, out AppListCollection list);
                 this.AppList = list;
@@ -252,9 +252,9 @@ namespace ManagementUI
         {
             await Task.Run(() =>
             {
-                App.Settings.Settings.Icons.Add(ais);
-                App.Settings.Settings.Icons.Sort(new AppSettingCollection.AppIconSettingDefaultSorter());
-                App.Settings.WriteSettings();
+                App.JsonSettings.Settings.Apps.Add(ais);
+                App.JsonSettings.Settings.Apps.Sort(new AppSettingCollection.AppIconSettingDefaultSorter());
+                App.JsonSettings.WriteSettings();
             });
         }
 

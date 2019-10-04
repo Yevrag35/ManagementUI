@@ -19,7 +19,8 @@ using System.Windows.Media.Imaging;
 namespace ManagementUI
 {
     /// <summary>
-    /// 
+    /// An individual item representing an app's logic and metadata to be 
+    /// displayed in a <see cref="ListView"/>.  Using this class, the app can be launched.
     /// </summary>
     public class AppListItem : ICloneable
     {
@@ -84,10 +85,9 @@ namespace ManagementUI
             Path = this.Path,
             Tags = this.Tags
         };
-
         object ICloneable.Clone() => this.Clone();
 
-        internal async Task LaunchAsync()
+        public async Task LaunchAsync()
         {
             await Task.Run(() =>
             {

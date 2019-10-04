@@ -4,13 +4,16 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Windows;
 
 namespace ManagementUI
 {
     [Serializable]
+    [JsonObject(MemberSerialization.OptIn)]
     public class SettingsJson
     {
         private string _path;
@@ -31,6 +34,7 @@ namespace ManagementUI
         #endregion
 
         #region PUBLIC METHODS
+
         public static SettingsJson ReadFromFile(string path)
         {
             if (string.IsNullOrEmpty(path))
@@ -57,7 +61,7 @@ namespace ManagementUI
             sj._path = path;
             return sj;
         }
-
+        private void Settings_Changed(object sender, NotifyCollectionChangedEventArgs e) => this.WriteSettings();
         public void WriteSettings()
         {
             var resolver = new JsonSerializerSettings
@@ -94,6 +98,15 @@ namespace ManagementUI
                     e.Message,
                     string.Format("LOCALAPPDATA: {0}", dir1)),            
                     "ERROR", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext ctx)
+        {
+            if (this.Settings != null && this.Settings.Apps != null)
+            {
+                this.Settings.Apps.CollectionChanged += this.Settings_Changed;
             }
         }
 

@@ -11,7 +11,7 @@ using System.Windows.Data;
 namespace ManagementUI
 {
     /// <summary>
-    /// The base <see cref="List{T}"/> class for MUI cloneable items which supports attaching to <see cref="ListView"/> as an ItemsSource
+    /// The <see langword="abstract"/> base <see cref="List{T}"/> class for MUI cloneable items which supports attaching to <see cref="ListView"/> as an ItemsSource
     /// while also implementing <see cref="INotifyCollectionChanged"/>.
     /// </summary>
     /// <typeparam name="T"></typeparam>
@@ -39,18 +39,35 @@ namespace ManagementUI
         #endregion
 
         #region CONSTRUCTORS
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BaseMuiCollection{T}"/> class that is empty 
+        /// and has the default initial capacity.
+        /// </summary>
         public BaseMuiCollection()
         {
             InnerList = new List<T>();
             InnerView = CollectionViewSource.GetDefaultView(InnerList) as ListCollectionView;
             InnerView.IsLiveSorting = true;
         }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BaseMuiCollection{T}"/> class that is empty
+        /// and has the specified initial capacity.
+        /// </summary>
+        /// <param name="capacity">The number of elements that the new collection can initially store.</param>
+        /// <exception cref="ArgumentOutOfRangeException"/>
         public BaseMuiCollection(int capacity)
         {
             InnerList = new List<T>(capacity);
             InnerView = CollectionViewSource.GetDefaultView(InnerList) as ListCollectionView;
             InnerView.IsLiveSorting = true;
         }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BaseMuiCollection{T}"/> class that
+        /// contains elements copied from the specified <see cref="IEnumerable{T}"/> and has
+        /// sufficient capacity to accommodate the number of elements copied.
+        /// </summary>
+        /// <param name="items">The collection whose elements are copied to the new list.</param>
+        /// <exception cref="ArgumentNullException"/>
         public BaseMuiCollection(IEnumerable<T> items)
         {
             InnerList = new List<T>(items);
@@ -96,18 +113,37 @@ namespace ManagementUI
         #endregion
 
         #region BASE METHODS
+        /// <summary>
+        /// Adds an item to end of the collection and triggers a collection changed event.
+        /// </summary>
+        /// <param name="item">The object to be added to the end of the collection.</param>
+        /// <exception cref="ArgumentNullException"/>
         public void Add(T item)
         {
+            if (item == null)
+                throw new ArgumentNullException("item");
+
             InnerList.Add(item);
             this.OnCollectionChanged(NotifyCollectionChangedAction.Add, item);
         }
+        /// <summary>
+        /// Adds the elements of the specified <see cref="IEnumerable{T}"/> to the end of the collection.
+        /// </summary>
+        /// <param name="apps">The collection whose elements should be added to the end of this collection.  The collection
+        /// itself cannot be null, but it can contain elements that are null if <see cref="T"/> is a reference type.</param>
+        /// <param name="notify">Indicates whether to trigger a collection changed event.</param>
+        /// <exception cref="ArgumentNullException"/>
         public void AddRange(IEnumerable<T> apps, bool notify = true)
         {
+            if (apps == null)
+                throw new ArgumentNullException("apps");
+
             var listOfItems = apps.ToList();
             InnerList.AddRange(listOfItems);
             if (notify)
                 this.OnCollectionChanged(NotifyCollectionChangedAction.Add, listOfItems);
         }
+
         public void Clear()
         {
             var oldItems = InnerList.ToList();

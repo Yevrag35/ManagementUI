@@ -21,10 +21,10 @@ namespace ManagementUI
 
         private void LoadIcons(IntPtr windowHandle, SettingsJson settings, out AppListCollection outList)
         {
-            outList = new AppListCollection(settings.Settings.Icons.Count);
-            for (int i = 0; i < settings.Settings.Icons.Count; i++)
+            outList = new AppListCollection(settings.Settings.Apps.Count);
+            for (int i = 0; i < settings.Settings.Apps.Count; i++)
             {
-                AppIconSetting app = settings.Settings.Icons[i];
+                AppIconSetting app = settings.Settings.Apps[i];
                 AppListItem ali = app.ToListItem(App.MyHandle);
                 if (!string.IsNullOrEmpty(app.Arguments))
                 {

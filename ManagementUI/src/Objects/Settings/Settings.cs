@@ -8,34 +8,25 @@ using System.Linq;
 namespace ManagementUI
 {
     [Serializable]
+    [JsonObject(MemberSerialization.OptIn)]
     public class Settings
     {
-        #region FIELDS/CONSTANTS
-
-
-        #endregion
-
         #region PROPERTIES
         [JsonProperty("icons")]
-        public List<AppIconSetting> Icons { get; set; }
+        public AppSettingCollection Apps { get; set; }
 
         #endregion
 
         #region CONSTRUCTORS
-        public Settings() { }
+        public Settings() => Apps = new AppSettingCollection();
 
         #endregion
 
         #region PUBLIC METHODS
         public AppIconSetting SettingFromIcon(AppListItem ali)
         {
-            return this.Icons.Find(x => x.Name.Equals(ali.AppName) && x.Path.Equals(ali.Path));
+            return this.Apps.Find(x => x.Name.Equals(ali.AppName) && x.Path.Equals(ali.Path));
         }
-
-        #endregion
-
-        #region BACKEND/PRIVATE METHODS
-
 
         #endregion
     }
