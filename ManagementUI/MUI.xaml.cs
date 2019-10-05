@@ -360,8 +360,10 @@ namespace ManagementUI
                     list.Add(ft.Tag);
             }
 
-            this.AppListView.Items.Filter = x => x is AppListItem ali && list.TrueForAll(
-                t => ali.TagList.Contains(t));
+            this.AppListView.Items.Filter = x => x is AppListItem ali && 
+                ali.TagList != null &&
+                list.TrueForAll(
+                    t => ali.TagList.Contains(t));
         }
 
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
@@ -373,8 +375,10 @@ namespace ManagementUI
                     list.Add(ft.Tag);
             }
 
-            this.AppListView.Items.Filter = x => x is AppListItem ali && list.TrueForAll(
-                t => ali.TagList.Contains(t));
+            this.AppListView.Items.Filter = x => x is AppListItem ali &&
+                ali.TagList != null &&
+                list.TrueForAll(
+                    t => ali.TagList.Contains(t));
         }
     }
 }

@@ -25,6 +25,10 @@ namespace ManagementUI
         {
             this.AllTags = new TagCollection(currentTags);
             this.Application = ali;
+
+            if (this.Application.TagList == null)
+                this.Application.TagList = new List<string>();
+
             this.Available = new TagCollection(this.AllTags.FindAll(x => !this.Application.TagList.Contains(x.Tag)));
             this.Available.CollectionChanged += this.OnAvailableTag_Changed;
 
