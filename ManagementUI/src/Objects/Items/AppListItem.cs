@@ -31,6 +31,7 @@ namespace ManagementUI
         public string Path { get; set; }
         public string Arguments { get; set; }
         public BitmapSource Image { get; set; }
+        public bool IsChecked { get; set; }
         public string Tags
         {
             get
