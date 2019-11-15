@@ -144,7 +144,7 @@ namespace ManagementUI
                         MUI.ShowErrorMessage(ex);
                     }
                 }
-            }); 
+            }).ConfigureAwait(false); 
         }
 
         [DllImport("gdi32.dll")]

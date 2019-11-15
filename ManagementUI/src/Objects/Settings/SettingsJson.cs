@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using MG.Settings.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
@@ -14,7 +15,7 @@ namespace ManagementUI
 {
     [Serializable]
     [JsonObject(MemberSerialization.OptIn)]
-    public class SettingsJson
+    public class SettingsJson : JsonSettingsManager
     {
         private string _path;
 
@@ -29,7 +30,8 @@ namespace ManagementUI
         #endregion
 
         #region CONSTRUCTORS
-        public SettingsJson() { }
+        public SettingsJson() : base() { }
+        public SettingsJson(string filePath) : base(filePath) { }
 
         #endregion
 

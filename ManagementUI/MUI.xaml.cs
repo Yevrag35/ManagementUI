@@ -65,7 +65,7 @@ namespace ManagementUI
                     App.JsonSettings.Settings.Apps.RemoveAt(index);
                     App.JsonSettings.WriteSettings();
                 }
-            });
+            }).ConfigureAwait(false);
             await this.Dispatcher.InvokeAsync(() =>
             {
                 ((MUI)Application.Current.MainWindow).AppList.UpdateView();
@@ -240,7 +240,7 @@ namespace ManagementUI
 
         #endregion
 
-        private void NewAppButton_Click(object sender, RoutedEventArgs e)
+        private async void NewAppButton_Click(object sender, RoutedEventArgs e)
         {
             var newApp = new NewApp
             {
@@ -249,20 +249,20 @@ namespace ManagementUI
             bool? result = newApp.ShowDialog();
             if (result.HasValue && result.Value)
             {
-                this.WriteAppToFile(newApp.CreatedApp);
+                await this.WriteAppToFile(newApp.CreatedApp);
                 AppListItem ali = newApp.CreatedApp.ToListItem(App.MyHandle);
                 AppList.Add(ali);
             }
         }
 
-        private async void WriteAppToFile(AppIconSetting ais)
+        private async Task WriteAppToFile(AppIconSetting ais)
         {
             await Task.Run(() =>
             {
                 App.JsonSettings.Settings.Apps.Add(ais);
                 App.JsonSettings.Settings.Apps.Sort(new AppSettingCollection.AppIconSettingDefaultSorter());
                 App.JsonSettings.WriteSettings();
-            });
+            }).ConfigureAwait(false);
         }
 
         private async void ALMIRemove_Click(object sender, RoutedEventArgs e)
