@@ -65,18 +65,40 @@ namespace ManagementUI
             sj._path = path;
             return sj;
         }
-        private void Settings_Changed(object sender, NotifyCollectionChangedEventArgs e) => this.WriteSettings();
-        public void WriteSettings()
+        private void Settings_Changed(object sender, NotifyCollectionChangedEventArgs e) => this.Save();
+        //public void WriteSettings()
+        //{
+        //    var resolver = new JsonSerializerSettings
+        //    {
+        //        Formatting = Formatting.Indented,
+        //        NullValueHandling = NullValueHandling.Include,
+        //        DefaultValueHandling = DefaultValueHandling.Include
+        //    };
+        //    resolver.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy()));
+        //    string jsonStr = JsonConvert.SerializeObject(this, resolver);
+        //    File.WriteAllText(_path, jsonStr);
+        //}
+
+        public void Save(SettingChangedAction action = SettingChangedAction.Save)
         {
-            var resolver = new JsonSerializerSettings
+            using (StreamWriter streamWriter = new StreamWriter(this.FilePath))
             {
-                Formatting = Formatting.Indented,
-                NullValueHandling = NullValueHandling.Include,
-                DefaultValueHandling = DefaultValueHandling.Include
-            };
-            resolver.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy()));
-            string jsonStr = JsonConvert.SerializeObject(this, resolver);
-            File.WriteAllText(_path, jsonStr);
+                using (var writer = new JsonTextWriter(streamWriter)
+                {
+                    AutoCompleteOnClose = true,
+                    CloseOutput = true,
+                    DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                    DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+                    Formatting = Formatting.Indented,
+                    IndentChar = char.Parse("\t"),
+                    Indentation = 1
+                })
+                {
+                    ((IJsonSettings)this).SettingsAsJson.WriteTo(writer, new StringEnumConverter(new CamelCaseNamingStrategy()));
+                }
+            }
+
+            base.OnSettingsChanged(new SettingsChangedEventArgs(action));
         }
 
         #endregion

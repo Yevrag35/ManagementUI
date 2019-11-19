@@ -63,7 +63,7 @@ namespace ManagementUI
                         .FindIndex(x => alis
                             .Any(ali => ali.AppName.Equals(x.Name)));
                     App.JsonSettings.Settings.Apps.RemoveAt(index);
-                    App.JsonSettings.WriteSettings();
+                    App.JsonSettings.Save();
                 }
             }).ConfigureAwait(false);
             await this.Dispatcher.InvokeAsync(() =>
@@ -261,7 +261,7 @@ namespace ManagementUI
             {
                 App.JsonSettings.Settings.Apps.Add(ais);
                 App.JsonSettings.Settings.Apps.Sort(new AppSettingCollection.AppIconSettingDefaultSorter());
-                App.JsonSettings.WriteSettings();
+                App.JsonSettings.Save();
             }).ConfigureAwait(false);
         }
 
@@ -346,7 +346,7 @@ namespace ManagementUI
                     {
                         ((MUI)Application.Current.MainWindow).AppListView.Items.Refresh();
                     });
-                    App.JsonSettings.WriteSettings();
+                    App.JsonSettings.Save();
                 }
             }
         }
