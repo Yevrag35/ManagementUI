@@ -71,7 +71,7 @@ namespace ManagementUI
                     CreatedApp.Arguments = this.argumentsBox.Text;
 
                 if (!string.IsNullOrEmpty((string)this.findIconLbl.Content))
-                    CreatedApp.Path = this.findIconLbl.Content as string;
+                    CreatedApp.IconPath = this.findIconLbl.Content as string;
 
                 CreatedApp.Index = !string.IsNullOrEmpty(this.iconIndexBox.Text)
                     ? Convert.ToInt32(this.iconIndexBox.Text)

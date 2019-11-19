@@ -26,7 +26,7 @@ namespace ManagementUI
         #region PUBLIC METHODS
         public AppIconSetting SettingFromIcon(AppListItem ali)
         {
-            return this.Apps.Find(x => x.Name.Equals(ali.AppName) && x.Path.Equals(ali.Path));
+            return this.Apps.Find(x => x.Name.Equals(ali.AppName) && x.IconPath.Equals(ali.Path));
         }
 
         #endregion

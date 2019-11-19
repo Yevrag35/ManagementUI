@@ -246,7 +246,7 @@
                     <GridView>
                         <GridView.Columns>
                             <GridViewColumn Header="" CellTemplate="{StaticResource CellTemplate}" />
-                            <GridViewColumn Header="Application Name" DisplayMemberBinding="{Binding Path=AppName}" 
+                            <GridViewColumn Header="Application Name" DisplayMemberBinding="{Binding Path=Name}" 
                                             ctrl:ProportionalColumn.Width="1"/>
                             <!--<GridViewColumn Header="Tags" DisplayMemberBinding="{Binding Path=Tags}"
                                             ctrl:FixedColumn.Width="300"/>-->

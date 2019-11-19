@@ -37,51 +37,39 @@ namespace ManagementUI
 
         #region PUBLIC METHODS
 
-        public static SettingsJson ReadFromFile(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-                throw new ArgumentNullException("Path cannot be null.");
-
-            if (!File.Exists(path))
-            {
-                CreateAppFolders();
-                var job = new JObject
-                {
-                    JValue.CreateComment("Reserved for later use."),
-                    new JProperty("version", "1.0"),
-                    JValue.CreateComment("Possible enumeration values are: [ \"notepad\", \"notepadplusplus\", \"vscode\" ]"),
-                    new JProperty("editor", "notepad"),
-                    new JProperty("settings", new JObject
-                    {
-                        new JProperty("icons", new JArray())
-                    })
-                };
-                File.WriteAllText(path, job.ToString());
-            }
-            string text = File.ReadAllText(path);
-            var resolver = new JsonSerializerSettings();
-            resolver.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy()));
-            SettingsJson sj = JsonConvert.DeserializeObject<SettingsJson>(text, resolver);
-            sj._path = path;
-            return sj;
-        }
-        private void Settings_Changed(object sender, NotifyCollectionChangedEventArgs e) => this.Save();
-        //public void WriteSettings()
+        //public static SettingsJson ReadFromFile(string path)
         //{
-        //    var resolver = new JsonSerializerSettings
+        //    if (string.IsNullOrEmpty(path))
+        //        throw new ArgumentNullException("Path cannot be null.");
+
+        //    if (!File.Exists(path))
         //    {
-        //        Formatting = Formatting.Indented,
-        //        NullValueHandling = NullValueHandling.Include,
-        //        DefaultValueHandling = DefaultValueHandling.Include
-        //    };
+        //        CreateAppFolders();
+        //        var job = new JObject
+        //        {
+        //            JValue.CreateComment("Reserved for later use."),
+        //            new JProperty("version", "1.0"),
+        //            JValue.CreateComment("Possible enumeration values are: [ \"notepad\", \"notepadplusplus\", \"vscode\" ]"),
+        //            new JProperty("editor", "notepad"),
+        //            new JProperty("settings", new JObject
+        //            {
+        //                new JProperty("icons", new JArray())
+        //            })
+        //        };
+        //        File.WriteAllText(path, job.ToString());
+        //    }
+        //    string text = File.ReadAllText(path);
+        //    var resolver = new JsonSerializerSettings();
         //    resolver.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy()));
-        //    string jsonStr = JsonConvert.SerializeObject(this, resolver);
-        //    File.WriteAllText(_path, jsonStr);
+        //    SettingsJson sj = JsonConvert.DeserializeObject<SettingsJson>(text, resolver);
+        //    sj._path = path;
+        //    return sj;
         //}
+        private void Settings_Changed(object sender, NotifyCollectionChangedEventArgs e) => this.Save();
 
         public void Save(SettingChangedAction action = SettingChangedAction.Save)
         {
-            using (StreamWriter streamWriter = new StreamWriter(this.FilePath))
+            using (var streamWriter = new StreamWriter(this.FilePath))
             {
                 using (var writer = new JsonTextWriter(streamWriter)
                 {
@@ -104,28 +92,28 @@ namespace ManagementUI
         #endregion
 
         #region BACKEND/PRIVATE METHODS
-        private static void CreateAppFolders()
-        {
-            string dir1 = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            try
-            {
-                string dir2 = dir1 + "\\Mike Garvey";
-                string dir3 = dir2 + "\\ManagementUI";
-                Directory.CreateDirectory(dir1);
-                Directory.CreateDirectory(dir2);
-                Directory.CreateDirectory(dir3);
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(string.Format(
-                    "An error occurred: {0}{1}{1}{2}{1}{1}{3}",
-                    e.GetType().FullName,
-                    Environment.NewLine,
-                    e.Message,
-                    string.Format("LOCALAPPDATA: {0}", dir1)),            
-                    "ERROR", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
+        //private static void CreateAppFolders()
+        //{
+        //    string dir1 = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        //    try
+        //    {
+        //        string dir2 = dir1 + "\\Mike Garvey";
+        //        string dir3 = dir2 + "\\ManagementUI";
+        //        Directory.CreateDirectory(dir1);
+        //        Directory.CreateDirectory(dir2);
+        //        Directory.CreateDirectory(dir3);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        MessageBox.Show(string.Format(
+        //            "An error occurred: {0}{1}{1}{2}{1}{1}{3}",
+        //            e.GetType().FullName,
+        //            Environment.NewLine,
+        //            e.Message,
+        //            string.Format("LOCALAPPDATA: {0}", dir1)),            
+        //            "ERROR", MessageBoxButton.OK, MessageBoxImage.Error);
+        //    }
+        //}
 
         [OnDeserialized]
         private void OnDeserialized(StreamingContext ctx)

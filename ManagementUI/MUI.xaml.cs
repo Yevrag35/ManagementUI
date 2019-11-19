@@ -21,9 +21,9 @@ namespace ManagementUI
     public partial class MUI : Window
     {
         internal static NetworkCredential Creds { get; set; }
-        private AppListCollection AppList { get; set; }
-        internal IEnumerable<string> AllTags => AppList != null
-            ? AppList.Where(x => x.TagList != null).SelectMany(x => x.TagList).Distinct()
+        private AppSettingCollection AppList { get; set; }
+        internal IEnumerable<string> AllTags => this.AppList != null
+            ? AppList.Where(x => x.Tags != null).SelectMany(x => x.Tags).Distinct()
             : null;
 
         public MUI() => InitializeComponent();
@@ -40,8 +40,12 @@ namespace ManagementUI
         {
             this.IdentityBlock.Text = WindowsIdentity.GetCurrent().Name;
             App.MyHandle = new WindowInteropHelper(this).Handle;
-            this.LoadIcons(App.MyHandle, App.JsonSettings, out AppListCollection outList);
-            this.AppList = outList;
+
+            this.AppList = App.JsonSettings.Settings.Apps;
+            this.AppListView.ItemsSource = this.AppList.View;
+
+            //this.LoadIcons(App.JsonSettings, out AppListCollection outList);
+            //this.AppList = outList;
             this.AppList.CollectionChanged += this.AppList_Changed;
             string[] tags = this.AppList.Tags;
             for (int i = 0; i < tags.Length; i++)
@@ -58,10 +62,10 @@ namespace ManagementUI
             {
                 if (e.Action == NotifyCollectionChangedAction.Remove)
                 {
-                    IEnumerable<AppListItem> alis = e.OldItems.Cast<AppListItem>();
+                    IEnumerable<AppIconSetting> alis = e.OldItems.Cast<AppIconSetting>();
                     int index = App.JsonSettings.Settings.Apps
                         .FindIndex(x => alis
-                            .Any(ali => ali.AppName.Equals(x.Name)));
+                            .Any(ali => ali.Name.Equals(x.Name)));
                     App.JsonSettings.Settings.Apps.RemoveAt(index);
                     App.JsonSettings.Save();
                 }
@@ -186,20 +190,12 @@ namespace ManagementUI
 
         private void SettingsUpdateBtn_Click(object sender, RoutedEventArgs e)
         {
-            string path = Environment.GetEnvironmentVariable("LOCALAPPDATA") + "\\Mike Garvey\\ManagementUI\\settings.json";
-            SettingsJson old = App.JsonSettings;
-            SettingsJson newJson = SettingsJson.ReadFromFile(path);
-            App.JsonSettings = newJson;
-            if (AppList.Count != newJson.Settings.Apps.Count)
-            {
-                this.LoadIcons(App.MyHandle, newJson, out AppListCollection list);
-                this.AppList = list;
-            }
+            App.JsonSettings.Read(MG.Settings.Json.SettingChangedAction.Reload);
         }
 
         private async void ListViewItem_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (sender is ListViewItem lvi && lvi.DataContext is AppListItem ali)
+            if (sender is ListViewItem lvi && lvi.DataContext is AppIconSetting ali)
             {
                 await ali.LaunchAsync();
             }
@@ -250,8 +246,7 @@ namespace ManagementUI
             if (result.HasValue && result.Value)
             {
                 await this.WriteAppToFile(newApp.CreatedApp);
-                AppListItem ali = newApp.CreatedApp.ToListItem(App.MyHandle);
-                AppList.Add(ali);
+                AppList.Add(newApp.CreatedApp);
             }
         }
 
@@ -268,7 +263,7 @@ namespace ManagementUI
         private async void ALMIRemove_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem mi && mi.DataContext is MUI mui &&
-                mui.AppListView.SelectedItem is AppListItem ali)
+                mui.AppListView.SelectedItem is AppIconSetting ali)
             {
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -284,7 +279,7 @@ namespace ManagementUI
                 var click = new RoutedEventArgs(Button.ClickEvent);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    var ali = ((MUI)Application.Current.MainWindow).AppListView.SelectedItem as AppListItem;
+                    var ali = ((MUI)Application.Current.MainWindow).AppListView.SelectedItem as AppIconSetting;
                     ((MUI)Application.Current.MainWindow).AppList.Remove(ali);
                 });
             }
@@ -360,10 +355,12 @@ namespace ManagementUI
                     list.Add(ft.Tag);
             }
 
-            this.AppListView.Items.Filter = x => x is AppListItem ali && 
-                ali.TagList != null &&
-                list.TrueForAll(
-                    t => ali.TagList.Contains(t));
+            this.AppListView.Items.Filter = x => 
+                list.Count <= 0 ||
+                    (x is AppIconSetting ali && 
+                    ali.Tags != null &&
+                    list.TrueForAll(
+                        t => ali.Tags.Contains(t)));
         }
 
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
@@ -375,10 +372,12 @@ namespace ManagementUI
                     list.Add(ft.Tag);
             }
 
-            this.AppListView.Items.Filter = x => x is AppListItem ali &&
-                ali.TagList != null &&
-                list.TrueForAll(
-                    t => ali.TagList.Contains(t));
+            this.AppListView.Items.Filter = x => 
+                list.Count <= 0 || (
+                    x is AppIconSetting ali &&
+                    ali.Tags != null &&
+                    list.TrueForAll(
+                        t => ali.Tags.Contains(t)));
         }
     }
 }

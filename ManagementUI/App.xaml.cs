@@ -27,7 +27,6 @@ namespace ManagementUI
             JsonSettings.Read();
             var main = new MUI();
             main.Show();
-            
         }
     }
 }
