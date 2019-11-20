@@ -13,7 +13,7 @@ namespace ManagementUI
     public class Settings
     {
         #region PROPERTIES
-        [JsonProperty("icons")]
+        [JsonProperty("apps")]
         public AppSettingCollection Apps { get; set; }
 
         #endregion

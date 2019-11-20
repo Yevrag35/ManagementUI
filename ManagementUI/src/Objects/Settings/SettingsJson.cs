@@ -17,7 +17,6 @@ namespace ManagementUI
     [JsonObject(MemberSerialization.OptIn)]
     public class SettingsJson : JsonSettingsManager
     {
-        private string _path;
 
         #region PROPERTIES
         [JsonProperty("version")]
@@ -36,35 +35,6 @@ namespace ManagementUI
         #endregion
 
         #region PUBLIC METHODS
-
-        //public static SettingsJson ReadFromFile(string path)
-        //{
-        //    if (string.IsNullOrEmpty(path))
-        //        throw new ArgumentNullException("Path cannot be null.");
-
-        //    if (!File.Exists(path))
-        //    {
-        //        CreateAppFolders();
-        //        var job = new JObject
-        //        {
-        //            JValue.CreateComment("Reserved for later use."),
-        //            new JProperty("version", "1.0"),
-        //            JValue.CreateComment("Possible enumeration values are: [ \"notepad\", \"notepadplusplus\", \"vscode\" ]"),
-        //            new JProperty("editor", "notepad"),
-        //            new JProperty("settings", new JObject
-        //            {
-        //                new JProperty("icons", new JArray())
-        //            })
-        //        };
-        //        File.WriteAllText(path, job.ToString());
-        //    }
-        //    string text = File.ReadAllText(path);
-        //    var resolver = new JsonSerializerSettings();
-        //    resolver.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy()));
-        //    SettingsJson sj = JsonConvert.DeserializeObject<SettingsJson>(text, resolver);
-        //    sj._path = path;
-        //    return sj;
-        //}
         private void Settings_Changed(object sender, NotifyCollectionChangedEventArgs e) => this.Save();
 
         public void Save(SettingChangedAction action = SettingChangedAction.Save)
