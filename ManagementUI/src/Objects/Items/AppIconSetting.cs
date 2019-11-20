@@ -21,11 +21,11 @@ namespace ManagementUI
 {
     [Serializable]
     [JsonObject(MemberSerialization.OptIn)]
-    public class AppIconSetting : ICloneable
+    public class AppIconSetting : ICloneable, IComparable<AppIconSetting>
     {
-        private const string MMC = "MMC";
-        private const string MMC_EXE = "\\mmc.exe";
-        private static readonly string MMC_PATH = Environment.GetFolderPath(Environment.SpecialFolder.System) + MMC_EXE;
+        //private const string MMC = "MMC";
+        //private const string MMC_EXE = "\\mmc.exe";
+        //private static readonly string MMC_PATH = Environment.GetFolderPath(Environment.SpecialFolder.System) + MMC_EXE;
 
         #region PROPERTIES
         [JsonProperty("arguments")]
@@ -71,7 +71,6 @@ namespace ManagementUI
 
             return retval;
         }
-
         public AppIconSetting Clone() => new AppIconSetting
         {
             Arguments = this.Arguments,
@@ -82,7 +81,7 @@ namespace ManagementUI
             Tags = this.Tags
         };
         object ICloneable.Clone() => this.Clone();
-
+        public int CompareTo(AppIconSetting other) => this.Name.CompareTo(other.Name);
         public void FinalizeObject()
         {
             IntPtr appHandle = ExtractIconA(App.MyHandle, this.IconPath, Convert.ToUInt32(this.Index));
@@ -98,7 +97,6 @@ namespace ManagementUI
 
             this.Image = this.Bitmap2BitmapImage(appIcon.ToBitmap());
         }
-
         public async Task LaunchAsync()
         {
             await Task.Run(() =>
@@ -143,23 +141,6 @@ namespace ManagementUI
                 }
             }).ConfigureAwait(false);
         }
-
-        //public static AppIconSetting NewMmcTemplate() => new AppIconSetting
-        //{
-        //    ExePath = MMC_PATH,
-        //    Tags = new List<string>(new string[1] { MMC })
-        //};
-        //public ProcessStartInfo NewStartInfo()
-        //{
-        //    return new ProcessStartInfo
-        //    {
-        //        Arguments = this.Arguments,
-        //        CreateNoWindow = true,
-        //        FileName = this.Path,
-        //        UseShellExecute = false
-        //    };
-        //}
-
         [OnDeserialized]
         private void OnDeserialized(StreamingContext context)
         {
@@ -169,27 +150,13 @@ namespace ManagementUI
             }
         }
 
-        public AppListItem ToListItem(IntPtr handle)
-        {
-            if (string.IsNullOrEmpty(this.IconPath))
-                this.IconPath = this.ExePath;
-
-            var ali = new AppListItem(this.Name, handle, this.IconPath, this.ExePath, this.Index);
-
-            if (this.Tags != null && this.Tags.Count > 0)
-                ali.TagList = this.Tags;
-
-            return ali;
-        }
-
         [DllImport("gdi32.dll")]
         public static extern bool DeleteObject(IntPtr hObject);
 
         [DllImport("shell32.dll")]
         internal static extern IntPtr ExtractIconA(IntPtr hInst, string pszExeFileName, uint nIconIndex);
+        
 
         #endregion
     }
-
-    
 }

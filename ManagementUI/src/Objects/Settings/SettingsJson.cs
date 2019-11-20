@@ -46,7 +46,7 @@ namespace ManagementUI
         #endregion
 
         #region PUBLIC METHODS
-        private void Settings_Changed(object sender, NotifyCollectionChangedEventArgs e) => this.Save();
+        //private void Settings_Changed(object sender, NotifyCollectionChangedEventArgs e) => this.Save();
 
         public void Save(SettingChangedAction action = SettingChangedAction.Save)
         {
@@ -119,14 +119,14 @@ namespace ManagementUI
             }
         }
 
-        [OnDeserialized]
-        private void OnDeserialized(StreamingContext ctx)
-        {
-            if (this.Settings != null && this.Settings.Apps != null)
-            {
-                this.Settings.Apps.CollectionChanged += this.Settings_Changed;
-            }
-        }
+        //[OnDeserialized]
+        //private void OnDeserialized(StreamingContext ctx)
+        //{
+        //    if (this.Settings != null && this.Settings.Apps != null)
+        //    {
+        //        this.Settings.Apps.CollectionChanged += this.Settings_Changed;
+        //    }
+        //}
 
         private void Save(JObject saveThis, SettingChangedAction action)
         {
@@ -144,6 +144,8 @@ namespace ManagementUI
                 })
                 {
                     saveThis.WriteTo(writer, new StringEnumConverter(new CamelCaseNamingStrategy()));
+                    streamWriter.Flush();
+                    streamWriter.Close();
                 }
             }
 

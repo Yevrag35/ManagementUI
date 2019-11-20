@@ -56,25 +56,26 @@ namespace ManagementUI
             }
         }
 
-        private async void AppList_Changed(object sender, NotifyCollectionChangedEventArgs e)
+        private void AppList_Changed(object sender, NotifyCollectionChangedEventArgs e)
         {
-            await Task.Run(() =>
+            //await Task.Run(() =>
+            //{
+            if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                if (e.Action == NotifyCollectionChangedAction.Remove)
-                {
-                    IEnumerable<AppIconSetting> alis = e.OldItems.Cast<AppIconSetting>();
-                    int index = App.JsonSettings.Settings.Apps
-                        .FindIndex(x => alis
-                            .Any(ali => ali.Name.Equals(x.Name)));
-                    App.JsonSettings.Settings.Apps.RemoveAt(index);
-                    App.JsonSettings.Save();
-                }
-            }).ConfigureAwait(false);
-            await this.Dispatcher.InvokeAsync(() =>
+                IEnumerable<AppIconSetting> alis = e.OldItems.Cast<AppIconSetting>();
+                int removed = App.JsonSettings.Settings.Apps.RemoveAll(app => alis.Contains(app));
+            }
+            //}).ConfigureAwait(false);
+            this.Dispatcher.Invoke(() =>
             {
                 ((MUI)Application.Current.MainWindow).AppList.UpdateView();
                 ((MUI)Application.Current.MainWindow).AppListView.Items.Refresh();
             });
+            App.JsonSettings.Save();
+            //await this.Dispatcher.InvokeAsync(() =>
+            //{
+
+            //});
         }
 
         private async void CredButton_Click(object sender, RoutedEventArgs e)
@@ -236,7 +237,7 @@ namespace ManagementUI
 
         #endregion
 
-        private async void NewAppButton_Click(object sender, RoutedEventArgs e)
+        private void NewAppButton_Click(object sender, RoutedEventArgs e)
         {
             var newApp = new NewApp
             {
@@ -245,20 +246,20 @@ namespace ManagementUI
             bool? result = newApp.ShowDialog();
             if (result.HasValue && result.Value)
             {
-                await this.WriteAppToFile(newApp.CreatedApp);
+                //await this.WriteAppToFile(newApp.CreatedApp);
                 AppList.Add(newApp.CreatedApp);
             }
         }
 
-        private async Task WriteAppToFile(AppIconSetting ais)
-        {
-            await Task.Run(() =>
-            {
-                App.JsonSettings.Settings.Apps.Add(ais);
-                App.JsonSettings.Settings.Apps.Sort(new AppSettingCollection.AppIconSettingDefaultSorter());
-                App.JsonSettings.Save();
-            }).ConfigureAwait(false);
-        }
+        //private async Task WriteAppToFile(AppIconSetting ais)
+        //{
+        //    await Task.Run(() =>
+        //    {
+        //        App.JsonSettings.Settings.Apps.Add(ais);
+        //        App.JsonSettings.Settings.Apps.Sort(new AppSettingCollection.AppIconSettingDefaultSorter());
+        //        App.JsonSettings.Save();
+        //    }).ConfigureAwait(false);
+        //}
 
         private async void ALMIRemove_Click(object sender, RoutedEventArgs e)
         {
