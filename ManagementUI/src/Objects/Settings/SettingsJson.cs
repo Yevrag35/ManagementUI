@@ -17,8 +17,12 @@ namespace ManagementUI
     [JsonObject(MemberSerialization.OptIn)]
     public class SettingsJson : JsonSettingsManager
     {
+        
 
         #region PROPERTIES
+        [JsonProperty("$schema")]
+        private const string SCHEMA = "https://json.yevrag35.com/uimanagement/v1.0.0/schema.json";
+
         [JsonProperty("version")]
         public string Version { get; set; }
         [JsonProperty("editor")]
@@ -73,7 +77,7 @@ namespace ManagementUI
         {
             return new JObject
             {
-                new JProperty("$schema", "https://json.yevrag35.com/uimanagement/v1.0.0/schema.json"),
+                new JProperty("$schema", SCHEMA),
                 new JProperty("version", "1.0"),
                 new JProperty("editor", SettingsLauncher.Notepad.ToString().ToLower()),
                 new JProperty("settings", new JObject
