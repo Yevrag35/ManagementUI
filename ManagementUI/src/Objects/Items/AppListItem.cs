@@ -22,7 +22,8 @@ namespace ManagementUI
     /// An individual item representing an app's logic and metadata to be 
     /// displayed in a <see cref="ListView"/>.  Using this class, the app can be launched.
     /// </summary>
-    public class AppListItem : ICloneable
+    [Obsolete]
+    public class AppListItem : ICloneable, IEquatable<AppListItem>
     {
         private string _tags;
 
@@ -101,6 +102,12 @@ namespace ManagementUI
             TagList = this.TagList
         };
         object ICloneable.Clone() => this.Clone();
+
+        public bool Equals(AppListItem other)
+        {
+            return this.Path.Equals(other.Path, StringComparison.CurrentCultureIgnoreCase) &&
+                this.Arguments.Equals(other.Arguments, StringComparison.CurrentCultureIgnoreCase);
+        }
 
         public async Task LaunchAsync()
         {

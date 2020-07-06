@@ -1,4 +1,5 @@
-﻿using MG.Settings.Json;
+﻿using ManagementUI.src.Objects.Collections;
+using MG.Settings.Json;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -14,20 +15,23 @@ namespace ManagementUI
     public class Settings
     {
         #region PROPERTIES
-        [JsonProperty("apps")]
-        public AppSettingCollection Apps { get; set; }
+        [JsonProperty("apps", DefaultValueHandling = DefaultValueHandling.Populate)]
+        public AppListViewCollection Apps { get; set; }
 
         #endregion
 
         #region CONSTRUCTORS
-        public Settings() => Apps = new AppSettingCollection();
+        [JsonConstructor]
+        public Settings() { }
 
         #endregion
 
         #region PUBLIC METHODS
+        [Obsolete]
         public AppIconSetting SettingFromIcon(AppListItem ali)
         {
-            return this.Apps.Find(x => x.Name.Equals(ali.AppName) && x.IconPath.Equals(ali.Path));
+            //return this.Apps.Find(x => x.Name.Equals(ali.AppName) && x.IconPath.Equals(ali.Path));
+            return null;
         }
 
         #endregion

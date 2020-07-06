@@ -80,7 +80,7 @@ namespace ManagementUI
             Tags = this.Tags
         };
         object ICloneable.Clone() => this.Clone();
-        public int CompareTo(AppIconSetting other) => this.Name.CompareTo(other.Name);
+        public int CompareTo(AppIconSetting other) => this.Name.ToLower().CompareTo(other.Name.ToLower());
         public void FinalizeObject()
         {
             IntPtr appHandle = ExtractIconA(App.MyHandle, this.IconPath, Convert.ToUInt32(this.Index));

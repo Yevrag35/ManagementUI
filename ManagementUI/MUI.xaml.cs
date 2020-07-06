@@ -1,4 +1,5 @@
 ﻿using ManagementUI.Auth;
+using ManagementUI.src.Objects.Collections;
 using Ookii.Dialogs.Wpf;
 using System;
 using System.Collections.Generic;
@@ -22,10 +23,9 @@ namespace ManagementUI
     public partial class MUI : Window
     {
         internal static ADCredential Creds { get; set; }
-        private AppSettingCollection AppList { get; set; }
-        internal IEnumerable<string> AllTags => this.AppList != null
-            ? AppList.Where(x => x.Tags != null).SelectMany(x => x.Tags).Distinct()
-            : null;
+        //private AppSettingCollection AppList { get; set; }
+        private AppListViewCollection AppList { get; set; }
+        internal IEnumerable<string> AllTags => this.AppList?.Tags;
 
         public MUI() => InitializeComponent();
 
@@ -45,37 +45,39 @@ namespace ManagementUI
             this.AppList = App.JsonSettings.Settings.Apps;
             this.AppListView.ItemsSource = this.AppList.View;
 
-            this.AppList.CollectionChanged += this.AppList_Changed;
-            string[] tags = this.AppList.Tags;
-            for (int i = 0; i < tags.Length; i++)
-            {
-                string tag = tags[i];
-                var ft = new FilterTag(tag, false);
-                this.FilterTags.Items.Add(ft);
-            }
+            //this.LoadIcons(App.JsonSettings, out AppListCollection outList);
+            //this.AppList = outList;
+            //this.AppList.CollectionChanged += this.AppList_Changed;
+            //string[] tags = this.AppList.Tags;
+            //for (int i = 0; i < tags.Length; i++)
+            //{
+            //    string tag = tags[i];
+            //    var ft = new FilterTag(tag, false);
+            //    this.FilterTags.Items.Add(ft);
+            //}
         }
 
-        private void AppList_Changed(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            //await Task.Run(() =>
-            //{
-            if (e.Action == NotifyCollectionChangedAction.Remove)
-            {
-                IEnumerable<AppIconSetting> alis = e.OldItems.Cast<AppIconSetting>();
-                int removed = App.JsonSettings.Settings.Apps.RemoveAll(app => alis.Contains(app));
-            }
-            //}).ConfigureAwait(false);
-            this.Dispatcher.Invoke(() =>
-            {
-                ((MUI)Application.Current.MainWindow).AppList.UpdateView();
-                ((MUI)Application.Current.MainWindow).AppListView.Items.Refresh();
-            });
-            App.JsonSettings.Save();
-            //await this.Dispatcher.InvokeAsync(() =>
-            //{
+        //private void AppList_Changed(object sender, NotifyCollectionChangedEventArgs e)
+        //{
+        //    //await Task.Run(() =>
+        //    //{
+        //    if (e.Action == NotifyCollectionChangedAction.Remove)
+        //    {
+        //        IEnumerable<AppIconSetting> alis = e.OldItems.Cast<AppIconSetting>();
+        //        int removed = App.JsonSettings.Settings.Apps.RemoveAll(app => alis.Contains(app));
+        //    }
+        //    //}).ConfigureAwait(false);
+        //    this.Dispatcher.Invoke(() =>
+        //    {
+        //        ((MUI)Application.Current.MainWindow).AppList.UpdateView();
+        //        ((MUI)Application.Current.MainWindow).AppListView.Items.Refresh();
+        //    });
+        //    App.JsonSettings.Save();
+        //    //await this.Dispatcher.InvokeAsync(() =>
+        //    //{
 
-            //});
-        }
+        //    //});
+        //}
 
         private void CredButton_Click(object sender, RoutedEventArgs e)
         {
