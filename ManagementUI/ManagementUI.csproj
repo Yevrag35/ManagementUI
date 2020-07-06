@@ -84,9 +84,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <None Include="EditTags.xaml.cs">
+    <Compile Include="EditTags.xaml.cs">
       <DependentUpon>EditTags.xaml</DependentUpon>
-    </None>
+    </Compile>
     <Compile Include="NewApp.xaml.cs">
       <DependentUpon>NewApp.xaml</DependentUpon>
     </Compile>
@@ -115,10 +115,10 @@
     <Compile Include="src\Objects\Settings\Settings.cs" />
     <Compile Include="src\Objects\Settings\SettingsEditor.cs" />
     <Compile Include="src\Objects\Settings\SettingsJson.cs" />
-    <None Include="EditTags.xaml">
+    <Page Include="EditTags.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </None>
+    </Page>
     <Page Include="MUI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

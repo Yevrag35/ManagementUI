@@ -1,13 +1,16 @@
 ﻿using ManagementUI.Editing;
+using ManagementUI.Extensions;
 using Microsoft.VisualBasic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace ManagementUI
@@ -17,6 +20,9 @@ namespace ManagementUI
     /// </summary>
     public partial class EditTags : Window
     {
+        public ICollectionView AppliedView { get; set; }
+        public ICollectionView AvailableView { get; set; }
+
         public HashSet<EditTagItem> AllTags { get; set; }
         //public TagCollection AllTags { get; set; }
         public HashSet<EditTagItem> Available { get; }
@@ -27,10 +33,26 @@ namespace ManagementUI
         public EditTags(AppIconSetting chosenApp, HashSet<FilterTag> allTags)
         {
             this.AllTags = new HashSet<EditTagItem>(allTags.Count);
+            this.Available = new HashSet<EditTagItem>(this.AllTags.Count);
+            this.Applied = new HashSet<EditTagItem>(this.AllTags.Count);
+            this.AppliedView = CollectionViewSource.GetDefaultView(this.AllTags);
+            this.AppliedView.SortDescriptions.Add<EditTagItem, string>(ListSortDirection.Ascending, x => x.Title);
+            this.AppliedView.Filter = x => x is EditTagItem eti && eti.Status == EditingStatus.Applied;
+
+            this.AvailableView = CollectionViewSource.GetDefaultView(this.AllTags);
+            this.AvailableView.SortDescriptions.Add<EditTagItem, string>(ListSortDirection.Ascending, x => x.Title);
+            this.AvailableView.Filter = x => x is EditTagItem eti && eti.Status == EditingStatus.Available;
+
             foreach (EditTagItem ft in allTags)
             {
-                //if (chosenApp.Tags.)
                 this.AllTags.Add(ft);
+            }
+
+            for (int i = 0; i < this.AllTags.Count; i++)
+            {
+                EditTagItem eti = this.AllTags.ElementAt(i);
+                if (chosenApp.Tags.Any(x => x.Tag.Equals(eti.Title)))
+                    eti.Status = EditingStatus.Applied;
             }
         }
 
@@ -103,14 +125,14 @@ namespace ManagementUI
             //this.Applied.Sort();
         }
 
-        private bool OnlyAvailable(object item)
-        {
-            //return item is FilterTag ft && !Application.TagList.Contains(ft.Tag);
-        }
-        private bool OnlyApplied(object item)
-        {
-            //return item is FilterTag ft && Application.TagList.Contains(ft.Tag);
-        }
+        //private bool OnlyAvailable(object item)
+        //{
+        //    //return item is FilterTag ft && !Application.TagList.Contains(ft.Tag);
+        //}
+        //private bool OnlyApplied(object item)
+        //{
+        //    //return item is FilterTag ft && Application.TagList.Contains(ft.Tag);
+        //}
 
         private void TextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -124,7 +146,7 @@ namespace ManagementUI
 
         private void RemoveTagBtn_Click(object sender, RoutedEventArgs e)
         {
-            foreach (FilterTag ft in this.AppliedTagsList.SelectedItems)
+            foreach (EditTagItem ft in this.AppliedTagsList.SelectedItems)
             {
                 this.Available.Add(ft);
             }
@@ -134,20 +156,24 @@ namespace ManagementUI
 
         private void ApplyTagBtn_Click(object sender, RoutedEventArgs e)
         {
-            foreach (FilterTag ft in this.AvailableTagsList.SelectedItems)
-            {
-                this.Applied.Add(ft);
-            }
+            //foreach (EditTagItem ft in this.AvailableTagsList.SelectedItems)
+            //{
+            //    this.Applied.Add(ft);
+            //}
+            //this.A
+            this.Applied.UnionWith(this.AvailableTagsList.SelectedItems as EditTagItem[]);
+            this.Available.SymmetricExceptWith(this.Applied);
 
-            this.AppliedTagsList.Items.Refresh();
-            this.AvailableTagsList.Items.Refresh();
+            //this.AppliedTagsList.Items.Refresh();
+            //this.AvailableTagsList.Items.Refresh();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (this.DialogResult.HasValue && this.DialogResult.Value)
             {
-                this.Application.Tags = this.Applied.ToList();
+                this.Application.Tags.Clear();
+                this.Application.Tags.UnionWith(this.Applied.Cast<FilterTag>());
             }
         }
 
@@ -166,10 +192,15 @@ namespace ManagementUI
             );
             if (!string.IsNullOrWhiteSpace(newTag) && newTag != "<new tag>")
             {
-                var ft = new FilterTag(newTag, false);
+                var ft = new EditTagItem
+                {
+                    IsChecked = false,
+                    Status = EditingStatus.Available,
+                    Title = newTag
+                };
                 this.AllTags.Add(ft);
-                ((ICollection<FilterTag>)this.Available).Add(ft);
-                this.AvailableTagsList.Items.Refresh();
+                this.Available.Add(ft);
+                //this.AvailableTagsList.Items.Refresh();
             }
         }
     }
