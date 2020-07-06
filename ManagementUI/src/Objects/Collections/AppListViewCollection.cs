@@ -11,11 +11,10 @@ namespace ManagementUI.src.Objects.Collections
 {
     public class AppListViewCollection : BaseViewCollection<AppIconSetting>, ICloneable
     {
-        private List<FilterTag> _allTags;
         //private IgnoreCaseEquality _ignoreCase;
         //public IEnumerable<FilterTag> Tags => base.Items.Where(x => x.Tags != null).SelectMany(x => x.Tags).Distinct();
-        public IReadOnlyList<FilterTag> Tags => _allTags;
-        public ListCollectionView TagView { get; }
+        public HashSet<FilterTag> Tags { get; }
+        public CollectionView TagView { get; }
 
         //internal AppListViewCollection()
         //    : base(ListSortDirection.Ascending, x => x.Name)
@@ -28,8 +27,8 @@ namespace ManagementUI.src.Objects.Collections
         internal AppListViewCollection(IEnumerable<AppIconSetting> items)
             : base(items, ListSortDirection.Ascending, x => x.Name)
         {
-            _allTags = new List<FilterTag>(base.Items.Where(x => x.Tags != null).SelectMany(x => x.Tags).Distinct());
-            this.TagView = CollectionViewSource.GetDefaultView(_allTags) as ListCollectionView;
+            this.Tags = new HashSet<FilterTag>(this.GetAllTags());
+            this.TagView = CollectionViewSource.GetDefaultView(this.Tags) as CollectionView;
             this.TagView.SortDescriptions.Add<FilterTag, string>(ListSortDirection.Ascending, x => x.Tag);
         }
 
@@ -43,5 +42,15 @@ namespace ManagementUI.src.Objects.Collections
             return col;
         }
         object ICloneable.Clone() => this.Clone();
+
+        internal IEnumerable<FilterTag> GetAllTags()
+        {
+            return base.Items.Where(x => x.Tags != null).SelectMany(x => x.Tags);
+        }
+        internal void RegenerateTagView()
+        {
+            this.Tags.Clear();
+            this.Tags.UnionWith(this.GetAllTags());
+        }
     }
 }
