@@ -9,7 +9,7 @@ using System.Security;
 
 namespace ManagementUI.Auth
 {
-    public class ADCredential : ICredentials, IStartInfoGenerator
+    public class ADCredential : ICredentials, ICreatesProcessStartInfo
     {
         private const string LDAP_DSE = "LDAP://{0}/RootDSE";
 
@@ -57,6 +57,15 @@ namespace ManagementUI.Auth
             if (!string.IsNullOrWhiteSpace(_netCreds.Domain))
                 psi.Domain = _netCreds.Domain;
 
+            return psi;
+        }
+        public ProcessStartInfo NewStartInfo(string filePath, bool runAs, bool useShellExecute)
+        {
+            ProcessStartInfo psi = this.NewStartInfo(filePath);
+            if (runAs)
+                psi.Verb = "RunAs";
+
+            psi.UseShellExecute = useShellExecute;
             return psi;
         }
         private (string, string) SeparateDomainAndUser(string combined)

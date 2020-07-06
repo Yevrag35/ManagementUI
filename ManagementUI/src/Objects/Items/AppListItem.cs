@@ -106,24 +106,20 @@ namespace ManagementUI
         {
             await Task.Run(() =>
             {
-                var psi = new ProcessStartInfo
-                {
-                    FileName = this.Path,
-                    CreateNoWindow = true,
-                    Verb = "runas",
-                    UseShellExecute = !MUI.IsElevated()
-                };
-                if (MUI.Creds != null)
-                {
-                    psi = MUI.Creds.NewStartInfo(this.Path);
-                    psi.Verb = "runas";
-                    psi.UseShellExecute = !MUI.IsElevated();
-                    //if (!string.IsNullOrEmpty(MUI.Creds.Domain))
-                    //    psi.Domain = MUI.Creds.Domain;
-
-                    //psi.UserName = MUI.Creds.UserName;
-                    //psi.Password = MUI.Creds.SecurePassword;
-                }
+                //var psi = new ProcessStartInfo
+                //{
+                //    FileName = this.Path,
+                //    CreateNoWindow = true,
+                //    Verb = "runas",
+                //    UseShellExecute = !MUI.IsElevated()
+                //};
+                //if (MUI.Creds != null)
+                //{
+                //    psi = MUI.Creds.NewStartInfo(this.Path);
+                //    psi.Verb = "runas";
+                //    psi.UseShellExecute = !MUI.IsElevated();
+                //}
+                ProcessStartInfo psi = StartInfoFactory.Create(this.Path, true, !MUI.IsElevated(), MUI.Creds);
 
                 if (!string.IsNullOrEmpty(this.Arguments))
                     psi.Arguments = this.Arguments;

@@ -91,7 +91,7 @@
       <DependentUpon>NewApp.xaml</DependentUpon>
     </Compile>
     <Compile Include="src\Auth\ADCreds.cs" />
-    <Compile Include="src\Auth\IStartInfoGenerator.cs" />
+    <Compile Include="src\Objects\Interfaces\ICreatesProcessStartInfo.cs" />
     <Compile Include="src\MUIExtensions\CredentialBox.cs" />
     <Compile Include="src\MUIExtensions\ErrorHandling.cs" />
     <Compile Include="src\MUIExtensions\LoadIcons.cs" />
@@ -102,6 +102,7 @@
     <Compile Include="src\Objects\Collections\AppSettingCollection.cs" />
     <Compile Include="src\Objects\Collections\BaseMuiCollection.cs" />
     <Compile Include="src\Objects\Items\FilterTag.cs" />
+    <Compile Include="src\Objects\Items\StartInfoFactory.cs" />
     <Compile Include="src\Objects\Settings\Settings.cs" />
     <Compile Include="src\Objects\Settings\SettingsEditor.cs" />
     <Compile Include="src\Objects\Settings\SettingsJson.cs" />
