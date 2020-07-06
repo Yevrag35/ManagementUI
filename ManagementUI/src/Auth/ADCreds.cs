@@ -26,6 +26,9 @@ namespace ManagementUI.Auth
             if (string.IsNullOrWhiteSpace(netCreds.Domain) && !string.IsNullOrEmpty(userAndDom.Item1))
                 netCreds.Domain = userAndDom.Item1;
 
+            if (netCreds.UserName.Contains(@"\"))
+                netCreds.UserName = userAndDom.Item2;
+
             _netCreds = netCreds;
             this.AuthUserName = this.Combine(userAndDom.Item2, userAndDom.Item1);
         }

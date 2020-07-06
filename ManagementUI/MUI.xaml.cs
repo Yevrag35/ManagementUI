@@ -153,18 +153,8 @@ namespace ManagementUI
         {
             AppDomain appId = AppDomain.CurrentDomain;
             string appPath = Path.Combine(appId.BaseDirectory, appId.FriendlyName);
-            ProcessStartInfo psi = Creds.NewStartInfo(appPath);
-            //var psi = new ProcessStartInfo
-            //{
-            //    FileName = appPath,
-            //    CreateNoWindow = true,
-            //    UseShellExecute = false,
-            //    LoadUserProfile = true,
-            //    UserName = Creds.UserName,
-            //    Password = Creds.SecurePassword
-            //};
-            //if (!string.IsNullOrEmpty(Creds.Domain))
-            //    psi.Domain = Creds.Domain;
+            ProcessStartInfo psi = StartInfoFactory.Create(appPath, false, false, Creds);
+            psi.LoadUserProfile = true;
 
             using (var relaunch = new Process
             {
