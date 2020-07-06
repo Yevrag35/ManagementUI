@@ -84,15 +84,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="EditTags.xaml.cs">
+    <None Include="EditTags.xaml.cs">
       <DependentUpon>EditTags.xaml</DependentUpon>
-    </Compile>
+    </None>
     <Compile Include="NewApp.xaml.cs">
       <DependentUpon>NewApp.xaml</DependentUpon>
     </Compile>
     <Compile Include="src\Auth\ADCreds.cs" />
+    <Compile Include="src\EditTags\EditTagItem.cs" />
     <Compile Include="src\Helpers\AppListItemEquality.cs" />
     <Compile Include="src\Helpers\IgnoreCaseEquality.cs" />
+    <Compile Include="src\Helpers\JsonFilterTagConverter.cs" />
     <Compile Include="src\MUIExtensions\ListSortDirectionExtensions.cs" />
     <Compile Include="src\MUIExtensions\SortDescriptionCollectionExtensions.cs" />
     <Compile Include="src\Objects\Collections\AppListViewCollection.cs" />
@@ -113,10 +115,10 @@
     <Compile Include="src\Objects\Settings\Settings.cs" />
     <Compile Include="src\Objects\Settings\SettingsEditor.cs" />
     <Compile Include="src\Objects\Settings\SettingsJson.cs" />
-    <Page Include="EditTags.xaml">
+    <None Include="EditTags.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
+    </None>
     <Page Include="MUI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -178,5 +180,6 @@
   <ItemGroup>
     <Resource Include="Media\RightArrow2.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

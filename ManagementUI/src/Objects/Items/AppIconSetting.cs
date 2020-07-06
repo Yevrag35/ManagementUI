@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -47,7 +48,7 @@ namespace ManagementUI
         public int Index { get; set; }
 
         [JsonProperty("tags", DefaultValueHandling = DefaultValueHandling.Populate)]
-        public List<FilterTag> Tags { get; set; }
+        public HashSet<FilterTag> Tags { get; set; }
 
         #endregion
 
@@ -137,7 +138,12 @@ namespace ManagementUI
                 this.FinalizeObject();
             }
             if (this.Tags == null)
-                this.Tags = new List<FilterTag>();
+                this.Tags = new HashSet<FilterTag>();
+
+            if (this.Tags.Count > 0)
+            {
+                this.Tags.RemoveWhere(x => string.IsNullOrWhiteSpace(x.Tag));
+            }
         }
 
         [DllImport("gdi32.dll")]

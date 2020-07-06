@@ -1,9 +1,12 @@
-﻿using System;
+﻿using ManagementUI.Converters;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace ManagementUI
 {
+    [JsonConverter(typeof(JsonFilterTagConverter))]
     public struct FilterTag : ICloneable, IComparable<FilterTag>, IComparable<string>, IEquatable<FilterTag>, IEquatable<string>
     {
         #region PROPERTIES
@@ -31,10 +34,21 @@ namespace ManagementUI
         };
         object ICloneable.Clone() => this.Clone();
 
-        public int CompareTo(FilterTag other) => this.Tag.CompareTo(other.Tag);
-        public int CompareTo(string tagString) => this.Tag.CompareTo(tagString);
-        public bool Equals(FilterTag other) => this.Tag.Equals(other.Tag, StringComparison.CurrentCulture) && this.IsChecked == other.IsChecked;
-        public bool Equals(string str) => this.Tag.Equals(str, StringComparison.CurrentCulture);
+        public int CompareTo(FilterTag other) => (this.Tag?.CompareTo(other.Tag)).GetValueOrDefault();
+        public int CompareTo(string tagString) => (this.Tag?.CompareTo(tagString)).GetValueOrDefault();
+        public bool Equals(FilterTag other)
+        {
+            bool result = false;
+            if ((string.IsNullOrWhiteSpace(this.Tag) && string.IsNullOrWhiteSpace(other.Tag)) ||
+                (!string.IsNullOrWhiteSpace(this.Tag) && !string.IsNullOrWhiteSpace(other.Tag)
+                && this.Tag.Equals(other.Tag, StringComparison.CurrentCulture)))
+            {
+                result = this.IsChecked == other.IsChecked;
+            }
+            return result;
+            //(this.Tag?.Equals(other.Tag, StringComparison.CurrentCulture)).GetValueOrDefault() && this.IsChecked == other.IsChecked;
+        }
+        public bool Equals(string str) => (this.Tag?.Equals(str, StringComparison.CurrentCulture)).GetValueOrDefault();
 
         public static implicit operator FilterTag(string tagString) => new FilterTag(tagString);
 
