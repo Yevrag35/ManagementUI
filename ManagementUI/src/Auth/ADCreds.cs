@@ -20,7 +20,15 @@ namespace ManagementUI.Auth
         public string Domain => _netCreds.Domain;
         public string UserName => _netCreds.UserName;
 
-        private ADCredential(NetworkCredential netCreds) => _netCreds = netCreds;
+        private ADCredential(NetworkCredential netCreds)
+        {
+            (string, string) userAndDom = this.SeparateDomainAndUser(netCreds.UserName);
+            if (string.IsNullOrWhiteSpace(netCreds.Domain) && !string.IsNullOrEmpty(userAndDom.Item1))
+                netCreds.Domain = userAndDom.Item1;
+
+            _netCreds = netCreds;
+            this.AuthUserName = this.Combine(userAndDom.Item2, userAndDom.Item1);
+        }
         public ADCredential(string userName, SecureString password)
         {
             (string, string) userAndDom = this.SeparateDomainAndUser(userName);
@@ -68,6 +76,7 @@ namespace ManagementUI.Auth
             }
             return retStr;
         }
+        public bool TryAuthenticate() => this.TryAuthenticate(out Exception throwAway);
         public bool TryAuthenticate(out Exception caughtException)
         {
             caughtException = null;
@@ -90,5 +99,7 @@ namespace ManagementUI.Auth
 
             return result;
         }
+
+        public static explicit operator ADCredential(NetworkCredential netCreds) => new ADCredential(netCreds);
     }
 }

@@ -91,6 +91,7 @@
       <DependentUpon>NewApp.xaml</DependentUpon>
     </Compile>
     <Compile Include="src\Auth\ADCreds.cs" />
+    <Compile Include="src\Auth\IStartInfoGenerator.cs" />
     <Compile Include="src\MUIExtensions\CredentialBox.cs" />
     <Compile Include="src\MUIExtensions\ErrorHandling.cs" />
     <Compile Include="src\MUIExtensions\LoadIcons.cs" />

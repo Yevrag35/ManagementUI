@@ -79,67 +79,47 @@ namespace ManagementUI
             //});
         }
 
-        private async void CredButton_Click(object sender, RoutedEventArgs e)
+        private void CredButton_Click(object sender, RoutedEventArgs e)
         {
             var click = new RoutedEventArgs(Button.ClickEvent);
-            if ((string)this.CredsButton.Content == "RUN AS")
+            if ((string)this.CredsButton.Content == RUN_AS)
             {
-                await Task.Run(() =>
+                using (CredentialDialog dialog = this.CreateCredentialDialog())
                 {
-                    //using (var dialog = new CredentialDialog
-                    //{
-                    //    MainInstruction = "Relaunch Credentials",
-                    //    Content = "Enter the executing credentials",
-                    //    ShowSaveCheckBox = true,
-                    //    Target = "ThisWindow",
-                    //    WindowTitle = "ManagementUI Credentials"
-                    //})
-                    using (CredentialDialog dialog = this.CreateCredentialDialog())
+                    bool res = false;
+                    do
                     {
-                        while (true)
+                        bool done = dialog.ShowDialog(this);
+                        if (done)
                         {
-                            bool done = dialog.ShowDialog();
-                            if (done)
+                            Creds = (ADCredential)dialog.Credentials;
+                            if (!Creds.TryAuthenticate(out Exception caught))
                             {
-                                Creds = new ADCredential(dialog.UserName, dialog.Credentials.SecurePassword);
-                                if (!Creds.TryAuthenticate(out Exception caught))
-                                {
-                                    bool res = ShowErrorMessage(caught, true);
-                                    if (res)
-                                        continue;
+                                res = ShowErrorMessage(caught, true);
+                                if (res)
+                                    continue;
 
-                                    else
-                                        break;
-                                }
-
-                                MessageBoxResult answer = MessageBox.Show("Would you like to relaunch as this user?", "RUN AS", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Cancel);
-                                switch (answer)
-                                {
-                                    case MessageBoxResult.Yes:
-                                        this.Dispatcher.Invoke(() =>
-                                        {
-                                            ((MUI)Application.Current.MainWindow).RelaunchBtn.RaiseEvent(click);
-                                        });
-                                        break;
-                                    case MessageBoxResult.No:
-                                        this.Dispatcher.Invoke(() =>
-                                        {
-                                            ((MUI)Application.Current.MainWindow).CredsButton.Content = "RELAUNCH";
-                                        });
-                                        break;
-
-                                    default:
-                                        break;
-                                }
-                                break;
+                                else
+                                    break;
                             }
+                            else
+                                res = false;
+
+                            
+                            break;
                         }
                     }
-                });
+                    while (res);
+
+                    this.HandleReprompt(click);
+                }
             }
+            //}
+            //});
+            //}
             else
             {
-                await this.Dispatcher.InvokeAsync(() =>
+                this.Dispatcher.Invoke(() =>
                 {
                     ((MUI)Application.Current.MainWindow).RelaunchBtn.RaiseEvent(click);
                 });
