@@ -1,4 +1,5 @@
-﻿using Ookii.Dialogs.Wpf;
+﻿using ManagementUI.Auth;
+using Ookii.Dialogs.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -20,7 +21,7 @@ namespace ManagementUI
     /// </summary>
     public partial class MUI : Window
     {
-        internal static NetworkCredential Creds { get; set; }
+        internal static ADCredential Creds { get; set; }
         private AppSettingCollection AppList { get; set; }
         internal IEnumerable<string> AllTags => this.AppList != null
             ? AppList.Where(x => x.Tags != null).SelectMany(x => x.Tags).Distinct()
@@ -78,86 +79,47 @@ namespace ManagementUI
             //});
         }
 
-        private async void CredButton_Click(object sender, RoutedEventArgs e)
+        private void CredButton_Click(object sender, RoutedEventArgs e)
         {
             var click = new RoutedEventArgs(Button.ClickEvent);
-            if ((string)this.CredsButton.Content == "RUN AS")
+            if ((string)this.CredsButton.Content == RUN_AS)
             {
-                await Task.Run(() =>
+                using (CredentialDialog dialog = this.CreateCredentialDialog())
                 {
-                    using (var dialog = new CredentialDialog
+                    bool res = false;
+                    do
                     {
-                        MainInstruction = "Relaunch Credentials",
-                        Content = "Enter the executing credentials",
-                        ShowSaveCheckBox = true,
-                        Target = "ThisWindow",
-                        WindowTitle = "ManagementUI Credentials"
-                    })
-                    {
-                        while (true)
+                        bool done = dialog.ShowDialog(this);
+                        if (done)
                         {
-                            bool done = dialog.ShowDialog();
-                            if (done)
+                            Creds = (ADCredential)dialog.Credentials;
+                            if (!Creds.TryAuthenticate(out Exception caught))
                             {
-                                Creds = new NetworkCredential(dialog.UserName, dialog.Password);
-                                if (Creds.UserName.Contains(@"\"))
-                                {
-                                    string[] splitBack = Creds.UserName.Split(
-                                        new string[1] { @"\" }, StringSplitOptions.RemoveEmptyEntries);
-                                    Creds.Domain = splitBack.First();
-                                    Creds.UserName = splitBack.Last();
-                                }
-                                else if (Creds.UserName.Contains("@"))
-                                {
-                                    string[] splitAt = Creds.UserName.Split(
-                                        new string[1] { "@" }, StringSplitOptions.RemoveEmptyEntries);
-                                    Creds.Domain = splitAt.Last();
-                                    Creds.UserName = splitAt.First();
-                                }
+                                res = ShowErrorMessage(caught, true);
+                                if (res)
+                                    continue;
 
-                                // Validate Credentials if Domain is specified.
-                                try
-                                {
-                                    this.VerifyCredentials(Creds);
-                                }
-                                catch (Exception ex)
-                                {
-                                    bool res = ShowErrorMessage(ex, true);
-                                    if (res)
-                                        continue;
-
-                                    else
-                                        break;
-                                }
-
-                                MessageBoxResult answer = MessageBox.Show("Would you like to relaunch as this user?", "RUN AS", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Cancel);
-                                switch (answer)
-                                {
-                                    case MessageBoxResult.Yes:
-                                        this.Dispatcher.Invoke(() =>
-                                        {
-                                            ((MUI)Application.Current.MainWindow).RelaunchBtn.RaiseEvent(click);
-                                        });
-                                        break;
-                                    case MessageBoxResult.No:
-                                        this.Dispatcher.Invoke(() =>
-                                        {
-                                            ((MUI)Application.Current.MainWindow).CredsButton.Content = "RELAUNCH";
-                                        });
-                                        break;
-
-                                    default:
-                                        break;
-                                }
-                                break;
+                                else
+                                    break;
                             }
+                            else
+                                res = false;
+
+                            
+                            break;
                         }
                     }
-                });
+                    while (res);
+
+                    this.HandleReprompt(click);
+                }
             }
+            //}
+            //});
+            //}
             else
             {
-                await this.Dispatcher.InvokeAsync(() =>
+                this.Dispatcher.Invoke(() =>
                 {
                     ((MUI)Application.Current.MainWindow).RelaunchBtn.RaiseEvent(click);
                 });
@@ -168,7 +130,8 @@ namespace ManagementUI
         {
             if (!string.IsNullOrEmpty(netCreds.Domain))
             {
-                using (var de = new DirectoryEntry("LDAP://RootDSE", netCreds.UserName, netCreds.Password, AuthenticationTypes.Secure))
+                string un = string.Format("{0}\\{1}", netCreds.Domain, netCreds.UserName);
+                using (var de = new DirectoryEntry("LDAP://RootDSE", un, netCreds.Password, AuthenticationTypes.Secure))
                 {
                     de.RefreshCache();
                 }
@@ -204,19 +167,20 @@ namespace ManagementUI
 
         private void RelaunchBtn_Click(object sender, RoutedEventArgs e)
         {
-            var appId = AppDomain.CurrentDomain;
+            AppDomain appId = AppDomain.CurrentDomain;
             string appPath = Path.Combine(appId.BaseDirectory, appId.FriendlyName);
-            var psi = new ProcessStartInfo
-            {
-                FileName = appPath,
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                LoadUserProfile = true,
-                UserName = Creds.UserName,
-                Password = Creds.SecurePassword
-            };
-            if (!string.IsNullOrEmpty(Creds.Domain))
-                psi.Domain = Creds.Domain;
+            ProcessStartInfo psi = Creds.NewStartInfo(appPath);
+            //var psi = new ProcessStartInfo
+            //{
+            //    FileName = appPath,
+            //    CreateNoWindow = true,
+            //    UseShellExecute = false,
+            //    LoadUserProfile = true,
+            //    UserName = Creds.UserName,
+            //    Password = Creds.SecurePassword
+            //};
+            //if (!string.IsNullOrEmpty(Creds.Domain))
+            //    psi.Domain = Creds.Domain;
 
             using (var relaunch = new Process
             {

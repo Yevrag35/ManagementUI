@@ -115,11 +115,14 @@ namespace ManagementUI
                 };
                 if (MUI.Creds != null)
                 {
-                    if (!string.IsNullOrEmpty(MUI.Creds.Domain))
-                        psi.Domain = MUI.Creds.Domain;
+                    psi = MUI.Creds.NewStartInfo(this.Path);
+                    psi.Verb = "runas";
+                    psi.UseShellExecute = !MUI.IsElevated();
+                    //if (!string.IsNullOrEmpty(MUI.Creds.Domain))
+                    //    psi.Domain = MUI.Creds.Domain;
 
-                    psi.UserName = MUI.Creds.UserName;
-                    psi.Password = MUI.Creds.SecurePassword;
+                    //psi.UserName = MUI.Creds.UserName;
+                    //psi.Password = MUI.Creds.SecurePassword;
                 }
 
                 if (!string.IsNullOrEmpty(this.Arguments))
