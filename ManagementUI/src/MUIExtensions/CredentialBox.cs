@@ -41,7 +41,6 @@ namespace ManagementUI
                 case MessageBoxResult.Yes:
                     this.Dispatcher.Invoke(() =>
                     {
-                        //((MUI)Application.Current.MainWindow).RelaunchBtn.RaiseEvent(clickEvent);
                         this.RelaunchBtn.RaiseEvent(clickEvent);
                     });
                     break;

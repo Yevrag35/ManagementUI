@@ -104,7 +104,6 @@ namespace ManagementUI
                             }
                             else
                                 res = false;
-
                             
                             break;
                         }
@@ -114,27 +113,12 @@ namespace ManagementUI
                     this.HandleReprompt(click);
                 }
             }
-            //}
-            //});
-            //}
             else
             {
                 this.Dispatcher.Invoke(() =>
                 {
-                    ((MUI)Application.Current.MainWindow).RelaunchBtn.RaiseEvent(click);
+                    this.RelaunchBtn.RaiseEvent(click);
                 });
-            }
-        }
-
-        private void VerifyCredentials(NetworkCredential netCreds)
-        {
-            if (!string.IsNullOrEmpty(netCreds.Domain))
-            {
-                string un = string.Format("{0}\\{1}", netCreds.Domain, netCreds.UserName);
-                using (var de = new DirectoryEntry("LDAP://RootDSE", un, netCreds.Password, AuthenticationTypes.Secure))
-                {
-                    de.RefreshCache();
-                }
             }
         }
 
