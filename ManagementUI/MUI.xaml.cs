@@ -242,51 +242,62 @@ namespace ManagementUI
             }
         }
 
-        //private void EditTagsBtn_Click(object sender, RoutedEventArgs e)
-        //{
-        //    if (sender is MenuItem mi && mi.DataContext is MUI mui &&
-        //        mui.AppListView.SelectedItem is AppListItem ali)
-        //    {
-        //        var editTags = new EditTags(ali, this.FilterTags.Items.Cast<FilterTag>())
-        //        {
-        //            Owner = this
-        //        };
-        //        bool? result = editTags.ShowDialog();
-        //        if (result.HasValue && result.Value)
-        //        {
-        //            var tempList = this.FilterTags.Items.Cast<FilterTag>().ToList();
-        //            //if (!tempList.TrueForAll(x => editTags.AllTags.Contains(t => t.Tag.Equals(x.Tag))))
-        //            if (!editTags.AllTags.TrueForAll(x => tempList.Contains(x)))
-        //            {
-        //                for (int i = this.FilterTags.Items.Count - 1; i >= 0; i--)
-        //                {
-        //                    var ft = (FilterTag)this.FilterTags.Items[i];
-        //                    if (!editTags.AllTags.Contains(t => t.Tag.Equals(ft.Tag)))
-        //                    { 
-        //                        this.FilterTags.Items.Remove(ft);
-        //                        this.FilterTags.Items.Refresh();
-        //                    }
-        //                }
-        //                for (int i = 0; i < editTags.AllTags.Count; i++)
-        //                {
-        //                    var ft2 = editTags.AllTags[i];
-        //                    if (!tempList.Exists(x => x.Tag.Equals(ft2.Tag)))
-        //                    {
-        //                        this.FilterTags.Items.Add(ft2);
-        //                        this.FilterTags.Items.Refresh();
-        //                    }
-        //                }
-        //            }
 
-        //            ali.Tags = string.Join(", ", ali.TagList);
-        //            this.Dispatcher.Invoke(() =>
-        //            {
-        //                ((MUI)Application.Current.MainWindow).AppListView.Items.Refresh();
-        //            });
-        //            App.JsonSettings.Save();
-        //        }
-        //    }
-        //}
+        private void EditTagsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem mi && mi.DataContext is MUI mui &&
+                mui.AppListView.SelectedItem is AppIconSetting ais)
+            {
+                var editTags = new EditTags(ais, this.AppList.Tags)
+                {
+                    Owner = this
+                };
+                bool? result = editTags.ShowDialog();
+            }
+
+            //    if (sender is MenuItem mi && mi.DataContext is MUI mui &&
+            //        mui.AppListView.SelectedItem is AppListItem ali)
+            //    {
+            //        var editTags = new EditTags(ali, this.FilterTags.Items.Cast<FilterTag>())
+            //        {
+            //            Owner = this
+            //        };
+            //        bool? result = editTags.ShowDialog();
+            //        if (result.HasValue && result.Value)
+            //        {
+            //            var tempList = this.FilterTags.Items.Cast<FilterTag>().ToList();
+            //            //if (!tempList.TrueForAll(x => editTags.AllTags.Contains(t => t.Tag.Equals(x.Tag))))
+            //            if (!editTags.AllTags.TrueForAll(x => tempList.Contains(x)))
+            //            {
+            //                for (int i = this.FilterTags.Items.Count - 1; i >= 0; i--)
+            //                {
+            //                    var ft = (FilterTag)this.FilterTags.Items[i];
+            //                    if (!editTags.AllTags.Contains(t => t.Tag.Equals(ft.Tag)))
+            //                    { 
+            //                        this.FilterTags.Items.Remove(ft);
+            //                        this.FilterTags.Items.Refresh();
+            //                    }
+            //                }
+            //                for (int i = 0; i < editTags.AllTags.Count; i++)
+            //                {
+            //                    var ft2 = editTags.AllTags[i];
+            //                    if (!tempList.Exists(x => x.Tag.Equals(ft2.Tag)))
+            //                    {
+            //                        this.FilterTags.Items.Add(ft2);
+            //                        this.FilterTags.Items.Refresh();
+            //                    }
+            //                }
+            //            }
+
+            //            ali.Tags = string.Join(", ", ali.TagList);
+            //            this.Dispatcher.Invoke(() =>
+            //            {
+            //                ((MUI)Application.Current.MainWindow).AppListView.Items.Refresh();
+            //            });
+            //            App.JsonSettings.Save();
+            //        }
+            //    }
+        }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {

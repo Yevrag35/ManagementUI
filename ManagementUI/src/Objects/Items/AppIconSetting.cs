@@ -78,7 +78,7 @@ namespace ManagementUI
             Index = this.Index,
             Name = this.Name,
             IconPath = this.IconPath,
-            Tags = this.Tags
+            Tags = new HashSet<FilterTag>(this.Tags)
         };
         object ICloneable.Clone() => this.Clone();
         public int CompareTo(AppIconSetting other) => this.Name.ToLower().CompareTo(other.Name.ToLower());
