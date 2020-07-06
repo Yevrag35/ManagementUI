@@ -36,7 +36,7 @@ namespace ManagementUI
         public bool Equals(FilterTag other) => this.Tag.Equals(other.Tag, StringComparison.CurrentCulture) && this.IsChecked == other.IsChecked;
         public bool Equals(string str) => this.Tag.Equals(str, StringComparison.CurrentCulture);
 
-        public static explicit operator FilterTag(string tagString) => new FilterTag(tagString);
+        public static implicit operator FilterTag(string tagString) => new FilterTag(tagString);
 
         #endregion
     }

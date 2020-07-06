@@ -106,7 +106,7 @@
     <Compile Include="src\Objects\Collections\TagCollection.cs" />
     <Compile Include="src\Objects\Interfaces\Interfaces.cs" />
     <Compile Include="src\Objects\Items\AppIconSetting.cs" />
-    <Compile Include="src\Objects\Collections\AppSettingCollection.cs" />
+    <None Include="src\Objects\Collections\AppSettingCollection.cs" />
     <Compile Include="src\Objects\Collections\BaseMuiCollection.cs" />
     <Compile Include="src\Objects\Items\FilterTag.cs" />
     <Compile Include="src\Helpers\StartInfoFactory.cs" />

@@ -45,7 +45,7 @@ namespace ManagementUI
         public int Index { get; set; }
 
         [JsonProperty("tags", DefaultValueHandling = DefaultValueHandling.Populate)]
-        public List<string> Tags { get; set; }
+        public List<FilterTag> Tags { get; set; }
 
         #endregion
 
@@ -140,6 +140,8 @@ namespace ManagementUI
             {
                 this.Exists = false;
             }
+            if (this.Tags == null)
+                this.Tags = new List<FilterTag>();
         }
 
         [DllImport("gdi32.dll")]
