@@ -25,7 +25,7 @@ namespace ManagementUI
         internal static ADCredential Creds { get; set; }
         //private AppSettingCollection AppList { get; set; }
         private AppListViewCollection AppList { get; set; }
-        internal IEnumerable<string> AllTags => this.AppList?.Tags;
+        //internal IEnumerable<string> AllTags => this.AppList?.Tags;
 
         public MUI() => InitializeComponent();
 
@@ -44,6 +44,7 @@ namespace ManagementUI
 
             this.AppList = App.JsonSettings.Settings.Apps;
             this.AppListView.ItemsSource = this.AppList.View;
+            this.FilterTags.ItemsSource = this.AppList.TagView;
 
             //this.LoadIcons(App.JsonSettings, out AppListCollection outList);
             //this.AppList = outList;
