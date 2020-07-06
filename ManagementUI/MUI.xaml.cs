@@ -1,4 +1,5 @@
-﻿using Ookii.Dialogs.Wpf;
+﻿using ManagementUI.Auth;
+using Ookii.Dialogs.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -20,7 +21,7 @@ namespace ManagementUI
     /// </summary>
     public partial class MUI : Window
     {
-        internal static NetworkCredential Creds { get; set; }
+        internal static ADCredential Creds { get; set; }
         private AppSettingCollection AppList { get; set; }
         internal IEnumerable<string> AllTags => this.AppList != null
             ? AppList.Where(x => x.Tags != null).SelectMany(x => x.Tags).Distinct()
@@ -85,44 +86,25 @@ namespace ManagementUI
             {
                 await Task.Run(() =>
                 {
-                    using (var dialog = new CredentialDialog
-                    {
-                        MainInstruction = "Relaunch Credentials",
-                        Content = "Enter the executing credentials",
-                        ShowSaveCheckBox = true,
-                        Target = "ThisWindow",
-                        WindowTitle = "ManagementUI Credentials"
-                    })
+                    //using (var dialog = new CredentialDialog
+                    //{
+                    //    MainInstruction = "Relaunch Credentials",
+                    //    Content = "Enter the executing credentials",
+                    //    ShowSaveCheckBox = true,
+                    //    Target = "ThisWindow",
+                    //    WindowTitle = "ManagementUI Credentials"
+                    //})
+                    using (CredentialDialog dialog = this.CreateCredentialDialog())
                     {
                         while (true)
                         {
                             bool done = dialog.ShowDialog();
                             if (done)
                             {
-                                Creds = new NetworkCredential(dialog.UserName, dialog.Password);
-                                if (Creds.UserName.Contains(@"\"))
+                                Creds = new ADCredential(dialog.UserName, dialog.Credentials.SecurePassword);
+                                if (!Creds.TryAuthenticate(out Exception caught))
                                 {
-                                    string[] splitBack = Creds.UserName.Split(
-                                        new string[1] { @"\" }, StringSplitOptions.RemoveEmptyEntries);
-                                    Creds.Domain = splitBack.First();
-                                    Creds.UserName = splitBack.Last();
-                                }
-                                else if (Creds.UserName.Contains("@"))
-                                {
-                                    string[] splitAt = Creds.UserName.Split(
-                                        new string[1] { "@" }, StringSplitOptions.RemoveEmptyEntries);
-                                    Creds.Domain = splitAt.Last();
-                                    Creds.UserName = splitAt.First();
-                                }
-
-                                // Validate Credentials if Domain is specified.
-                                try
-                                {
-                                    this.VerifyCredentials(Creds);
-                                }
-                                catch (Exception ex)
-                                {
-                                    bool res = ShowErrorMessage(ex, true);
+                                    bool res = ShowErrorMessage(caught, true);
                                     if (res)
                                         continue;
 
@@ -168,7 +150,8 @@ namespace ManagementUI
         {
             if (!string.IsNullOrEmpty(netCreds.Domain))
             {
-                using (var de = new DirectoryEntry("LDAP://RootDSE", netCreds.UserName, netCreds.Password, AuthenticationTypes.Secure))
+                string un = string.Format("{0}\\{1}", netCreds.Domain, netCreds.UserName);
+                using (var de = new DirectoryEntry("LDAP://RootDSE", un, netCreds.Password, AuthenticationTypes.Secure))
                 {
                     de.RefreshCache();
                 }
@@ -204,19 +187,20 @@ namespace ManagementUI
 
         private void RelaunchBtn_Click(object sender, RoutedEventArgs e)
         {
-            var appId = AppDomain.CurrentDomain;
+            AppDomain appId = AppDomain.CurrentDomain;
             string appPath = Path.Combine(appId.BaseDirectory, appId.FriendlyName);
-            var psi = new ProcessStartInfo
-            {
-                FileName = appPath,
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                LoadUserProfile = true,
-                UserName = Creds.UserName,
-                Password = Creds.SecurePassword
-            };
-            if (!string.IsNullOrEmpty(Creds.Domain))
-                psi.Domain = Creds.Domain;
+            ProcessStartInfo psi = Creds.NewStartInfo(appPath);
+            //var psi = new ProcessStartInfo
+            //{
+            //    FileName = appPath,
+            //    CreateNoWindow = true,
+            //    UseShellExecute = false,
+            //    LoadUserProfile = true,
+            //    UserName = Creds.UserName,
+            //    Password = Creds.SecurePassword
+            //};
+            //if (!string.IsNullOrEmpty(Creds.Domain))
+            //    psi.Domain = Creds.Domain;
 
             using (var relaunch = new Process
             {

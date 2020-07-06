@@ -90,6 +90,8 @@
     <Compile Include="NewApp.xaml.cs">
       <DependentUpon>NewApp.xaml</DependentUpon>
     </Compile>
+    <Compile Include="src\Auth\ADCreds.cs" />
+    <Compile Include="src\MUIExtensions\CredentialBox.cs" />
     <Compile Include="src\MUIExtensions\ErrorHandling.cs" />
     <Compile Include="src\MUIExtensions\LoadIcons.cs" />
     <Compile Include="src\Objects\Collections\AppListCollection.cs" />
