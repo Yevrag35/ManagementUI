@@ -46,7 +46,7 @@ namespace ManagementUI
         [JsonProperty("iconIndex")]
         public int Index { get; set; }
 
-        [JsonProperty("tags")]
+        [JsonProperty("tags", DefaultValueHandling = DefaultValueHandling.Populate)]
         public List<string> Tags { get; set; }
 
         #endregion
