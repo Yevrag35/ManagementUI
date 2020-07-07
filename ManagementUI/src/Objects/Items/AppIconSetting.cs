@@ -25,6 +25,8 @@ namespace ManagementUI
     [JsonObject(MemberSerialization.OptIn)]
     public class AppIconSetting : ICloneable, IComparable<AppIconSetting>
     {
+        [JsonProperty("tags", DefaultValueHandling = DefaultValueHandling.Populate)]
+        private List<string> _tags;
         //private const string MMC = "MMC";
         //private const string MMC_EXE = "\\mmc.exe";
         //private static readonly string MMC_PATH = Environment.GetFolderPath(Environment.SpecialFolder.System) + MMC_EXE;
@@ -47,7 +49,7 @@ namespace ManagementUI
         [JsonProperty("iconIndex")]
         public int Index { get; set; }
 
-        [JsonProperty("tags", DefaultValueHandling = DefaultValueHandling.Populate)]
+        [JsonIgnore]
         public HashSet<FilterTag> Tags { get; set; }
 
         #endregion
@@ -80,7 +82,7 @@ namespace ManagementUI
             Index = this.Index,
             Name = this.Name,
             IconPath = this.IconPath,
-            Tags = new HashSet<FilterTag>(this.Tags)
+            Tags = new HashSet<FilterTag>(this.Tags, new FilterTagEquality())
         };
         object ICloneable.Clone() => this.Clone();
         public int CompareTo(AppIconSetting other) => this.Name.ToLower().CompareTo(other.Name.ToLower());
@@ -137,12 +139,33 @@ namespace ManagementUI
             {
                 this.FinalizeObject();
             }
-            if (this.Tags == null)
-                this.Tags = new HashSet<FilterTag>();
+            if (_tags == null)
+            {
+                _tags = new List<string>();
+                this.Tags = new HashSet<FilterTag>(new FilterTagEquality());
+            }
+            else
+            {
+                this.Tags = new HashSet<FilterTag>(_tags.Count, new FilterTagEquality());
+                _tags.ForEach((x) =>
+                {
+                    this.Tags.Add(new FilterTag(x, false));
+                });
+            }
 
             if (this.Tags.Count > 0)
             {
                 this.Tags.RemoveWhere(x => string.IsNullOrWhiteSpace(x.Tag));
+            }
+        }
+
+        [OnSerializing]
+        private void OnSerializing(StreamingContext context)
+        {
+            _tags.Clear();
+            if (this.Tags.Count > 0)
+            {
+                _tags.AddRange(this.Tags.Select(x => x.Tag));
             }
         }
 

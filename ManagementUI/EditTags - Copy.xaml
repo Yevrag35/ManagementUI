@@ -91,7 +91,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
+        
         <Style TargetType="{x:Type Label}">
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Bottom"/>
@@ -115,7 +115,7 @@
             <RowDefinition />
             <RowDefinition Height="10"/>
         </Grid.RowDefinitions>
-
+        
         <!-- TOP LABELS -->
         <Label Content="Available Tags" Grid.Column="1" Grid.Row="0" />
         <Label Content="Tags Applied" Grid.Column="3" Grid.Row="0" />
@@ -148,25 +148,25 @@
                 <Image Source="Media/LeftArrow2.png"/>
             </Button>
         </Grid>
-
+        
         <!-- AVAILABLE LIST -->
         <ListView x:Name="AvailableTagsList" Grid.Column="1" Grid.Row="1">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Title}" HorizontalAlignment="Left" VerticalAlignment="Center" 
+                        <TextBlock Text="{Binding Tag}" HorizontalAlignment="Left" VerticalAlignment="Center" 
                                    FontFamily="Microsoft Sans Serif" FontSize="14" FontWeight="SemiBold" />
                     </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-
+        
         <!-- APPLIED LIST -->
         <ListView x:Name="AppliedTagsList" Grid.Column="3" Grid.Row="1">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Title}" HorizontalAlignment="Left" VerticalAlignment="Center" 
+                        <TextBlock Text="{Binding Tag}" HorizontalAlignment="Left" VerticalAlignment="Center" 
                                    FontFamily="Microsoft Sans Serif" FontSize="14" FontWeight="SemiBold" />
                     </StackPanel>
                 </DataTemplate>
