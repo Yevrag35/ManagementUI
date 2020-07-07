@@ -7,7 +7,7 @@ using System.Linq;
 namespace ManagementUI
 {
     [JsonConverter(typeof(JsonFilterTagConverter))]
-    public struct FilterTag : ICloneable, IComparable<FilterTag>, IComparable<string>, IEquatable<FilterTag>, IEquatable<string>
+    public class FilterTag : ICloneable, IComparable<FilterTag>, IComparable<string>, IEquatable<FilterTag>, IEquatable<string>
     {
         #region PROPERTIES
         public bool IsChecked { get; set; }
@@ -16,6 +16,7 @@ namespace ManagementUI
         #endregion
 
         #region CONSTRUCTORS
+        internal FilterTag() { }
         public FilterTag(string tag)
         {
             this.IsChecked = false;
@@ -43,7 +44,7 @@ namespace ManagementUI
                 (!string.IsNullOrWhiteSpace(this.Tag) && !string.IsNullOrWhiteSpace(other.Tag)
                 && this.Tag.Equals(other.Tag, StringComparison.CurrentCulture)))
             {
-                result = this.IsChecked == other.IsChecked;
+                result = true;
             }
             return result;
             //(this.Tag?.Equals(other.Tag, StringComparison.CurrentCulture)).GetValueOrDefault() && this.IsChecked == other.IsChecked;

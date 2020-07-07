@@ -253,6 +253,26 @@ namespace ManagementUI
                     Owner = this
                 };
                 bool? result = editTags.ShowDialog();
+                if (result.GetValueOrDefault())
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        foreach (FilterTag checkedTag in this.FilterTags.Items.OfType<FilterTag>().Where(x => x.IsChecked))
+                        {
+                            foreach (AppIconSetting ais2 in this.AppList)
+                            {
+                                foreach (FilterTag innerFt in ais2.Tags)
+                                {
+                                    if (innerFt.Tag.Equals(checkedTag.Tag))
+                                        innerFt.IsChecked = true;
+                                }
+                            }
+                        }
+
+                        this.AppList.TagView.Refresh();
+                        this.AppList.View.Refresh();
+                    });
+                }
             }
 
             //    if (sender is MenuItem mi && mi.DataContext is MUI mui &&
@@ -301,19 +321,25 @@ namespace ManagementUI
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            var list = new List<string>();
-            foreach (FilterTag ft in FilterTags.Items)
-            {
-                if (ft.IsChecked)
-                    list.Add(ft.Tag);
-            }
+            IEnumerable<FilterTag> selectedTags = this.FilterTags.SelectedItems.OfType<FilterTag>();
+            this.AppListView.Items.Filter = app =>
+                app is AppIconSetting ais
+                &&
+                ais.Tags.IsSupersetOf(selectedTags);
 
-            this.AppListView.Items.Filter = x => 
-                list.Count <= 0 ||
-                    (x is AppIconSetting ali && 
-                    ali.Tags != null &&
-                    list.TrueForAll(
-                        t => ali.Tags.Contains(t)));
+            //var list = new List<string>();
+            //foreach (FilterTag ft in FilterTags.Items)
+            //{
+            //    if (ft.IsChecked)
+            //        list.Add(ft.Tag);
+            //}
+
+            //this.AppListView.Items.Filter = x =>
+            //    list.Count <= 0 ||
+            //        (x is AppIconSetting ali &&
+            //        ali.Tags != null &&
+            //        list.TrueForAll(
+            //            t => ali.Tags.Contains(t)));
         }
 
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)

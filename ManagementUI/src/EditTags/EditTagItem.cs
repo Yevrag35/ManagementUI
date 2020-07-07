@@ -4,11 +4,11 @@ using System.Linq;
 
 namespace ManagementUI.Editing
 {
-    public struct EditTagItem
+    public class EditTagItem
     {
-        public bool IsChecked;
-        public EditingStatus Status;
-        public string Title;
+        public bool IsChecked { get; set; }
+        public EditingStatus Status { get; set; }
+        public string Title { get; set; }
 
         public static explicit operator EditTagItem(FilterTag filTag)
         {
