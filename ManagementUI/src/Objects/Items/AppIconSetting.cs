@@ -27,6 +27,7 @@ namespace ManagementUI
     {
         [JsonProperty("tags", DefaultValueHandling = DefaultValueHandling.Populate)]
         private List<string> _tags;
+
         #region PROPERTIES
         [JsonProperty("arguments")]
         public string Arguments { get; set; }

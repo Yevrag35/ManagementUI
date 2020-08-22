@@ -52,5 +52,15 @@ namespace ManagementUI.src.Objects.Collections
             this.Tags.Clear();
             this.Tags.UnionWith(this.GetAllTags());
         }
+
+        internal void RemoveAll(Func<AppIconSetting, bool> predicate)
+        {
+            for (int i = base.Items.Count - 1; i >= 0; i--)
+            {
+                AppIconSetting ais = base.Items[i];
+                if (predicate(ais))
+                    base.Items.Remove(ais);
+            }
+        }
     }
 }
