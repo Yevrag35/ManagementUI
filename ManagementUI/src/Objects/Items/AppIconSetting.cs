@@ -23,10 +23,6 @@ namespace ManagementUI
     [JsonObject(MemberSerialization.OptIn)]
     public class AppIconSetting : ICloneable, IComparable<AppIconSetting>
     {
-        //private const string MMC = "MMC";
-        //private const string MMC_EXE = "\\mmc.exe";
-        //private static readonly string MMC_PATH = Environment.GetFolderPath(Environment.SpecialFolder.System) + MMC_EXE;
-
         #region PROPERTIES
         [JsonProperty("arguments")]
         public string Arguments { get; set; }
@@ -38,6 +34,8 @@ namespace ManagementUI
         public BitmapSource Image { get; set; }
 
         public bool IsChecked { get; set; }
+
+        public bool Exists { get; private set; }
 
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -144,9 +142,15 @@ namespace ManagementUI
         [OnDeserialized]
         private void OnDeserialized(StreamingContext context)
         {
-            if (App.MyHandle != null && !string.IsNullOrEmpty(this.ExePath) && !string.IsNullOrEmpty(this.IconPath))
+            if (App.MyHandle != null && !string.IsNullOrEmpty(this.ExePath) && !string.IsNullOrEmpty(this.IconPath)
+                && File.Exists(this.ExePath) && File.Exists(this.IconPath))
             {
                 this.FinalizeObject();
+                this.Exists = true;
+            }
+            else
+            {
+                this.Exists = false;
             }
         }
 

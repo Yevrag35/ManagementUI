@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace ManagementUI
 {
@@ -30,5 +31,14 @@ namespace ManagementUI
         }
 
         #endregion
+
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext ctx)
+        {
+            if (this.Apps != null && this.Apps.Count > 0)
+            {
+                this.Apps.RemoveAll(x => !x.Exists);
+            }
+        }
     }
 }

@@ -44,8 +44,6 @@ namespace ManagementUI
             this.AppList = App.JsonSettings.Settings.Apps;
             this.AppListView.ItemsSource = this.AppList.View;
 
-            //this.LoadIcons(App.JsonSettings, out AppListCollection outList);
-            //this.AppList = outList;
             this.AppList.CollectionChanged += this.AppList_Changed;
             string[] tags = this.AppList.Tags;
             for (int i = 0; i < tags.Length; i++)
