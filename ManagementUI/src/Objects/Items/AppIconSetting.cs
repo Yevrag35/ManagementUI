@@ -139,13 +139,6 @@ namespace ManagementUI
                 this.FinalizeObject();
                 this.Exists = true;
             }
-            if (this.Tags == null)
-                this.Tags = new HashSet<FilterTag>();
-
-            if (this.Tags.Count > 0)
-            {
-                this.Tags.RemoveWhere(x => string.IsNullOrWhiteSpace(x.Tag));
-            }
         }
 
         [OnSerializing]
