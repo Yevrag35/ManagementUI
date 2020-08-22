@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using ManagementUI.Auth;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
@@ -43,7 +44,7 @@ namespace ManagementUI
         [JsonProperty("iconIndex")]
         public int Index { get; set; }
 
-        [JsonProperty("tags")]
+        [JsonProperty("tags", DefaultValueHandling = DefaultValueHandling.Populate)]
         public List<string> Tags { get; set; }
 
         #endregion
@@ -99,21 +100,8 @@ namespace ManagementUI
         {
             await Task.Run(() =>
             {
-                var psi = new ProcessStartInfo
-                {
-                    FileName = this.ExePath,
-                    CreateNoWindow = true,
-                    Verb = "runas",
-                    UseShellExecute = !MUI.IsElevated()
-                };
-                if (MUI.Creds != null)
-                {
-                    if (!string.IsNullOrEmpty(MUI.Creds.Domain))
-                        psi.Domain = MUI.Creds.Domain;
 
-                    psi.UserName = MUI.Creds.UserName;
-                    psi.Password = MUI.Creds.SecurePassword;
-                }
+                ProcessStartInfo psi = StartInfoFactory.Create(this.ExePath, true, !MUI.IsElevated(), MUI.Creds);
 
                 if (!string.IsNullOrEmpty(this.Arguments))
                     psi.Arguments = this.Arguments;
