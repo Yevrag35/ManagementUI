@@ -99,6 +99,7 @@
     <Compile Include="src\MUIExtensions\SortDescriptionCollectionExtensions.cs" />
     <Compile Include="src\Objects\Collections\AppListViewCollection.cs" />
     <Compile Include="src\Objects\Collections\BaseViewCollection.cs" />
+    <Compile Include="src\Objects\Collections\ObservableSortedList.cs" />
     <Compile Include="src\Objects\Collections\TagList.cs" />
     <Compile Include="src\Objects\Collections\TagViewCollection.cs" />
     <Compile Include="src\Objects\Interfaces\ICreatesProcessStartInfo.cs" />
