@@ -1,47 +1,30 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace ManagementUI
 {
-    public class TagList : IEnumerable<FilterTag>
+    public class TagList : ObservableSortedList<string, FilterTag>
     {
-        private SortedList<string, FilterTag> _list;
-
-        public FilterTag this[int index] => _list.Values[index];
-        public FilterTag this[string tag] => _list[tag];
-
-        public int Count => _list.Count;
-
         public TagList()
+            : base(0, GetDefaultSortDescription(), x => x.Tag)
         {
-            _list = new SortedList<string, FilterTag>(StringComparer.CurrentCultureIgnoreCase);
         }
 
-        public void Add(string newTag)
+        public void AddMany(IEnumerable<FilterTag> tags)
         {
-            var ft = new FilterTag(newTag);
-            _list.Add(ft.Tag, ft);
-        }
-        public void Add(FilterTag ft) => _list.Add(ft.Tag, ft);
-        public void AddRange(IEnumerable<FilterTag> fts)
-        {
-            foreach (FilterTag ft in fts)
+            foreach (FilterTag ft in tags)
             {
-                _list.Add(ft.Tag, ft);
+                this.Add(ft, true);
             }
+            base.OnReset();
         }
 
-        public IEnumerator<FilterTag> GetEnumerator() => _list.Values.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
-
-        public void Remove(params string[] tags)
+        private static SortDescription GetDefaultSortDescription()
         {
-            foreach (string t in tags)
-            {
-                _list.Remove(t);
-            }
+            return new SortDescription("Tag", ListSortDirection.Descending);
         }
     }
 }

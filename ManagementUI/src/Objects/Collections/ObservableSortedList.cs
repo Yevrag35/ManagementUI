@@ -25,23 +25,23 @@ namespace ManagementUI
         {
             this.CollectionChanged?.Invoke(this, e);
         }
-        private void OnAdd(object changedItem, int index)
+        protected void OnAdd(object changedItem, int index)
         {
             this.OnCollectionChanged(
                 new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, changedItem, index));
         }
-        private void OnRemove(object removedItem, int index)
+        protected void OnRemove(object removedItem, int index)
         {
             this.OnCollectionChanged(
                 new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removedItem, index));
         }
-        private void OnReplace(int index)
+        protected void OnReplace(int index)
         {
             object item = this[index];
             this.OnCollectionChanged(
                 new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, item, index));
         }
-        private void OnReset()
+        protected void OnReset()
         {
             this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
@@ -145,7 +145,7 @@ namespace ManagementUI
 
         #region LIST METHODS
         /// <exception cref="ArgumentNullException"/>
-        private bool Add(TValue item, bool deferNotify)
+        protected bool Add(TValue item, bool deferNotify)
         {
             TKey key = this.GetKey(item);
             try
