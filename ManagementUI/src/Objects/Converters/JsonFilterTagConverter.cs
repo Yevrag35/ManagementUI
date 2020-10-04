@@ -15,7 +15,7 @@ namespace ManagementUI.Converters
             JToken jtok = JToken.ReadFrom(reader);
             if (jtok.Type == JTokenType.String)
             {
-                ret = new FilterTag(jtok.ToObject<string>(), false);
+                ret = new FilterTag(jtok.ToObject<string>());
             }
             return ret;
         }

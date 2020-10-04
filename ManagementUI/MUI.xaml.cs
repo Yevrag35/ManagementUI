@@ -1,5 +1,4 @@
 ﻿using ManagementUI.Auth;
-using ManagementUI.src.Objects.Collections;
 using Ookii.Dialogs.Wpf;
 using System;
 using System.Collections.Generic;
@@ -35,6 +34,18 @@ namespace ManagementUI
             var prinId = new WindowsPrincipal(winId);
             return prinId.IsInRole(WindowsBuiltInRole.Administrator);
         }
+
+        #region CHECKBOX FILTER
+        private async Task ApplyCheckBoxFilter(IEnumerable<FilterTag> mustBeSuperSet)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.AppListView.Items.Filter = app =>
+                app is AppIconSetting ais && ais.Tags.IsSupersetOf(mustBeSuperSet);
+            });
+        }
+
+        #endregion
 
         #region EVENT HANDLERS
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -82,7 +93,7 @@ namespace ManagementUI
             //    //});
         }
 
-    private void CredButton_Click(object sender, RoutedEventArgs e)
+        private void CredButton_Click(object sender, RoutedEventArgs e)
         {
             var click = new RoutedEventArgs(Button.ClickEvent);
             if ((string)this.CredsButton.Content == RUN_AS)
@@ -191,16 +202,6 @@ namespace ManagementUI
                 AppList.Add(newApp.CreatedApp);
             }
         }
-
-        //private async Task WriteAppToFile(AppIconSetting ais)
-        //{
-        //    await Task.Run(() =>
-        //    {
-        //        App.JsonSettings.Settings.Apps.Add(ais);
-        //        App.JsonSettings.Settings.Apps.Sort(new AppSettingCollection.AppIconSettingDefaultSorter());
-        //        App.JsonSettings.Save();
-        //    }).ConfigureAwait(false);
-        //}
 
         private async void ALMIRemove_Click(object sender, RoutedEventArgs e)
         {
@@ -319,13 +320,10 @@ namespace ManagementUI
             //    }
         }
 
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        private async void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            IEnumerable<FilterTag> selectedTags = this.FilterTags.SelectedItems.OfType<FilterTag>();
-            this.AppListView.Items.Filter = app =>
-                app is AppIconSetting ais
-                &&
-                ais.Tags.IsSupersetOf(selectedTags);
+            IEnumerable<FilterTag> selectedTags = this.AppList.Tags.Where(x => x.IsChecked);
+            await this.ApplyCheckBoxFilter(selectedTags);
 
             //var list = new List<string>();
             //foreach (FilterTag ft in FilterTags.Items)
@@ -342,21 +340,22 @@ namespace ManagementUI
             //            t => ali.Tags.Contains(t)));
         }
 
-        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        private async void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
-            var list = new List<string>();
-            foreach (FilterTag ft in FilterTags.Items)
-            {
-                if (ft.IsChecked)
-                    list.Add(ft.Tag);
-            }
+            IEnumerable<FilterTag> notChecked = this.AppList.Tags.Where(x => !x.IsChecked);
+            //var list = new List<string>();
+            //foreach (FilterTag ft in FilterTags.Items)
+            //{
+            //    if (ft.IsChecked)
+            //        list.Add(ft.Tag);
+            //}
 
-            this.AppListView.Items.Filter = x => 
-                list.Count <= 0 || (
-                    x is AppIconSetting ali &&
-                    ali.Tags != null &&
-                    list.TrueForAll(
-                        t => ali.Tags.Contains(t)));
+            //this.AppListView.Items.Filter = x => 
+            //    list.Count <= 0 || (
+            //        x is AppIconSetting ali &&
+            //        ali.Tags != null &&
+            //        list.TrueForAll(
+            //            t => ali.Tags.Contains(t)));
         }
     }
 }

@@ -1,21 +1,16 @@
-﻿using ManagementUI.Auth;
+﻿using ManagementUI.Converters;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
@@ -25,9 +20,6 @@ namespace ManagementUI
     [JsonObject(MemberSerialization.OptIn)]
     public class AppIconSetting : ICloneable, IComparable<AppIconSetting>
     {
-        [JsonProperty("tags", DefaultValueHandling = DefaultValueHandling.Populate)]
-        private List<string> _tags;
-
         #region PROPERTIES
         [JsonProperty("arguments")]
         public string Arguments { get; set; }
@@ -48,8 +40,9 @@ namespace ManagementUI
         [JsonProperty("iconIndex")]
         public int Index { get; set; }
 
-        [JsonIgnore]
-        public HashSet<FilterTag> Tags { get; set; }
+        [JsonProperty("tags")]
+        [JsonConverter(typeof(FilterTagConverter))]
+        public SortedSet<FilterTag> Tags { get; set; } = new SortedSet<FilterTag>();
 
         #endregion
 
@@ -81,10 +74,10 @@ namespace ManagementUI
             Index = this.Index,
             Name = this.Name,
             IconPath = this.IconPath,
-            Tags = new HashSet<FilterTag>(this.Tags, new FilterTagEquality())
+            Tags = new SortedSet<FilterTag>(this.Tags, this.Tags.Comparer)
         };
         object ICloneable.Clone() => this.Clone();
-        public int CompareTo(AppIconSetting other) => this.Name.ToLower().CompareTo(other.Name.ToLower());
+        public int CompareTo(AppIconSetting other) => StringComparer.CurrentCultureIgnoreCase.Compare(this.Name, other?.Name);
         public void FinalizeObject()
         {
             IntPtr appHandle = ExtractIconA(App.MyHandle, this.IconPath, Convert.ToUInt32(this.Index));
@@ -142,15 +135,15 @@ namespace ManagementUI
             }
         }
 
-        [OnSerializing]
-        private void OnSerializing(StreamingContext context)
-        {
-            _tags.Clear();
-            if (this.Tags.Count > 0)
-            {
-                _tags.AddRange(this.Tags.Select(x => x.Tag));
-            }
-        }
+        //[OnSerializing]
+        //private void OnSerializing(StreamingContext context)
+        //{
+        //    _tags.Clear();
+        //    if (this.Tags.Count > 0)
+        //    {
+        //        _tags.AddRange(this.Tags.Select(x => x.Tag));
+        //    }
+        //}
 
         [DllImport("gdi32.dll")]
         public static extern bool DeleteObject(IntPtr hObject);

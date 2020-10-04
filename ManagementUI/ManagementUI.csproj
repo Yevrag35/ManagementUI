@@ -94,7 +94,8 @@
     <Compile Include="src\EditTags\EditTagItem.cs" />
     <Compile Include="src\Helpers\AppListItemEquality.cs" />
     <Compile Include="src\Helpers\FilterTagEquality.cs" />
-    <Compile Include="src\Helpers\JsonFilterTagConverter.cs" />
+    <Compile Include="src\Objects\Collections\TagSet.cs" />
+    <Compile Include="src\Objects\Converters\JsonFilterTagConverter.cs" />
     <Compile Include="src\MUIExtensions\ListSortDirectionExtensions.cs" />
     <Compile Include="src\MUIExtensions\SortDescriptionCollectionExtensions.cs" />
     <Compile Include="src\Objects\Collections\AppListViewCollection.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="src\Objects\Collections\ObservableSortedList.cs" />
     <Compile Include="src\Objects\Collections\TagList.cs" />
     <Compile Include="src\Objects\Collections\TagViewCollection.cs" />
+    <Compile Include="src\Objects\Converters\FilterTagConverter.cs" />
     <Compile Include="src\Objects\Interfaces\ICreatesProcessStartInfo.cs" />
     <Compile Include="src\MUIExtensions\CredentialBox.cs" />
     <Compile Include="src\MUIExtensions\ErrorHandling.cs" />
@@ -112,6 +114,7 @@
     <Compile Include="src\Objects\Items\AppIconSetting.cs" />
     <None Include="src\Objects\Collections\AppSettingCollection.cs" />
     <Compile Include="src\Objects\Collections\BaseMuiCollection.cs" />
+    <Compile Include="src\Objects\Items\ChangeableItem.cs" />
     <Compile Include="src\Objects\Items\FilterTag.cs" />
     <Compile Include="src\Helpers\StartInfoFactory.cs" />
     <Compile Include="src\Objects\Settings\Settings.cs" />

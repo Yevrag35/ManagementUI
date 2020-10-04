@@ -2,16 +2,56 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace ManagementUI
 {
     [JsonConverter(typeof(JsonFilterTagConverter))]
-    public class FilterTag : ICloneable, IComparable<FilterTag>, IComparable<string>, IEquatable<FilterTag>, IEquatable<string>
+    public class FilterTag : ChangeableItem, ICloneable, IComparable<FilterTag>, IComparable<string>, IEquatable<FilterTag>, IEquatable<string>,
+        INotifyPropertyChanged
     {
+        private static StringComparer Comparer = StringComparer.CurrentCultureIgnoreCase;
+        private bool _isChecked;
+        private string _tag;
+
+        public override event PropertyChangedEventHandler PropertyChanged;
+
         #region PROPERTIES
-        public bool IsChecked { get; set; }
-        public string Tag { get; set; }
+        public bool IsChecked
+        {
+            get => _isChecked;
+            set
+            {
+                _isChecked = value;
+                this.OnChange(x => x.IsChecked);
+            }
+        }
+        public string Tag
+        {
+            get => _tag;
+            set
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    _tag = value;
+                    this.OnChange(x => x.Tag);
+                }
+            }
+        }
+
+        #endregion
+
+        #region EVENT HANDLERS
+        private void OnChange<T>(Expression<Func<FilterTag, T>> expression)
+        {
+            if (this.PropertyChanged != null)
+            {
+                string memberName = base.GetPropertyName(expression);
+                this.PropertyChanged.Invoke(this, new PropertyChangedEventArgs(memberName));
+            }
+        }
 
         #endregion
 
@@ -19,37 +59,29 @@ namespace ManagementUI
         internal FilterTag() { }
         public FilterTag(string tag)
         {
-            this.IsChecked = false;
-            this.Tag = tag;
+            _isChecked = false;
+            _tag = tag;
         }
         internal FilterTag(string tag, bool isChecked)
-            : this(tag) => this.IsChecked = isChecked;
+            : this(tag) => _isChecked = isChecked;
 
         #endregion
 
         #region PUBLIC METHODS
         public FilterTag Clone() => new FilterTag
         {
-            Tag = this.Tag,
-            IsChecked = this.IsChecked
+            _tag = this.Tag,
+            _isChecked = this.IsChecked
         };
         object ICloneable.Clone() => this.Clone();
 
-        public int CompareTo(FilterTag other) => (this.Tag?.CompareTo(other.Tag)).GetValueOrDefault();
-        public int CompareTo(string tagString) => (this.Tag?.CompareTo(tagString)).GetValueOrDefault();
+        public int CompareTo(FilterTag other) => Comparer.Compare(this.Tag, other?.Tag);
+        public int CompareTo(string tagString) => Comparer.Compare(this.Tag, tagString);
         public bool Equals(FilterTag other)
         {
-            bool result = false;
-            if ((string.IsNullOrWhiteSpace(this.Tag) && string.IsNullOrWhiteSpace(other.Tag)) ||
-                (!string.IsNullOrWhiteSpace(this.Tag) && !string.IsNullOrWhiteSpace(other.Tag)
-                && this.Tag.Equals(other.Tag, StringComparison.CurrentCulture)))
-            {
-                result = true;
-            }
-            return result;
-            //(this.Tag?.Equals(other.Tag, StringComparison.CurrentCulture)).GetValueOrDefault() && this.IsChecked == other.IsChecked;
+            return Comparer.Equals(this.Tag, other?.Tag);
         }
-        public bool Equals(string str) => (this.Tag?.Equals(str, StringComparison.CurrentCulture)).GetValueOrDefault();
+        public bool Equals(string str) => Comparer.Equals(this.Tag, str);
 
         public static implicit operator FilterTag(string tagString) => new FilterTag(tagString);
 

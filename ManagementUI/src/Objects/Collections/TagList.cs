@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,8 +10,18 @@ namespace ManagementUI
     public class TagList : ObservableSortedList<string, FilterTag>
     {
         public TagList()
-            : base(0, GetDefaultSortDescription(), x => x.Tag)
+            : base(0, GetDefaultSortDescription(), x => x.Tag, StringComparer.CurrentCultureIgnoreCase)
         {
+        }
+
+        [JsonConstructor]
+        public TagList(IEnumerable<FilterTag> tags)
+            : base(tags, GetDefaultSortDescription(), x => x.Tag, StringComparer.CurrentCultureIgnoreCase)
+        {
+            foreach (FilterTag ft in tags)
+            {
+                this.Add(ft, true);
+            }
         }
 
         public void AddMany(IEnumerable<FilterTag> tags)

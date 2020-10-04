@@ -7,7 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Windows.Data;
 
-namespace ManagementUI.src.Objects.Collections
+namespace ManagementUI
 {
     public class AppListViewCollection : BaseViewCollection<AppIconSetting>, ICloneable
     {

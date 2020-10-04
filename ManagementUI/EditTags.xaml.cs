@@ -38,7 +38,7 @@ namespace ManagementUI
             foreach (EditTagItem ft in allTags)
             {
                 this.AllTags.Add(ft);
-                if (this.Application.Tags.Any(x => x.Tag.Equals(ft.Title)))
+                if (this.Application.Tags.Contains(ft.Title))
                     ft.Status = EditingStatus.Applied;
             }
 
