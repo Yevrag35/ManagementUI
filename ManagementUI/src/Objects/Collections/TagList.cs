@@ -16,8 +16,7 @@ namespace ManagementUI
 
         public TagList()
         {
-            IComparer<string> comparer = new IgnoreCaseComparer();
-            _list = new SortedList<string, FilterTag>(comparer);
+            _list = new SortedList<string, FilterTag>(StringComparer.CurrentCultureIgnoreCase);
         }
 
         public void Add(string newTag)
