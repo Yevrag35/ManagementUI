@@ -17,6 +17,7 @@ namespace ManagementUI
 {
     /// <summary>
     /// Interaction logic for EditTags.xaml
+    /// TO DO - FIND A WAY TO LOAD THE EXISTING APPLIED EASILY
     /// </summary>
     public partial class EditTags : Window
     {
