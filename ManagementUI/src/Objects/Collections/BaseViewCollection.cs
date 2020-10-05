@@ -104,6 +104,11 @@ namespace ManagementUI
             }
         }
 
+        public virtual void RefreshAll()
+        {
+            _backingView.Refresh();
+        }
+
         /// <summary>
         /// Updates the <see cref="ListCollectionView"/> of the <see cref="HsObservableCollection{T}.View"/> with the 
         /// default <see cref="SortDescription"/> if one is present.

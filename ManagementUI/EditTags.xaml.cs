@@ -30,11 +30,10 @@ namespace ManagementUI
         public AppIconSetting Application { get; }
         //public HashSet<EditTagItem> Applied { get; }
 
-        public EditTags(AppIconSetting chosenApp, HashSet<FilterTag> allTags)
+        public EditTags(AppIconSetting chosenApp, IEnumerable<FilterTag> allTags)
         {
-            _allFilterTags = allTags;
+            _allFilterTags = new HashSet<FilterTag>(allTags);
             this.Application = chosenApp;
-            this.AllTags = new HashSet<EditTagItem>(allTags.Count);
             foreach (EditTagItem ft in allTags)
             {
                 this.AllTags.Add(ft);

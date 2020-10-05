@@ -32,10 +32,15 @@ namespace ManagementUI
             }
             base.OnReset();
         }
+        public IEnumerable<FilterTag> GetChecked() => base.Items.Values.Where(x => x.IsChecked);
+        public void Reset(IEnumerable<FilterTag> with)
+        {
+            base.Update(with);
+        }
 
         private static SortDescription GetDefaultSortDescription()
         {
-            return new SortDescription("Tag", ListSortDirection.Descending);
+            return new SortDescription("Tag", ListSortDirection.Ascending);
         }
     }
 }

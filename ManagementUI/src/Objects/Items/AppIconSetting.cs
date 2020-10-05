@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -18,8 +19,11 @@ namespace ManagementUI
 {
     [Serializable]
     [JsonObject(MemberSerialization.OptIn)]
-    public class AppIconSetting : ICloneable, IComparable<AppIconSetting>
+    public class AppIconSetting : ChangeableItem, ICloneable, IComparable<AppIconSetting>, INotifyPropertyChanged
     {
+        public override event PropertyChangedEventHandler PropertyChanged;
+        private bool _isChecked = true;
+
         #region PROPERTIES
         [JsonProperty("arguments")]
         public string Arguments { get; set; }
@@ -30,7 +34,15 @@ namespace ManagementUI
 
         public BitmapSource Image { get; set; }
 
-        public bool IsChecked { get; set; }
+        public bool IsChecked
+        {
+            get => _isChecked;
+            set
+            {
+                _isChecked = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(this.GetName(x => x.IsChecked)));
+            }
+        }
 
         public bool Exists { get; private set; }
 
@@ -93,6 +105,10 @@ namespace ManagementUI
 
             this.Image = this.Bitmap2BitmapImage(appIcon.ToBitmap());
         }
+        private string GetName<T>(Expression<Func<AppIconSetting, T>> expression)
+        {
+            return base.GetPropertyName(expression);
+        }
         public async Task LaunchAsync()
         {
             await Task.Run(() =>
@@ -135,15 +151,6 @@ namespace ManagementUI
             }
         }
 
-        //[OnSerializing]
-        //private void OnSerializing(StreamingContext context)
-        //{
-        //    _tags.Clear();
-        //    if (this.Tags.Count > 0)
-        //    {
-        //        _tags.AddRange(this.Tags.Select(x => x.Tag));
-        //    }
-        //}
 
         [DllImport("gdi32.dll")]
         public static extern bool DeleteObject(IntPtr hObject);

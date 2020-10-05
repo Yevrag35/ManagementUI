@@ -13,7 +13,7 @@ namespace ManagementUI
     {
         //private IgnoreCaseEquality _ignoreCase;
         //public IEnumerable<FilterTag> Tags => base.Items.Where(x => x.Tags != null).SelectMany(x => x.Tags).Distinct();
-        public HashSet<FilterTag> Tags { get; }
+        public TagList Tags { get; }
         public CollectionView TagView { get; }
 
         //internal AppListViewCollection()
@@ -27,9 +27,12 @@ namespace ManagementUI
         internal AppListViewCollection(IEnumerable<AppIconSetting> items)
             : base(items, ListSortDirection.Ascending, x => x.Name)
         {
-            this.Tags = new HashSet<FilterTag>(this.GetAllTags(), new FilterTagEquality());
-            this.TagView = CollectionViewSource.GetDefaultView(this.Tags) as CollectionView;
-            this.TagView.SortDescriptions.Add<FilterTag, string>(ListSortDirection.Ascending, x => x.Tag);
+            //this.Tags = new TagSet(this.GetAllTags(), new FilterTagEquality());
+            this.Tags = new TagList(this.GetAllTags());
+            this.View.IsLiveFiltering = true;
+            this.View.LiveFilteringProperties.Add("IsChecked");
+            this.View.Filter = app =>
+                app is AppIconSetting ais && ais.IsChecked;
         }
 
         internal AppListViewCollection Clone()
@@ -43,14 +46,19 @@ namespace ManagementUI
         }
         object ICloneable.Clone() => this.Clone();
 
+        public override void RefreshAll()
+        {
+            base.RefreshAll();
+            this.Tags.Update(this.GetAllTags());
+        }
+
         internal IEnumerable<FilterTag> GetAllTags()
         {
             return base.Items.Where(x => x.Tags != null).SelectMany(x => x.Tags);
         }
         internal void RegenerateTagView()
         {
-            this.Tags.Clear();
-            this.Tags.UnionWith(this.GetAllTags());
+            this.Tags.Reset(this.GetAllTags());
         }
 
         internal void RemoveAll(Func<AppIconSetting, bool> predicate)

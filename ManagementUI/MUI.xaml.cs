@@ -21,12 +21,17 @@ namespace ManagementUI
     /// </summary>
     public partial class MUI : Window
     {
+        private static HashSet<FilterTag> Checked;
+
         internal static ADCredential Creds { get; set; }
         //private AppSettingCollection AppList { get; set; }
         private AppListViewCollection AppList { get; set; }
         //internal IEnumerable<string> AllTags => this.AppList?.Tags;
 
-        public MUI() => InitializeComponent();
+        public MUI()
+        {
+            InitializeComponent();
+        }
 
         internal static bool IsElevated()
         {
@@ -36,12 +41,18 @@ namespace ManagementUI
         }
 
         #region CHECKBOX FILTER
-        private async Task ApplyCheckBoxFilter(IEnumerable<FilterTag> mustBeSuperSet)
+        private async Task ApplyCheckBoxFilter()
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                this.AppListView.Items.Filter = app =>
-                app is AppIconSetting ais && ais.Tags.IsSupersetOf(mustBeSuperSet);
+                foreach (AppIconSetting ais in this.AppList)
+                {
+                    if (!ais.Tags.IsSupersetOf(Checked))
+                        ais.IsChecked = false;
+
+                    else
+                        ais.IsChecked = true;
+                }
             });
         }
 
@@ -54,25 +65,18 @@ namespace ManagementUI
             App.MyHandle = new WindowInteropHelper(this).Handle;
 
             this.AppList = App.JsonSettings.Settings.Apps;
-            this.AppListView.ItemsSource = this.AppList.View;
-            this.FilterTags.ItemsSource = this.AppList.TagView;
+            Checked = new HashSet<FilterTag>(this.AppList.Tags.Count);
 
-            //this.LoadIcons(App.JsonSettings, out AppListCollection outList);
-            //this.AppList = outList;
+            this.AppListView.ItemsSource = this.AppList.View;
+            this.FilterTags.ItemsSource = this.AppList.Tags.View;
+
             this.AppList.CollectionChanged += this.AppList_Changed;
-            //string[] tags = this.AppList.Tags;
-            //for (int i = 0; i < tags.Length; i++)
-            //{
-            //    string tag = tags[i];
-            //    var ft = new FilterTag(tag, false);
-            //    this.FilterTags.Items.Add(ft);
-            //}
         }
 
 
         private void AppList_Changed(object sender, NotifyCollectionChangedEventArgs e)
         {
-            this.AppList.RegenerateTagView();
+            this.AppList.RefreshAll();
             //    //await Task.Run(() =>
             //    //{
             //    if (e.Action == NotifyCollectionChangedAction.Remove)
@@ -270,7 +274,7 @@ namespace ManagementUI
                             }
                         }
 
-                        this.AppList.TagView.Refresh();
+                        this.AppList.Tags.View.Refresh();
                         this.AppList.View.Refresh();
                     });
                 }
@@ -322,40 +326,14 @@ namespace ManagementUI
 
         private async void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            IEnumerable<FilterTag> selectedTags = this.AppList.Tags.Where(x => x.IsChecked);
-            await this.ApplyCheckBoxFilter(selectedTags);
-
-            //var list = new List<string>();
-            //foreach (FilterTag ft in FilterTags.Items)
-            //{
-            //    if (ft.IsChecked)
-            //        list.Add(ft.Tag);
-            //}
-
-            //this.AppListView.Items.Filter = x =>
-            //    list.Count <= 0 ||
-            //        (x is AppIconSetting ali &&
-            //        ali.Tags != null &&
-            //        list.TrueForAll(
-            //            t => ali.Tags.Contains(t)));
+            Checked.Add(((e.Source as CheckBox).DataContext as FilterTag));
+            await this.ApplyCheckBoxFilter();
         }
 
         private async void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
-            IEnumerable<FilterTag> notChecked = this.AppList.Tags.Where(x => !x.IsChecked);
-            //var list = new List<string>();
-            //foreach (FilterTag ft in FilterTags.Items)
-            //{
-            //    if (ft.IsChecked)
-            //        list.Add(ft.Tag);
-            //}
-
-            //this.AppListView.Items.Filter = x => 
-            //    list.Count <= 0 || (
-            //        x is AppIconSetting ali &&
-            //        ali.Tags != null &&
-            //        list.TrueForAll(
-            //            t => ali.Tags.Contains(t)));
+            Checked.Remove(((e.Source as CheckBox).DataContext as FilterTag));
+            await this.ApplyCheckBoxFilter();
         }
     }
 }

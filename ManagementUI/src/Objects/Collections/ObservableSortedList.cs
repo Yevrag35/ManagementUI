@@ -110,17 +110,21 @@ namespace ManagementUI
             : this(capacity, keySelector, null)
         {
             _defaultSortDescription = defaultSort;
+            this.UpdateView();
         }
         public ObservableSortedList(int capacity, SortDescription defaultSort, Func<TValue, TKey> keySelector, IComparer<TKey> comparer)
             : this(capacity, keySelector, comparer)
         {
             _defaultSortDescription = defaultSort;
+            this.UpdateView();
         }
         public ObservableSortedList(IEnumerable<TValue> items, Func<TValue, TKey> keySelector, IComparer<TKey> comparer)
             : this(GetCountOrDefault(items), keySelector, comparer)
         {
-            // TO DO:
-            //  - AddMany to Items
+            foreach (TValue value in items)
+            {
+                this.Add(value, true);
+            }
         }
         public ObservableSortedList(IEnumerable<TValue> items, SortDescription defaultSort, Func<TValue, TKey> keySelector)
             : this(items, defaultSort, keySelector, null)
@@ -130,15 +134,7 @@ namespace ManagementUI
             : this(items, keySelector, comparer)
         {
             _defaultSortDescription = defaultSort;
-            // TO DO:
-            //foreach (TValue item in items)
-            //{
-            //    TKey key = _keySelector(item);
-            //    if (this.Items.Count == 0 || !this.Items.ContainsKey(key))
-            //    {
-            //        this.Items.Add(key, item);
-            //    }
-            //}
+            this.UpdateView();
         }
 
         #endregion
@@ -171,6 +167,14 @@ namespace ManagementUI
         {
             this.Items.Clear();
             this.OnReset();
+        }
+        internal void Clear(bool deferNotify)
+        {
+            this.Items.Clear();
+            if (!deferNotify)
+            {
+                this.OnReset();
+            }
         }
         public bool Contains(TValue item)
         {
@@ -261,6 +265,15 @@ namespace ManagementUI
         {
             _backingView = this.CreateDefaultView();
             this.AddDefaultSortToView(_backingView);
+        }
+        public void Update(IEnumerable<TValue> values)
+        {
+            this.Clear(true);
+            foreach (TValue item in values)
+            {
+                this.Add(item, true);
+            }
+            this.OnReset();
         }
 
         #endregion

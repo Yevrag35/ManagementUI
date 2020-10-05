@@ -94,7 +94,6 @@
     <Compile Include="src\EditTags\EditTagItem.cs" />
     <Compile Include="src\Helpers\AppListItemEquality.cs" />
     <Compile Include="src\Helpers\FilterTagEquality.cs" />
-    <Compile Include="src\Objects\Collections\TagSet.cs" />
     <Compile Include="src\Objects\Converters\JsonFilterTagConverter.cs" />
     <Compile Include="src\MUIExtensions\ListSortDirectionExtensions.cs" />
     <Compile Include="src\MUIExtensions\SortDescriptionCollectionExtensions.cs" />
