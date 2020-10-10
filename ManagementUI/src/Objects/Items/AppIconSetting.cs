@@ -53,8 +53,11 @@ namespace ManagementUI
         public int Index { get; set; }
 
         [JsonProperty("tags")]
-        [JsonConverter(typeof(FilterTagConverter))]
-        public SortedSet<FilterTag> Tags { get; set; } = new SortedSet<FilterTag>();
+        public HashSet<string> Tags { get; set; } = new HashSet<string>(StringComparer.CurrentCultureIgnoreCase);
+
+        //[JsonProperty("tags")]
+        //[JsonConverter(typeof(FilterTagConverter))]
+        //public SortedSet<FilterTag> Tags { get; set; } = new SortedSet<FilterTag>();
 
         #endregion
 
