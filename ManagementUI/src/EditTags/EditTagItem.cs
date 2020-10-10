@@ -30,6 +30,16 @@ namespace ManagementUI.Editing
             }
             return list;
         }
+
+        public static EditTagItem FromFilterTag(FilterTag ft, AppIconSetting ais)
+        {
+            return new EditTagItem
+            {
+                IsChecked = ft.IsChecked,
+                Status = ais.Tags.Contains(ft.Tag) ? EditingStatus.Applied : EditingStatus.Available,
+                Title = ft.Tag
+            };
+        }
     }
 
     public enum EditingStatus

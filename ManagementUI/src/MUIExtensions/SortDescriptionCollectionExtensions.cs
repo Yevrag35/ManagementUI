@@ -31,7 +31,7 @@ namespace ManagementUI.Extensions
             ListSortDirection opposite = sortDescription.Direction.ToOpposite();
             AddOnly(collection, new SortDescription(sortDescription.PropertyName, opposite));
         }
-        private static string GetMemberNameFromExpression<T, U>(Expression<Func<T, U>> memberExpression)
+        internal static string GetMemberNameFromExpression<T, U>(Expression<Func<T, U>> memberExpression)
         {
             string name = null;
 
