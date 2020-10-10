@@ -11,11 +11,11 @@ namespace ManagementUI.Editing
 {
     public class EditTagList : ObservableCollection<EditTagItem>
     {
-        private CollectionViewSource _available;
-        private CollectionViewSource _applied;
+        private ListCollectionView _available;
+        private ListCollectionView _applied;
 
-        public ICollectionView Available => _available.View;
-        public ICollectionView Applied => _applied.View;
+        public ICollectionView Available => _available;
+        public ICollectionView Applied => _applied;
 
         public EditTagList(IEnumerable<FilterTag> filterTags, AppIconSetting ais)
             : this(ConvertAll(filterTags, ais))
@@ -35,14 +35,14 @@ namespace ManagementUI.Editing
             _available = new CollectionViewSource
             {
                 Source = this
-            };
+            }.View as ListCollectionView;
             _available.SortDescriptions.Add(new SortDescription(propertyName, ListSortDirection.Descending));
-            _available.IsLiveSortingRequested = true;
-            _available.IsLiveFilteringRequested = true;
             _available.LiveFilteringProperties.Add(filterProperty);
             _available.LiveSortingProperties.Add(propertyName);
-
-            _available.View.Filter = tag =>
+            _available.IsLiveSorting = true;
+            _available.IsLiveFiltering = true;
+            
+            _available.Filter = tag =>
                 tag is EditTagItem eti && eti.Status == EditingStatus.Available;
         }
         private void CreateAppliedView(string propertyName, string filterProperty)
@@ -50,14 +50,14 @@ namespace ManagementUI.Editing
             _applied = new CollectionViewSource
             {
                 Source = this
-            };
+            }.View as ListCollectionView;
             _applied.SortDescriptions.Add(new SortDescription(propertyName, ListSortDirection.Descending));
-            _applied.IsLiveFilteringRequested = true;
-            _applied.IsLiveSortingRequested = true;
             _applied.LiveFilteringProperties.Add(filterProperty);
             _applied.LiveSortingProperties.Add(propertyName);
+            _applied.IsLiveFiltering = true;
+            _applied.IsLiveSorting = true;
 
-            _applied.View.Filter = tag =>
+            _applied.Filter = tag =>
                 tag is EditTagItem eti && eti.Status == EditingStatus.Applied;
         }
 

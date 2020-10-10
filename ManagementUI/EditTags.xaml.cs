@@ -43,15 +43,6 @@ namespace ManagementUI
             this.AvailableTagsList.ItemsSource = this.AllTags.Available;
         }
 
-        private bool OnlyAvailable(object item)
-        {
-            return item is EditTagItem eti && eti.Status == EditingStatus.Available;
-        }
-        private bool OnlyApplied(object item)
-        {
-            return item is EditTagItem eti && eti.Status == EditingStatus.Applied;
-        }
-
         private void TextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
 
@@ -66,9 +57,9 @@ namespace ManagementUI
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                foreach (EditTagItem ft in this.AppliedTagsList.SelectedItems)
+                foreach (EditTagItem eti in this.AppliedTagsList.SelectedItems)
                 {
-                    ft.Status = EditingStatus.Available;
+                    eti.Status = EditingStatus.Available;
                 }
             });
         }
@@ -77,27 +68,17 @@ namespace ManagementUI
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                foreach (EditTagItem ft in this.AvailableTagsList.SelectedItems)
+                foreach (EditTagItem eti in this.AvailableTagsList.SelectedItems)
                 {
-                    ft.Status = EditingStatus.Applied;
+                    eti.Status = EditingStatus.Applied;
                 }
             });
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            if (this.DialogResult.HasValue && this.DialogResult.Value)
-            {
-
-
-                this.Application.Tags.Clear();
-                this.Application.Tags.UnionWith(this.AllTags.Where(x => x.Status == EditingStatus.Applied).Select(x => x.Title));
-                //this.Application.Tags.ExceptWith(this.AllTags.Where(x => x.Status == EditingStatus.Available).Cast<FilterTag>());
-            }
-        }
-
         private void OKBtn_Click(object sender, RoutedEventArgs e)
         {
+            this.Application.Tags.Clear();
+            this.Application.Tags.UnionWith(this.AllTags.Where(x => x.Status == EditingStatus.Applied).Select(x => x.Title));
             this.DialogResult = true;
             this.Close();
         }
