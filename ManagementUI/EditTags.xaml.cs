@@ -21,49 +21,19 @@ namespace ManagementUI
     /// </summary>
     public partial class EditTags : Window
     {
-        private HashSet<FilterTag> _allFilterTags;
-
-        public CollectionViewSource AppliedView { get; set; }
-        public CollectionViewSource AvailableView { get; set; }
-
-        public HashSet<EditTagItem> AllTags { get; set; }
-        //public HashSet<EditTagItem> Available { get; }
+        public HashSet<FilterTag> AllFilterTags { get; }
+        public EditTagList AllTags { get; }
         public AppIconSetting Application { get; }
-        //public HashSet<EditTagItem> Applied { get; }
 
         public EditTags(AppIconSetting chosenApp, IEnumerable<FilterTag> allTags)
         {
-            _allFilterTags = new HashSet<FilterTag>(allTags);
+            this.AllFilterTags = new HashSet<FilterTag>(allTags);
             this.Application = chosenApp;
-            foreach (EditTagItem ft in allTags)
-            {
-                this.AllTags.Add(ft);
-                if (this.Application.Tags.Contains(ft.Title))
-                    ft.Status = EditingStatus.Applied;
-            }
-
-            this.AppliedView = new CollectionViewSource { Source = this.AllTags };
-            this.AppliedView.SortDescriptions.Add<EditTagItem, string>(ListSortDirection.Ascending, x => x.Title);
-            this.AppliedView.View.Filter = this.OnlyApplied;
-
-            this.AvailableView = new CollectionViewSource { Source = this.AllTags };
-            this.AvailableView.SortDescriptions.Add<EditTagItem, string>(ListSortDirection.Ascending, x => x.Title);
-            this.AvailableView.View.Filter = this.OnlyAvailable;
+            this.AllTags = new EditTagList(allTags, chosenApp);
             this.InitializeComponent();
 
-            this.AppliedView.View.Refresh();
-            this.AvailableView.View.Refresh();
-            this.AppliedTagsList.ItemsSource = this.AppliedView.View;
-            this.AvailableTagsList.ItemsSource = this.AvailableView.View;
-        }
-
-        private bool OnlyAvailable(object item)
-        {
-            return item is EditTagItem eti && eti.Status == EditingStatus.Available;
-        }
-        private bool OnlyApplied(object item)
-        {
-            return item is EditTagItem eti && eti.Status == EditingStatus.Applied;
+            this.AppliedTagsList.ItemsSource = this.AllTags.Applied;
+            this.AvailableTagsList.ItemsSource = this.AllTags.Available;
         }
 
         private void TextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -80,12 +50,10 @@ namespace ManagementUI
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                foreach (EditTagItem ft in this.AppliedTagsList.SelectedItems)
+                foreach (EditTagItem eti in this.AppliedTagsList.SelectedItems)
                 {
-                    ft.Status = EditingStatus.Available;
+                    eti.Status = EditingStatus.Available;
                 }
-                this.AppliedView.View.Refresh();
-                this.AvailableView.View.Refresh();
             });
         }
 
@@ -93,29 +61,17 @@ namespace ManagementUI
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                foreach (EditTagItem ft in this.AvailableTagsList.SelectedItems)
+                foreach (EditTagItem eti in this.AvailableTagsList.SelectedItems)
                 {
-                    ft.Status = EditingStatus.Applied;
+                    eti.Status = EditingStatus.Applied;
                 }
-                this.AppliedView.View.Refresh();
-                this.AvailableView.View.Refresh();
             });
-        }
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            if (this.DialogResult.HasValue && this.DialogResult.Value)
-            {
-
-
-                this.Application.Tags.Clear();
-                this.Application.Tags.UnionWith(_allFilterTags.Where(x => this.AllTags.Any(et => et.Status == EditingStatus.Applied && et.Title == x.Tag)));
-                //this.Application.Tags.ExceptWith(this.AllTags.Where(x => x.Status == EditingStatus.Available).Cast<FilterTag>());
-            }
         }
 
         private void OKBtn_Click(object sender, RoutedEventArgs e)
         {
+            this.Application.Tags.Clear();
+            this.Application.Tags.UnionWith(this.AllTags.Where(x => x.Status == EditingStatus.Applied).Select(x => x.Title));
             this.DialogResult = true;
             this.Close();
         }
@@ -135,16 +91,13 @@ namespace ManagementUI
                     Status = EditingStatus.Available,
                     Title = newTag
                 };
-                this.AllTags.Add(ft);
-                _allFilterTags.Add(new FilterTag(ft.Title, false));
-
                 this.Dispatcher.Invoke(() =>
                 {
-                    this.AvailableView.View.Refresh();
+                    this.AllTags.Add(ft);
+                    this.AllFilterTags.Add(ft.Title);
+                    this.AllTags.Available.Refresh();
+                    this.AllTags.Applied.Refresh();
                 });
-
-                //this.Available.Add(ft);
-                //this.AvailableTagsList.Items.Refresh();
             }
         }
     }

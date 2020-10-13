@@ -21,7 +21,7 @@ namespace ManagementUI
     /// </summary>
     public partial class MUI : Window
     {
-        private static HashSet<FilterTag> Checked;
+        private static HashSet<string> Checked;
 
         internal static ADCredential Creds { get; set; }
         //private AppSettingCollection AppList { get; set; }
@@ -65,7 +65,7 @@ namespace ManagementUI
             App.MyHandle = new WindowInteropHelper(this).Handle;
 
             this.AppList = App.JsonSettings.Settings.Apps;
-            Checked = new HashSet<FilterTag>(this.AppList.Tags.Count);
+            Checked = new HashSet<string>(this.AppList.Tags.Count);
 
             this.AppListView.ItemsSource = this.AppList.View;
             this.FilterTags.ItemsSource = this.AppList.Tags.View;
@@ -326,13 +326,13 @@ namespace ManagementUI
 
         private async void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            Checked.Add(((e.Source as CheckBox).DataContext as FilterTag));
+            Checked.Add(((e.Source as CheckBox).DataContext as FilterTag).Tag);
             await this.ApplyCheckBoxFilter();
         }
 
         private async void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
-            Checked.Remove(((e.Source as CheckBox).DataContext as FilterTag));
+            Checked.Remove(((e.Source as CheckBox).DataContext as FilterTag).Tag);
             await this.ApplyCheckBoxFilter();
         }
     }

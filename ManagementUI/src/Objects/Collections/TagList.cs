@@ -15,8 +15,8 @@ namespace ManagementUI
         }
 
         [JsonConstructor]
-        public TagList(IEnumerable<FilterTag> tags)
-            : base(tags, GetDefaultSortDescription(), x => x.Tag, StringComparer.CurrentCultureIgnoreCase)
+        public TagList(IEnumerable<string> tags)
+            : base(ConvertAll(tags), GetDefaultSortDescription(), x => x.Tag, StringComparer.CurrentCultureIgnoreCase)
         {
             foreach (FilterTag ft in tags)
             {
@@ -36,6 +36,11 @@ namespace ManagementUI
         public void Reset(IEnumerable<FilterTag> with)
         {
             base.Update(with);
+        }
+
+        private static IEnumerable<FilterTag> ConvertAll(IEnumerable<string> strings)
+        {
+            return strings.Select(x => new FilterTag(x));
         }
 
         private static SortDescription GetDefaultSortDescription()

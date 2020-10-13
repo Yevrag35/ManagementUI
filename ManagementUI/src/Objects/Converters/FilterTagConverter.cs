@@ -7,11 +7,11 @@ using System.Linq;
 
 namespace ManagementUI.Converters
 {
-    public class FilterTagConverter : JsonConverter<SortedSet<FilterTag>>
+    public class FilterTagConverter : JsonConverter<HashSet<string>>
     {
-        public override SortedSet<FilterTag> ReadJson(JsonReader reader, Type objectType, SortedSet<FilterTag> existingValue, bool hasExistingValue, JsonSerializer serializer)
+        public override HashSet<string> ReadJson(JsonReader reader, Type objectType, HashSet<string> existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            SortedSet<FilterTag> tl = new SortedSet<FilterTag>();
+            HashSet<string> tl = new HashSet<string>();
             JToken token = JToken.ReadFrom(reader);
             if (token.Type == JTokenType.Array && token is JArray jar)
             {
@@ -19,20 +19,20 @@ namespace ManagementUI.Converters
                 {
                     if (item.Type == JTokenType.String)
                     {
-                        tl.Add(new FilterTag(item.ToObject<string>()));
+                        tl.Add(item.ToObject<string>());
                     }
                 }
             }
             return tl;
         }
-        public override void WriteJson(JsonWriter writer, SortedSet<FilterTag> value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, HashSet<string> value, JsonSerializer serializer)
         {
             writer.WriteStartArray();
             if (value != null)
             {
-                foreach (FilterTag ft in value)
+                foreach (string ft in value)
                 {
-                    writer.WriteValue(ft.Tag);
+                    writer.WriteValue(ft);
                 }
             }
             writer.WriteEndArray();

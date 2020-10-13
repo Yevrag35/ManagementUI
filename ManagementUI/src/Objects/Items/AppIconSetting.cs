@@ -54,7 +54,11 @@ namespace ManagementUI
 
         [JsonProperty("tags")]
         [JsonConverter(typeof(FilterTagConverter))]
-        public SortedSet<FilterTag> Tags { get; set; } = new SortedSet<FilterTag>();
+        public HashSet<string> Tags { get; set; } = new HashSet<string>(StringComparer.CurrentCultureIgnoreCase);
+
+        //[JsonProperty("tags")]
+        //[JsonConverter(typeof(FilterTagConverter))]
+        //public SortedSet<FilterTag> Tags { get; set; } = new SortedSet<FilterTag>();
 
         #endregion
 
@@ -86,7 +90,7 @@ namespace ManagementUI
             Index = this.Index,
             Name = this.Name,
             IconPath = this.IconPath,
-            Tags = new SortedSet<FilterTag>(this.Tags, this.Tags.Comparer)
+            Tags = new HashSet<string>(this.Tags, this.Tags.Comparer)
         };
         object ICloneable.Clone() => this.Clone();
         public int CompareTo(AppIconSetting other) => StringComparer.CurrentCultureIgnoreCase.Compare(this.Name, other?.Name);

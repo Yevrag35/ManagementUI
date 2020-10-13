@@ -49,16 +49,16 @@ namespace ManagementUI
         public override void RefreshAll()
         {
             base.RefreshAll();
-            this.Tags.Update(this.GetAllTags());
+            this.Tags.Update(this.GetAllTags().Select(x => new FilterTag(x)));
         }
 
-        internal IEnumerable<FilterTag> GetAllTags()
+        internal IEnumerable<string> GetAllTags()
         {
             return base.Items.Where(x => x.Tags != null).SelectMany(x => x.Tags);
         }
         internal void RegenerateTagView()
         {
-            this.Tags.Reset(this.GetAllTags());
+            this.Tags.Reset(this.GetAllTags().Select(x => new FilterTag(x)));
         }
 
         internal void RemoveAll(Func<AppIconSetting, bool> predicate)
