@@ -269,7 +269,7 @@ namespace ManagementUI
         {
             if (result)
             {
-                if (!modifiedApp.Tags.IsSubsetOf(this.AppList.Tags.Select(x => x.Tag)))
+                if (!modifiedApp.Tags.IsSubsetOf(this.AppList.Tags.GetTagsAsStrings()))
                 {
                     await this.AddTagsToTagList(modifiedApp.Tags, this.AppList.Tags);
                 }
@@ -290,6 +290,10 @@ namespace ManagementUI
             {
                 tagList.AddMany(containingAddedTags.Where(x => !this.AppList.Tags.ContainsKey(x)).Select(ft => new FilterTag(ft)));
                 tagList.View.Refresh();
+                foreach (FilterTag ft in tagList.Where(x => Checked.Contains(x.Tag)))
+                {
+                    ft.IsChecked = true;
+                }
             }).Task;
         }
         private async Task RemoveAnyTagsFromTagList(AppListViewCollection appList)
@@ -300,14 +304,22 @@ namespace ManagementUI
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     appList.Tags.Reset(allTags);
-                    appList.Tags.View.Refresh();
                 });
 
-                IEnumerable<string> tagsAsStrings = appList.GetAllTags();
+                string[] tagsAsStrings = appList.Tags.GetTagsAsStrings();
                 if (!Checked.IsSubsetOf(tagsAsStrings))
                 {
                     Checked.IntersectWith(tagsAsStrings);
                 }
+
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    appList.Tags.View.Refresh();
+                    foreach (FilterTag ft in appList.Tags.Where(x => Checked.Contains(x.Tag)))
+                    {
+                        ft.IsChecked = true;
+                    }
+                });
             }
         }
 
