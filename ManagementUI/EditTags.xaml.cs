@@ -22,15 +22,8 @@ namespace ManagementUI
     public partial class EditTags : Window
     {
         public HashSet<FilterTag> AllFilterTags { get; }
-
-        //public CollectionViewSource AppliedView { get; set; }
-        //public CollectionViewSource AvailableView { get; set; }
-
-        //public HashSet<EditTagItem> AllTags { get; set; }
         public EditTagList AllTags { get; }
-        //public HashSet<EditTagItem> Available { get; }
         public AppIconSetting Application { get; }
-        //public HashSet<EditTagItem> Applied { get; }
 
         public EditTags(AppIconSetting chosenApp, IEnumerable<FilterTag> allTags)
         {
