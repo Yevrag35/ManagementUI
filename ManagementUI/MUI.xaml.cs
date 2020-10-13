@@ -258,70 +258,32 @@ namespace ManagementUI
                     Owner = this
                 };
                 bool? result = editTags.ShowDialog();
-                if (result.GetValueOrDefault())
-                {
-                    this.Dispatcher.Invoke(() =>
-                    {
-                        foreach (FilterTag checkedTag in this.FilterTags.Items.OfType<FilterTag>().Where(x => x.IsChecked))
-                        {
-                            foreach (AppIconSetting ais2 in this.AppList)
-                            {
-                                foreach (FilterTag innerFt in ais2.Tags)
-                                {
-                                    if (innerFt.Tag.Equals(checkedTag.Tag))
-                                        innerFt.IsChecked = true;
-                                }
-                            }
-                        }
+                this.HandleOkEdit(result.GetValueOrDefault(), editTags.Application);
+            }
+        }
 
+        // Handle Edit OK
+        private async Task HandleOkEdit(bool result, AppIconSetting modifiedApp)
+        {
+            if (result)
+            {
+                if (!modifiedApp.Tags.IsSubsetOf(this.AppList.Tags.Select(x => x.Tag)))
+                {
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.AppList.Tags.AddMany(modifiedApp.Tags.Where(x => !this.AppList.Tags.ContainsKey(x)).Select(ft => new FilterTag(ft)));
                         this.AppList.Tags.View.Refresh();
-                        this.AppList.View.Refresh();
                     });
                 }
+
+                await this.ApplyCheckBoxFilter();
+
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.AppList.View.Refresh();
+                    
+                });
             }
-
-            //    if (sender is MenuItem mi && mi.DataContext is MUI mui &&
-            //        mui.AppListView.SelectedItem is AppListItem ali)
-            //    {
-            //        var editTags = new EditTags(ali, this.FilterTags.Items.Cast<FilterTag>())
-            //        {
-            //            Owner = this
-            //        };
-            //        bool? result = editTags.ShowDialog();
-            //        if (result.HasValue && result.Value)
-            //        {
-            //            var tempList = this.FilterTags.Items.Cast<FilterTag>().ToList();
-            //            //if (!tempList.TrueForAll(x => editTags.AllTags.Contains(t => t.Tag.Equals(x.Tag))))
-            //            if (!editTags.AllTags.TrueForAll(x => tempList.Contains(x)))
-            //            {
-            //                for (int i = this.FilterTags.Items.Count - 1; i >= 0; i--)
-            //                {
-            //                    var ft = (FilterTag)this.FilterTags.Items[i];
-            //                    if (!editTags.AllTags.Contains(t => t.Tag.Equals(ft.Tag)))
-            //                    { 
-            //                        this.FilterTags.Items.Remove(ft);
-            //                        this.FilterTags.Items.Refresh();
-            //                    }
-            //                }
-            //                for (int i = 0; i < editTags.AllTags.Count; i++)
-            //                {
-            //                    var ft2 = editTags.AllTags[i];
-            //                    if (!tempList.Exists(x => x.Tag.Equals(ft2.Tag)))
-            //                    {
-            //                        this.FilterTags.Items.Add(ft2);
-            //                        this.FilterTags.Items.Refresh();
-            //                    }
-            //                }
-            //            }
-
-            //            ali.Tags = string.Join(", ", ali.TagList);
-            //            this.Dispatcher.Invoke(() =>
-            //            {
-            //                ((MUI)Application.Current.MainWindow).AppListView.Items.Refresh();
-            //            });
-            //            App.JsonSettings.Save();
-            //        }
-            //    }
         }
 
         private async void CheckBox_Checked(object sender, RoutedEventArgs e)
