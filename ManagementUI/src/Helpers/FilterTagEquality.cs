@@ -10,25 +10,16 @@ namespace ManagementUI
     {
         public bool Equals(FilterTag x, FilterTag y)
         {
-            if (string.IsNullOrWhiteSpace(x.Tag) && string.IsNullOrWhiteSpace(y.Tag))
-                return true;
-
-            else if (!string.IsNullOrWhiteSpace(x.Tag) && !string.IsNullOrWhiteSpace(y.Tag) &&
-                x.Tag.Equals(y.Tag, StringComparison.CurrentCulture))
+            if (object.ReferenceEquals(x, y))
                 return true;
 
             else
-                return false;
+                return StringComparer.CurrentCultureIgnoreCase.Equals(x?.Tag, y?.Tag);
         }
 
         public int GetHashCode(FilterTag tag)
         {
-            if (!string.IsNullOrWhiteSpace(tag.Tag))
-            {
-                return tag.Tag.GetHashCode();
-            }
-            else
-                return tag.GetHashCode();
+            return StringComparer.CurrentCultureIgnoreCase.GetHashCode(tag?.Tag);
         }
     }
 }

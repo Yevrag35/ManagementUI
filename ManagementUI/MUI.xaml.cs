@@ -22,6 +22,7 @@ namespace ManagementUI
     public partial class MUI : Window
     {
         private static HashSet<string> Checked;
+        private FilterTagEquality _ftEquality;
 
         internal static ADCredential Creds { get; set; }
         //private AppSettingCollection AppList { get; set; }
@@ -30,6 +31,7 @@ namespace ManagementUI
 
         public MUI()
         {
+            _ftEquality = new FilterTagEquality();
             InitializeComponent();
         }
 
@@ -269,23 +271,41 @@ namespace ManagementUI
             {
                 if (!modifiedApp.Tags.IsSubsetOf(this.AppList.Tags.Select(x => x.Tag)))
                 {
-                    await this.Dispatcher.InvokeAsync(() =>
-                    {
-                        this.AppList.Tags.AddMany(modifiedApp.Tags.Where(x => !this.AppList.Tags.ContainsKey(x)).Select(ft => new FilterTag(ft)));
-                        this.AppList.Tags.View.Refresh();
-                    });
+                    await this.AddTagsToTagList(modifiedApp.Tags, this.AppList.Tags);
                 }
+                await this.RemoveAnyTagsFromTagList(this.AppList);
 
                 await this.ApplyCheckBoxFilter();
 
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.AppList.View.Refresh();
-                    
                 });
             }
         }
 
+        private Task AddTagsToTagList(ISet<string> containingAddedTags, TagList tagList)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                tagList.AddMany(containingAddedTags.Where(x => !this.AppList.Tags.ContainsKey(x)).Select(ft => new FilterTag(ft)));
+                tagList.View.Refresh();
+            }).Task;
+        }
+        private async Task RemoveAnyTagsFromTagList(AppListViewCollection appList)
+        {
+            var allTags = new HashSet<FilterTag>(appList.GetAllTags().Select(x => new FilterTag(x)), _ftEquality);
+            if (allTags.IsProperSubsetOf(appList.Tags))
+            {
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    appList.Tags.Reset(allTags);
+                    appList.Tags.View.Refresh();
+                });
+            }
+        }
+
+        #region CHECKBOX EVENTS
         private async void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             Checked.Add(((e.Source as CheckBox).DataContext as FilterTag).Tag);
@@ -297,5 +317,7 @@ namespace ManagementUI
             Checked.Remove(((e.Source as CheckBox).DataContext as FilterTag).Tag);
             await this.ApplyCheckBoxFilter();
         }
+
+        #endregion
     }
 }
