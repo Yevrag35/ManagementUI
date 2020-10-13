@@ -36,16 +36,6 @@ namespace ManagementUI
             this.AvailableTagsList.ItemsSource = this.AllTags.Available;
         }
 
-        private void TextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-
-        private void TextBox_MouseEnter(object sender, MouseEventArgs e)
-        {
-
-        }
-
         private async void RemoveTagBtn_Click(object sender, RoutedEventArgs e)
         {
             await this.Dispatcher.InvokeAsync(() =>
