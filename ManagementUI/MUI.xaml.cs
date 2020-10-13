@@ -21,13 +21,17 @@ namespace ManagementUI
     /// </summary>
     public partial class MUI : Window
     {
-        internal static ADCredential Creds { get; set; }
-        private AppSettingCollection AppList { get; set; }
-        internal IEnumerable<string> AllTags => this.AppList != null
-            ? AppList.Where(x => x.Tags != null).SelectMany(x => x.Tags).Distinct()
-            : null;
+        private static HashSet<string> Checked;
 
-        public MUI() => InitializeComponent();
+        internal static ADCredential Creds { get; set; }
+        //private AppSettingCollection AppList { get; set; }
+        private AppListViewCollection AppList { get; set; }
+        //internal IEnumerable<string> AllTags => this.AppList?.Tags;
+
+        public MUI()
+        {
+            InitializeComponent();
+        }
 
         internal static bool IsElevated()
         {
@@ -36,6 +40,24 @@ namespace ManagementUI
             return prinId.IsInRole(WindowsBuiltInRole.Administrator);
         }
 
+        #region CHECKBOX FILTER
+        private async Task ApplyCheckBoxFilter()
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                foreach (AppIconSetting ais in this.AppList)
+                {
+                    if (!ais.Tags.IsSupersetOf(Checked))
+                        ais.IsChecked = false;
+
+                    else
+                        ais.IsChecked = true;
+                }
+            });
+        }
+
+        #endregion
+
         #region EVENT HANDLERS
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -43,38 +65,36 @@ namespace ManagementUI
             App.MyHandle = new WindowInteropHelper(this).Handle;
 
             this.AppList = App.JsonSettings.Settings.Apps;
+            Checked = new HashSet<string>(this.AppList.Tags.Count);
+
             this.AppListView.ItemsSource = this.AppList.View;
+            this.FilterTags.ItemsSource = this.AppList.Tags.View;
 
             this.AppList.CollectionChanged += this.AppList_Changed;
-            string[] tags = this.AppList.Tags;
-            for (int i = 0; i < tags.Length; i++)
-            {
-                string tag = tags[i];
-                var ft = new FilterTag(tag, false);
-                this.FilterTags.Items.Add(ft);
-            }
         }
+
 
         private void AppList_Changed(object sender, NotifyCollectionChangedEventArgs e)
         {
-            //await Task.Run(() =>
-            //{
-            if (e.Action == NotifyCollectionChangedAction.Remove)
-            {
-                IEnumerable<AppIconSetting> alis = e.OldItems.Cast<AppIconSetting>();
-                int removed = App.JsonSettings.Settings.Apps.RemoveAll(app => alis.Contains(app));
-            }
-            //}).ConfigureAwait(false);
-            this.Dispatcher.Invoke(() =>
-            {
-                ((MUI)Application.Current.MainWindow).AppList.UpdateView();
-                ((MUI)Application.Current.MainWindow).AppListView.Items.Refresh();
-            });
-            App.JsonSettings.Save();
-            //await this.Dispatcher.InvokeAsync(() =>
-            //{
+            this.AppList.RefreshAll();
+            //    //await Task.Run(() =>
+            //    //{
+            //    if (e.Action == NotifyCollectionChangedAction.Remove)
+            //    {
+            //        IEnumerable<AppIconSetting> alis = e.OldItems.Cast<AppIconSetting>();
+            //        int removed = App.JsonSettings.Settings.Apps.RemoveAll(app => alis.Contains(app));
+            //    }
+            //    //}).ConfigureAwait(false);
+            //    this.Dispatcher.Invoke(() =>
+            //    {
+            //        ((MUI)Application.Current.MainWindow).AppList.UpdateView();
+            //        ((MUI)Application.Current.MainWindow).AppListView.Items.Refresh();
+            //    });
+            //    App.JsonSettings.Save();
+            //    //await this.Dispatcher.InvokeAsync(() =>
+            //    //{
 
-            //});
+            //    //});
         }
 
         private void CredButton_Click(object sender, RoutedEventArgs e)
@@ -187,16 +207,6 @@ namespace ManagementUI
             }
         }
 
-        //private async Task WriteAppToFile(AppIconSetting ais)
-        //{
-        //    await Task.Run(() =>
-        //    {
-        //        App.JsonSettings.Settings.Apps.Add(ais);
-        //        App.JsonSettings.Settings.Apps.Sort(new AppSettingCollection.AppIconSettingDefaultSorter());
-        //        App.JsonSettings.Save();
-        //    }).ConfigureAwait(false);
-        //}
-
         private async void ALMIRemove_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem mi && mi.DataContext is MUI mui &&
@@ -237,84 +247,93 @@ namespace ManagementUI
             }
         }
 
+
         private void EditTagsBtn_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem mi && mi.DataContext is MUI mui &&
-                mui.AppListView.SelectedItem is AppListItem ali)
+                mui.AppListView.SelectedItem is AppIconSetting ais)
             {
-                var editTags = new EditTags(ali, this.FilterTags.Items.Cast<FilterTag>())
+                var editTags = new EditTags(ais, this.AppList.Tags)
                 {
                     Owner = this
                 };
                 bool? result = editTags.ShowDialog();
-                if (result.HasValue && result.Value)
+                if (result.GetValueOrDefault())
                 {
-                    var tempList = this.FilterTags.Items.Cast<FilterTag>().ToList();
-                    //if (!tempList.TrueForAll(x => editTags.AllTags.Contains(t => t.Tag.Equals(x.Tag))))
-                    if (!editTags.AllTags.TrueForAll(x => tempList.Contains(x)))
-                    {
-                        for (int i = this.FilterTags.Items.Count - 1; i >= 0; i--)
-                        {
-                            var ft = (FilterTag)this.FilterTags.Items[i];
-                            if (!editTags.AllTags.Contains(t => t.Tag.Equals(ft.Tag)))
-                            { 
-                                this.FilterTags.Items.Remove(ft);
-                                this.FilterTags.Items.Refresh();
-                            }
-                        }
-                        for (int i = 0; i < editTags.AllTags.Count; i++)
-                        {
-                            var ft2 = editTags.AllTags[i];
-                            if (!tempList.Exists(x => x.Tag.Equals(ft2.Tag)))
-                            {
-                                this.FilterTags.Items.Add(ft2);
-                                this.FilterTags.Items.Refresh();
-                            }
-                        }
-                    }
-
-                    ali.Tags = string.Join(", ", ali.TagList);
                     this.Dispatcher.Invoke(() =>
                     {
-                        ((MUI)Application.Current.MainWindow).AppListView.Items.Refresh();
+                        foreach (FilterTag checkedTag in this.FilterTags.Items.OfType<FilterTag>().Where(x => x.IsChecked))
+                        {
+                            foreach (AppIconSetting ais2 in this.AppList)
+                            {
+                                foreach (FilterTag innerFt in ais2.Tags)
+                                {
+                                    if (innerFt.Tag.Equals(checkedTag.Tag))
+                                        innerFt.IsChecked = true;
+                                }
+                            }
+                        }
+
+                        this.AppList.Tags.View.Refresh();
+                        this.AppList.View.Refresh();
                     });
-                    App.JsonSettings.Save();
                 }
             }
+
+            //    if (sender is MenuItem mi && mi.DataContext is MUI mui &&
+            //        mui.AppListView.SelectedItem is AppListItem ali)
+            //    {
+            //        var editTags = new EditTags(ali, this.FilterTags.Items.Cast<FilterTag>())
+            //        {
+            //            Owner = this
+            //        };
+            //        bool? result = editTags.ShowDialog();
+            //        if (result.HasValue && result.Value)
+            //        {
+            //            var tempList = this.FilterTags.Items.Cast<FilterTag>().ToList();
+            //            //if (!tempList.TrueForAll(x => editTags.AllTags.Contains(t => t.Tag.Equals(x.Tag))))
+            //            if (!editTags.AllTags.TrueForAll(x => tempList.Contains(x)))
+            //            {
+            //                for (int i = this.FilterTags.Items.Count - 1; i >= 0; i--)
+            //                {
+            //                    var ft = (FilterTag)this.FilterTags.Items[i];
+            //                    if (!editTags.AllTags.Contains(t => t.Tag.Equals(ft.Tag)))
+            //                    { 
+            //                        this.FilterTags.Items.Remove(ft);
+            //                        this.FilterTags.Items.Refresh();
+            //                    }
+            //                }
+            //                for (int i = 0; i < editTags.AllTags.Count; i++)
+            //                {
+            //                    var ft2 = editTags.AllTags[i];
+            //                    if (!tempList.Exists(x => x.Tag.Equals(ft2.Tag)))
+            //                    {
+            //                        this.FilterTags.Items.Add(ft2);
+            //                        this.FilterTags.Items.Refresh();
+            //                    }
+            //                }
+            //            }
+
+            //            ali.Tags = string.Join(", ", ali.TagList);
+            //            this.Dispatcher.Invoke(() =>
+            //            {
+            //                ((MUI)Application.Current.MainWindow).AppListView.Items.Refresh();
+            //            });
+            //            App.JsonSettings.Save();
+            //        }
+            //    }
         }
 
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        private async void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            var list = new List<string>();
-            foreach (FilterTag ft in FilterTags.Items)
-            {
-                if (ft.IsChecked)
-                    list.Add(ft.Tag);
-            }
-
-            this.AppListView.Items.Filter = x => 
-                list.Count <= 0 ||
-                    (x is AppIconSetting ali && 
-                    ali.Tags != null &&
-                    list.TrueForAll(
-                        t => ali.Tags.Contains(t)));
+            Checked.Add(((e.Source as CheckBox).DataContext as FilterTag).Tag);
+            await this.ApplyCheckBoxFilter();
         }
 
-        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        private async void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
-            var list = new List<string>();
-            foreach (FilterTag ft in FilterTags.Items)
-            {
-                if (ft.IsChecked)
-                    list.Add(ft.Tag);
-            }
-
-            this.AppListView.Items.Filter = x => 
-                list.Count <= 0 || (
-                    x is AppIconSetting ali &&
-                    ali.Tags != null &&
-                    list.TrueForAll(
-                        t => ali.Tags.Contains(t)));
+            Checked.Remove(((e.Source as CheckBox).DataContext as FilterTag).Tag);
+            await this.ApplyCheckBoxFilter();
         }
     }
 }

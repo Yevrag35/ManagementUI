@@ -1,145 +1,67 @@
-﻿using Microsoft.VisualBasic;
+﻿using ManagementUI.Editing;
+using ManagementUI.Extensions;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace ManagementUI
 {
     /// <summary>
     /// Interaction logic for EditTags.xaml
+    /// TO DO - FIND A WAY TO LOAD THE EXISTING APPLIED EASILY
     /// </summary>
     public partial class EditTags : Window
     {
-        public TagCollection AllTags { get; set; }
-        public TagCollection Available { get; }
-        public AppListItem Application { get; }
-        public TagCollection Applied { get; }
+        public HashSet<FilterTag> AllFilterTags { get; }
+        public EditTagList AllTags { get; }
+        public AppIconSetting Application { get; }
 
-        public EditTags(AppListItem ali, IEnumerable<FilterTag> currentTags)
+        public EditTags(AppIconSetting chosenApp, IEnumerable<FilterTag> allTags)
         {
-            this.AllTags = new TagCollection(currentTags);
-            this.Application = ali;
+            this.AllFilterTags = new HashSet<FilterTag>(allTags);
+            this.Application = chosenApp;
+            this.AllTags = new EditTagList(allTags, chosenApp);
+            this.InitializeComponent();
 
-            if (this.Application.TagList == null)
-                this.Application.TagList = new List<string>();
-
-            this.Available = new TagCollection(this.AllTags.FindAll(x => !this.Application.TagList.Contains(x.Tag)));
-            this.Available.CollectionChanged += this.OnAvailableTag_Changed;
-
-            this.Applied = new TagCollection(this.AllTags.FindAll(x => this.Application.TagList.Contains(x.Tag)));
-            this.Applied.CollectionChanged += this.OnAppliedTag_Changed;
-
-            InitializeComponent();
-
-            this.AvailableTagsList.ItemsSource = this.Available;
-            this.AppliedTagsList.ItemsSource = this.Applied;
+            this.AppliedTagsList.ItemsSource = this.AllTags.Applied;
+            this.AvailableTagsList.ItemsSource = this.AllTags.Available;
         }
 
-        private void OnAvailableTag_Changed(object sender, NotifyCollectionChangedEventArgs e)
+        private async void RemoveTagBtn_Click(object sender, RoutedEventArgs e)
         {
-            switch (e.Action)
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                case NotifyCollectionChangedAction.Add:
+                foreach (EditTagItem eti in this.AppliedTagsList.SelectedItems)
                 {
-                    foreach (FilterTag ft in e.NewItems)
-                    {
-                        ((ICollection<FilterTag>)this.Applied).Remove(ft);
-                    }
-                    break;
+                    eti.Status = EditingStatus.Available;
                 }
-                case NotifyCollectionChangedAction.Remove:
+            });
+        }
+
+        private async void ApplyTagBtn_Click(object sender, RoutedEventArgs e)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                foreach (EditTagItem eti in this.AvailableTagsList.SelectedItems)
                 {
-                    foreach (FilterTag ft in e.OldItems)
-                    {
-                        ((ICollection<FilterTag>)this.Available).Remove(ft);
-                    }
-                    break;
+                    eti.Status = EditingStatus.Applied;
                 }
-            }
-            this.Applied.Sort();
-            this.Available.Sort();
-        }
-        private void OnAppliedTag_Changed(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                {
-                    foreach (FilterTag ft in e.NewItems)
-                    {
-                        ((ICollection<FilterTag>)this.Available).Remove(ft);
-                    }
-                    break;
-                }
-                case NotifyCollectionChangedAction.Remove:
-                {
-                    foreach (FilterTag ft in e.OldItems)
-                    {
-                        ((ICollection<FilterTag>)this.Applied).Remove(ft);
-                    }
-                    break;
-                }
-            }
-            this.Available.Sort();
-            this.Applied.Sort();
-        }
-
-        private bool OnlyAvailable(object item)
-        {
-            return item is FilterTag ft && !Application.TagList.Contains(ft.Tag);
-        }
-        private bool OnlyApplied(object item)
-        {
-            return item is FilterTag ft && Application.TagList.Contains(ft.Tag);
-        }
-
-        private void TextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-
-        private void TextBox_MouseEnter(object sender, MouseEventArgs e)
-        {
-
-        }
-
-        private void RemoveTagBtn_Click(object sender, RoutedEventArgs e)
-        {
-            foreach (FilterTag ft in this.AppliedTagsList.SelectedItems)
-            {
-                this.Available.Add(ft);
-            }
-            this.AppliedTagsList.Items.Refresh();
-            this.AvailableTagsList.Items.Refresh();
-        }
-
-        private void ApplyTagBtn_Click(object sender, RoutedEventArgs e)
-        {
-            foreach (FilterTag ft in this.AvailableTagsList.SelectedItems)
-            {
-                this.Applied.Add(ft);
-            }
-
-            this.AppliedTagsList.Items.Refresh();
-            this.AvailableTagsList.Items.Refresh();
-        }
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            if (this.DialogResult.HasValue && this.DialogResult.Value)
-            {
-                this.Application.TagList = this.Applied.Select(x => x.Tag).ToList();
-            }
+            });
         }
 
         private void OKBtn_Click(object sender, RoutedEventArgs e)
         {
+            this.Application.Tags.Clear();
+            this.Application.Tags.UnionWith(this.AllTags.Where(x => x.Status == EditingStatus.Applied).Select(x => x.Title));
             this.DialogResult = true;
             this.Close();
         }
@@ -153,10 +75,19 @@ namespace ManagementUI
             );
             if (!string.IsNullOrWhiteSpace(newTag) && newTag != "<new tag>")
             {
-                var ft = new FilterTag(newTag, false);
-                this.AllTags.Add(ft);
-                ((ICollection<FilterTag>)this.Available).Add(ft);
-                this.AvailableTagsList.Items.Refresh();
+                var ft = new EditTagItem
+                {
+                    IsChecked = false,
+                    Status = EditingStatus.Available,
+                    Title = newTag
+                };
+                this.Dispatcher.Invoke(() =>
+                {
+                    this.AllTags.Add(ft);
+                    this.AllFilterTags.Add(ft.Title);
+                    this.AllTags.Available.Refresh();
+                    this.AllTags.Applied.Refresh();
+                });
             }
         }
     }

@@ -1,20 +1,17 @@
-﻿using ManagementUI.Auth;
+﻿using ManagementUI.Converters;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
@@ -22,8 +19,11 @@ namespace ManagementUI
 {
     [Serializable]
     [JsonObject(MemberSerialization.OptIn)]
-    public class AppIconSetting : ICloneable, IComparable<AppIconSetting>
+    public class AppIconSetting : ChangeableItem, ICloneable, IComparable<AppIconSetting>, INotifyPropertyChanged
     {
+        public override event PropertyChangedEventHandler PropertyChanged;
+        private bool _isChecked = true;
+
         #region PROPERTIES
         [JsonProperty("arguments")]
         public string Arguments { get; set; }
@@ -34,7 +34,15 @@ namespace ManagementUI
 
         public BitmapSource Image { get; set; }
 
-        public bool IsChecked { get; set; }
+        public bool IsChecked
+        {
+            get => _isChecked;
+            set
+            {
+                _isChecked = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(this.GetName(x => x.IsChecked)));
+            }
+        }
 
         public bool Exists { get; private set; }
 
@@ -44,8 +52,13 @@ namespace ManagementUI
         [JsonProperty("iconIndex")]
         public int Index { get; set; }
 
-        [JsonProperty("tags", DefaultValueHandling = DefaultValueHandling.Populate)]
-        public List<string> Tags { get; set; }
+        [JsonProperty("tags")]
+        [JsonConverter(typeof(FilterTagConverter))]
+        public HashSet<string> Tags { get; set; } = new HashSet<string>(StringComparer.CurrentCultureIgnoreCase);
+
+        //[JsonProperty("tags")]
+        //[JsonConverter(typeof(FilterTagConverter))]
+        //public SortedSet<FilterTag> Tags { get; set; } = new SortedSet<FilterTag>();
 
         #endregion
 
@@ -77,10 +90,10 @@ namespace ManagementUI
             Index = this.Index,
             Name = this.Name,
             IconPath = this.IconPath,
-            Tags = this.Tags
+            Tags = new HashSet<string>(this.Tags, this.Tags.Comparer)
         };
         object ICloneable.Clone() => this.Clone();
-        public int CompareTo(AppIconSetting other) => this.Name.CompareTo(other.Name);
+        public int CompareTo(AppIconSetting other) => StringComparer.CurrentCultureIgnoreCase.Compare(this.Name, other?.Name);
         public void FinalizeObject()
         {
             IntPtr appHandle = ExtractIconA(App.MyHandle, this.IconPath, Convert.ToUInt32(this.Index));
@@ -95,6 +108,10 @@ namespace ManagementUI
             }
 
             this.Image = this.Bitmap2BitmapImage(appIcon.ToBitmap());
+        }
+        private string GetName<T>(Expression<Func<AppIconSetting, T>> expression)
+        {
+            return base.GetPropertyName(expression);
         }
         public async Task LaunchAsync()
         {
@@ -136,11 +153,8 @@ namespace ManagementUI
                 this.FinalizeObject();
                 this.Exists = true;
             }
-            else
-            {
-                this.Exists = false;
-            }
         }
+
 
         [DllImport("gdi32.dll")]
         public static extern bool DeleteObject(IntPtr hObject);

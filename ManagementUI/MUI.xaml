@@ -256,6 +256,7 @@
                 <ListView.ContextMenu>
                     <ContextMenu x:Name="AppListContextMenu">
                         <MenuItem x:Name="EditTagsBtn" Header="Edit Tags..." InputGestureText="E" Click="EditTagsBtn_Click"/>
+                        
                         <MenuItem x:Name="ALMIRemove" Header="Remove from List"
                                   InputGestureText="Delete" Click="ALMIRemove_Click"/>
                     </ContextMenu>
