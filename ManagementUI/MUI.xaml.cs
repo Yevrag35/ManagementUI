@@ -294,7 +294,7 @@ namespace ManagementUI
         }
         private async Task RemoveAnyTagsFromTagList(AppListViewCollection appList)
         {
-            var allTags = new HashSet<FilterTag>(appList.GetAllTags().Select(x => new FilterTag(x)), _ftEquality);
+            HashSet<FilterTag> allTags = appList.GetAllTagsAsSet(_ftEquality);
             if (allTags.IsProperSubsetOf(appList.Tags))
             {
                 await this.Dispatcher.InvokeAsync(() =>
@@ -302,6 +302,12 @@ namespace ManagementUI
                     appList.Tags.Reset(allTags);
                     appList.Tags.View.Refresh();
                 });
+
+                IEnumerable<string> tagsAsStrings = appList.GetAllTags();
+                if (!Checked.IsSubsetOf(tagsAsStrings))
+                {
+                    Checked.IntersectWith(tagsAsStrings);
+                }
             }
         }
 
