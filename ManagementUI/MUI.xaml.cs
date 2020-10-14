@@ -22,6 +22,7 @@ namespace ManagementUI
     public partial class MUI : Window
     {
         private static HashSet<string> Checked;
+        private FilterTagEquality _ftEquality;
 
         internal static ADCredential Creds { get; set; }
         //private AppSettingCollection AppList { get; set; }
@@ -30,6 +31,7 @@ namespace ManagementUI
 
         public MUI()
         {
+            _ftEquality = new FilterTagEquality();
             InitializeComponent();
         }
 
@@ -258,72 +260,70 @@ namespace ManagementUI
                     Owner = this
                 };
                 bool? result = editTags.ShowDialog();
-                if (result.GetValueOrDefault())
-                {
-                    this.Dispatcher.Invoke(() =>
-                    {
-                        foreach (FilterTag checkedTag in this.FilterTags.Items.OfType<FilterTag>().Where(x => x.IsChecked))
-                        {
-                            foreach (AppIconSetting ais2 in this.AppList)
-                            {
-                                foreach (FilterTag innerFt in ais2.Tags)
-                                {
-                                    if (innerFt.Tag.Equals(checkedTag.Tag))
-                                        innerFt.IsChecked = true;
-                                }
-                            }
-                        }
-
-                        this.AppList.Tags.View.Refresh();
-                        this.AppList.View.Refresh();
-                    });
-                }
+                this.HandleOkEdit(result.GetValueOrDefault(), editTags.Application);
             }
-
-            //    if (sender is MenuItem mi && mi.DataContext is MUI mui &&
-            //        mui.AppListView.SelectedItem is AppListItem ali)
-            //    {
-            //        var editTags = new EditTags(ali, this.FilterTags.Items.Cast<FilterTag>())
-            //        {
-            //            Owner = this
-            //        };
-            //        bool? result = editTags.ShowDialog();
-            //        if (result.HasValue && result.Value)
-            //        {
-            //            var tempList = this.FilterTags.Items.Cast<FilterTag>().ToList();
-            //            //if (!tempList.TrueForAll(x => editTags.AllTags.Contains(t => t.Tag.Equals(x.Tag))))
-            //            if (!editTags.AllTags.TrueForAll(x => tempList.Contains(x)))
-            //            {
-            //                for (int i = this.FilterTags.Items.Count - 1; i >= 0; i--)
-            //                {
-            //                    var ft = (FilterTag)this.FilterTags.Items[i];
-            //                    if (!editTags.AllTags.Contains(t => t.Tag.Equals(ft.Tag)))
-            //                    { 
-            //                        this.FilterTags.Items.Remove(ft);
-            //                        this.FilterTags.Items.Refresh();
-            //                    }
-            //                }
-            //                for (int i = 0; i < editTags.AllTags.Count; i++)
-            //                {
-            //                    var ft2 = editTags.AllTags[i];
-            //                    if (!tempList.Exists(x => x.Tag.Equals(ft2.Tag)))
-            //                    {
-            //                        this.FilterTags.Items.Add(ft2);
-            //                        this.FilterTags.Items.Refresh();
-            //                    }
-            //                }
-            //            }
-
-            //            ali.Tags = string.Join(", ", ali.TagList);
-            //            this.Dispatcher.Invoke(() =>
-            //            {
-            //                ((MUI)Application.Current.MainWindow).AppListView.Items.Refresh();
-            //            });
-            //            App.JsonSettings.Save();
-            //        }
-            //    }
         }
 
+        // Handle Edit OK
+        private async Task HandleOkEdit(bool result, AppIconSetting modifiedApp)
+        {
+            if (result)
+            {
+                if (!modifiedApp.Tags.IsSubsetOf(this.AppList.Tags.GetTagsAsStrings()))
+                {
+                    await this.AddTagsToTagList(modifiedApp.Tags, this.AppList.Tags);
+                }
+                await this.RemoveAnyTagsFromTagList(this.AppList);
+
+                await this.ApplyCheckBoxFilter();
+
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.AppList.View.Refresh();
+                });
+            }
+        }
+
+        private Task AddTagsToTagList(ISet<string> containingAddedTags, TagList tagList)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                tagList.AddMany(containingAddedTags.Where(x => !this.AppList.Tags.ContainsKey(x)).Select(ft => new FilterTag(ft)));
+                tagList.View.Refresh();
+                foreach (FilterTag ft in tagList.Where(x => Checked.Contains(x.Tag)))
+                {
+                    ft.IsChecked = true;
+                }
+            }).Task;
+        }
+        private async Task RemoveAnyTagsFromTagList(AppListViewCollection appList)
+        {
+            HashSet<FilterTag> allTags = appList.GetAllTagsAsSet(_ftEquality);
+            if (allTags.IsProperSubsetOf(appList.Tags))
+            {
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    appList.Tags.Reset(allTags);
+                });
+
+                string[] tagsAsStrings = appList.Tags.GetTagsAsStrings();
+                if (!Checked.IsSubsetOf(tagsAsStrings))
+                {
+                    Checked.IntersectWith(tagsAsStrings);
+                }
+
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    appList.Tags.View.Refresh();
+                    foreach (FilterTag ft in appList.Tags.Where(x => Checked.Contains(x.Tag)))
+                    {
+                        ft.IsChecked = true;
+                    }
+                });
+            }
+        }
+
+        #region CHECKBOX EVENTS
         private async void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             Checked.Add(((e.Source as CheckBox).DataContext as FilterTag).Tag);
@@ -335,5 +335,7 @@ namespace ManagementUI
             Checked.Remove(((e.Source as CheckBox).DataContext as FilterTag).Tag);
             await this.ApplyCheckBoxFilter();
         }
+
+        #endregion
     }
 }

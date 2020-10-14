@@ -56,6 +56,17 @@ namespace ManagementUI
         {
             return base.Items.Where(x => x.Tags != null).SelectMany(x => x.Tags);
         }
+        internal IEnumerable<FilterTag> GetAllTagsAsFilter()
+        {
+            foreach (string s in this.GetAllTags())
+            {
+                yield return new FilterTag(s);
+            }
+        }
+        internal HashSet<FilterTag> GetAllTagsAsSet(IEqualityComparer<FilterTag> comparer)
+        {
+            return new HashSet<FilterTag>(this.GetAllTagsAsFilter(), comparer);
+        }
         internal void RegenerateTagView()
         {
             this.Tags.Reset(this.GetAllTags().Select(x => new FilterTag(x)));

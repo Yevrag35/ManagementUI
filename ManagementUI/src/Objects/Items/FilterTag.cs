@@ -1,16 +1,18 @@
 ﻿using ManagementUI.Converters;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime;
 
 namespace ManagementUI
 {
     [JsonConverter(typeof(JsonFilterTagConverter))]
     public class FilterTag : ChangeableItem, ICloneable, IComparable<FilterTag>, IComparable<string>, IEquatable<FilterTag>, IEquatable<string>,
-        INotifyPropertyChanged
+        INotifyPropertyChanged, IComparable
     {
         private static StringComparer Comparer = StringComparer.CurrentCultureIgnoreCase;
         private bool _isChecked;
@@ -74,6 +76,18 @@ namespace ManagementUI
             _isChecked = this.IsChecked
         };
         object ICloneable.Clone() => this.Clone();
+        public int CompareTo(object obj)
+        {
+            if (ReferenceEquals(this, obj))
+                return 0;
+
+            else if (obj is FilterTag ft)
+            {
+                return this.CompareTo(ft);
+            }
+            else
+                return 1;
+        }
 
         public int CompareTo(FilterTag other) => Comparer.Compare(this.Tag, other?.Tag);
         public int CompareTo(string tagString) => Comparer.Compare(this.Tag, tagString);
@@ -82,6 +96,7 @@ namespace ManagementUI
             return Comparer.Equals(this.Tag, other?.Tag);
         }
         public bool Equals(string str) => Comparer.Equals(this.Tag, str);
+        
 
         public static implicit operator FilterTag(string tagString) => new FilterTag(tagString);
 

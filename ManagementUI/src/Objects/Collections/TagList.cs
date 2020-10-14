@@ -33,6 +33,16 @@ namespace ManagementUI
             base.OnReset();
         }
         public IEnumerable<FilterTag> GetChecked() => base.Items.Values.Where(x => x.IsChecked);
+        public string[] GetTagsAsStrings()
+        {
+            string[] strArr = new string[base.Items.Count];
+            for (int i = 0; i < base.Items.Values.Count; i++)
+            {
+                strArr[i] = base.Items.Values[i].Tag;
+            }
+            return strArr;
+        }
+
         public void Reset(IEnumerable<FilterTag> with)
         {
             base.Update(with);

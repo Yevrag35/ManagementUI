@@ -12,7 +12,7 @@ namespace ManagementUI
     {
         #region FIELDS/CONSTANTS
         private SortDescription? _defaultSortDescription;
-        private ICollectionView _backingView;
+        private ListCollectionView _backingView;
         private Func<TValue, TKey> _keySelector;
 
         #endregion
@@ -81,7 +81,7 @@ namespace ManagementUI
         /// <summary>
         /// The constructed view of the <see cref="ObservableSortedList{TKey, TValue}"/>.
         /// </summary>
-        public ICollectionView View => _backingView;
+        public ListCollectionView View => _backingView;
 
         #region INTERFACE PROPERTIES
         bool ICollection.IsSynchronized => false;
@@ -263,7 +263,7 @@ namespace ManagementUI
         /// </remarks>
         public void UpdateView()
         {
-            _backingView = this.CreateDefaultView();
+            _backingView = this.CreateDefaultView() as ListCollectionView;
             this.AddDefaultSortToView(_backingView);
         }
         public void Update(IEnumerable<TValue> values)
