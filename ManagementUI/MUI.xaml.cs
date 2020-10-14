@@ -1,4 +1,5 @@
 ﻿using ManagementUI.Auth;
+using ManagementUI.Json.Preferences;
 using Ookii.Dialogs.Wpf;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,7 @@ namespace ManagementUI
         public MUI()
         {
             _ftEquality = new FilterTagEquality();
+            new PreferencesModel();
             InitializeComponent();
         }
 

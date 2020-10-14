@@ -14,7 +14,7 @@ namespace ManagementUI
     public class Settings
     {
         #region PROPERTIES
-        [JsonProperty("apps", DefaultValueHandling = DefaultValueHandling.Populate)]
+        [JsonProperty("apps")]
         public AppListViewCollection Apps { get; set; }
 
         #endregion
@@ -26,12 +26,12 @@ namespace ManagementUI
         #endregion
 
         #region PUBLIC METHODS
-        [Obsolete]
-        public AppIconSetting SettingFromIcon(AppListItem ali)
-        {
-            //return this.Apps.Find(x => x.Name.Equals(ali.AppName) && x.IconPath.Equals(ali.Path));
-            return null;
-        }
+        //[Obsolete]
+        //public AppIconSetting SettingFromIcon(AppListItem ali)
+        //{
+        //    //return this.Apps.Find(x => x.Name.Equals(ali.AppName) && x.IconPath.Equals(ali.Path));
+        //    return null;
+        //}
 
         #endregion
 

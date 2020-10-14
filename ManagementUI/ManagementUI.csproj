@@ -92,7 +92,6 @@
     </Compile>
     <Compile Include="src\Auth\ADCreds.cs" />
     <Compile Include="src\EditTags\EditTagItem.cs" />
-    <Compile Include="src\Helpers\AppListItemEquality.cs" />
     <Compile Include="src\Helpers\FilterTagEquality.cs" />
     <Compile Include="src\Objects\Collections\EditTagList.cs" />
     <Compile Include="src\Objects\Converters\JsonFilterTagConverter.cs" />
@@ -111,15 +110,18 @@
     <None Include="src\Objects\Collections\AppListCollection.cs" />
     <None Include="src\Objects\Collections\TagCollection.cs" />
     <Compile Include="src\Objects\Interfaces\Interfaces.cs" />
-    <Compile Include="src\Objects\Items\AppIconSetting.cs" />
+    <Compile Include="src\Objects\Apps\AppIconSetting.cs" />
     <None Include="src\Objects\Collections\AppSettingCollection.cs" />
     <Compile Include="src\Objects\Collections\BaseMuiCollection.cs" />
     <Compile Include="src\Objects\Items\ChangeableItem.cs" />
     <Compile Include="src\Objects\Items\FilterTag.cs" />
     <Compile Include="src\Helpers\StartInfoFactory.cs" />
-    <Compile Include="src\Objects\Settings\Settings.cs" />
-    <Compile Include="src\Objects\Settings\SettingsEditor.cs" />
-    <Compile Include="src\Objects\Settings\SettingsJson.cs" />
+    <Compile Include="src\Objects\Json\Apps\AppModel.cs" />
+    <Compile Include="src\Objects\Json\Preferences\Editor.cs" />
+    <Compile Include="src\Objects\Json\Preferences\PreferencesModel.cs" />
+    <Compile Include="src\Objects\Settings_Old\Settings.cs" />
+    <Compile Include="src\Objects\Settings_Old\SettingsEditor.cs" />
+    <Compile Include="src\Objects\Settings_Old\SettingsJson.cs" />
     <Page Include="EditTags.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -132,7 +134,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="src\Objects\Items\AppListItem.cs" />
+    <None Include="src\Objects\Apps\AppListItem.cs" />
     <Compile Include="MUI.xaml.cs">
       <DependentUpon>MUI.xaml</DependentUpon>
       <SubType>Code</SubType>
