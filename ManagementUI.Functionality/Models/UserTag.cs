@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ManagementUI.src.Objects.Json.Preferences
+namespace ManagementUI.Functionality.Models
 {
-    class Editor
+    public class UserTag : UIModelBase
     {
+        [JsonPro]
     }
 }

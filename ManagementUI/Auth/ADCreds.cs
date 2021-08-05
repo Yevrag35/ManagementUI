@@ -6,10 +6,11 @@ using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Net;
 using System.Security;
+using ManagementUI.Functionality;
 
 namespace ManagementUI.Auth
 {
-    public class ADCredential : ICredentials, ICreatesProcessStartInfo
+    public class ADCredential : ICredentials, ICreatesProcessStartInfo, IProcessCredential
     {
         private const string LDAP_DSE = "LDAP://{0}/RootDSE";
 
@@ -46,6 +47,7 @@ namespace ManagementUI.Auth
 
         private string Combine(string user, string domain) => string.Format("{0}\\{1}", domain, user);
         public NetworkCredential GetCredential(Uri uri, string authType) => _netCreds.GetCredential(uri, authType);
+        SecureString IProcessCredential.GetPassword() => _netCreds.SecurePassword;
         public ProcessStartInfo NewStartInfo(string filePath)
         {
             var psi = new ProcessStartInfo
@@ -111,6 +113,7 @@ namespace ManagementUI.Auth
 
             return result;
         }
+        bool IProcessCredential.Validate(out Exception e) => this.TryAuthenticate(out e);
 
         public static explicit operator ADCredential(NetworkCredential netCreds) => new ADCredential(netCreds);
     }
