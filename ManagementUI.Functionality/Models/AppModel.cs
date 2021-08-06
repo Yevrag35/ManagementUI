@@ -9,7 +9,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
-using ManagementUI.Functionality.Extensions;
+using ManagementUI.Functionality.Executable;
+using ManagementUI.Functionality.Executable.Extensions;
 
 namespace ManagementUI.Functionality.Models
 {
@@ -25,7 +26,7 @@ namespace ManagementUI.Functionality.Models
         private string _iconPath;
 
         [JsonProperty("arguments", Order = 3)]
-        public string Arguments
+        public override string Arguments
         {
             get => _arguments;
             set
@@ -41,7 +42,7 @@ namespace ManagementUI.Functionality.Models
         }
         
         [JsonProperty("exePath", Order = 2)]
-        public string ExePath
+        public override string ExePath
         {
             get => _exePath;
             set
@@ -162,22 +163,5 @@ namespace ManagementUI.Functionality.Models
 
         [DllImport("shell32.dll")]
         public static extern IntPtr ExtractIconA(IntPtr hInst, string pszExeFileName, uint nIconIndex);
-
-        public Process MakeProcess(bool parentIsElevated, bool runAs, IProcessCredential credential)
-        {
-            var proc = new Process { StartInfo = NewProcessStartInfo(parentIsElevated, runAs, credential, this.ExePath, this.Arguments) };
-            return proc;
-        }
-        private static ProcessStartInfo NewProcessStartInfo(bool parentIsElevated, bool runAs, IProcessCredential credential,
-            string exe, string arguments)
-        {
-            return StartInfoFactory
-                .Create()
-                    .AddExe(exe)
-                    .AddArguments(arguments)
-                    .AddRunAs(runAs)
-                    .UseShellExecute(!parentIsElevated)
-                    .AddCredentials(credential);
-        }
     }
 }

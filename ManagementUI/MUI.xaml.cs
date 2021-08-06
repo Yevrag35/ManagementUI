@@ -1,5 +1,5 @@
 ﻿using ManagementUI.Auth;
-using ManagementUI.Json.Preferences;
+//using ManagementUI.Json.Preferences;
 using Ookii.Dialogs.Wpf;
 using System;
 using System.Collections.Generic;
@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
+using ManagementUI.Functionality.Settings;
 
 namespace ManagementUI
 {
@@ -33,7 +34,7 @@ namespace ManagementUI
         public MUI()
         {
             _ftEquality = new FilterTagEquality();
-            new PreferencesModel();
+            //new PreferencesModel();
             InitializeComponent();
         }
 
@@ -146,16 +147,31 @@ namespace ManagementUI
 
         private async void SettsButton_Click(object sender, RoutedEventArgs e)
         {
-            var editor = new SettingsEditor(App.JsonSettings);
-            await Task.Run(() =>
+            var editor = App.JsonSettings.EditorManager[App.JsonSettings.Editor.ToString()];
+            if (!editor.IsUsable())
             {
-                editor.Launch();
-                var click = new RoutedEventArgs(Button.ClickEvent);
-                this.Dispatcher.Invoke(() =>
+                editor = App.JsonSettings.EditorManager.FirstOrDefault(x => x.Value.IsUsable()).Value;
+                if (null == editor)
                 {
-                    ((MUI)Application.Current.MainWindow).SettingsUpdateBtn.RaiseEvent(click);
-                });
+                    ShowErrorMessage(new InvalidOperationException("No openable editors :("));
+                    return;
+                }
+            }
+
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                editor.Start(IsElevated(), false);
             });
+            //var editor = new SettingsEditor(App.JsonSettings);
+            //await Task.Run(() =>
+            //{
+            //    editor.Launch();
+            //    var click = new RoutedEventArgs(Button.ClickEvent);
+            //    this.Dispatcher.Invoke(() =>
+            //    {
+            //        ((MUI)Application.Current.MainWindow).SettingsUpdateBtn.RaiseEvent(click);
+            //    });
+            //});
         }
 
         private void SettingsUpdateBtn_Click(object sender, RoutedEventArgs e)

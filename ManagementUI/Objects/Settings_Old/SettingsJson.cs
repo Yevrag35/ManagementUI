@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Windows;
+using ManagementUI.Json;
 
 namespace ManagementUI
 {
@@ -23,10 +24,13 @@ namespace ManagementUI
         [JsonProperty("$schema")]
         private const string SCHEMA = "https://json.yevrag35.com/uimanagement/v1.0.0/schema.json";
 
+        [JsonProperty("customEditors")]
+        public EditorManager EditorManager { get; set; }
+
         [JsonProperty("version")]
         public string Version { get; set; }
         [JsonProperty("editor")]
-        public SettingsLauncher Editor { get; set; }
+        public string Editor { get; set; }
         [JsonProperty("settings")]
         public Settings Settings { get; set; }
 

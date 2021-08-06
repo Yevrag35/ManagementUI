@@ -6,7 +6,7 @@ using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Net;
 using System.Security;
-using ManagementUI.Functionality;
+using ManagementUI.Functionality.Executable;
 
 namespace ManagementUI.Auth
 {

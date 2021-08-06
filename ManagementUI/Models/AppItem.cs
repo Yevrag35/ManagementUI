@@ -14,6 +14,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using ManagementUI.Functionality;
+using ManagementUI.Functionality.Executable;
 using ManagementUI.Functionality.Models;
 
 namespace ManagementUI.Models

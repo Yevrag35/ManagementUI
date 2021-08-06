@@ -14,8 +14,10 @@ namespace ManagementUI
 
         public SettingsLauncher Current { get; set; }
 
-        public SettingsEditor(SettingsJson currentSettings) => 
+        public SettingsEditor(SettingsJson currentSettings)
+        {
             this.Current = currentSettings.Editor;
+        }
 
         public void Launch()
         {

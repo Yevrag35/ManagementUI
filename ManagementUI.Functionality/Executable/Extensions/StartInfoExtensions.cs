@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using ManagementUI.Functionality.Executable;
 
-namespace ManagementUI.Functionality
+namespace ManagementUI.Functionality.Executable
 {
     public static class StartInfoFactory
     {
@@ -12,7 +13,7 @@ namespace ManagementUI.Functionality
     }
 }
 
-namespace ManagementUI.Functionality.Extensions
+namespace ManagementUI.Functionality.Executable.Extensions
 {
     public static class StartInfoExtensions
     {
@@ -36,10 +37,10 @@ namespace ManagementUI.Functionality.Extensions
                 psi.LoadUserProfile = true;
                 psi.UseShellExecute = false;
                 psi.Password = credential.GetPassword();
-            }
 
-            if (!string.IsNullOrWhiteSpace(credential.Domain))
-                psi.Domain = credential.Domain;
+                if (!string.IsNullOrWhiteSpace(credential.Domain))
+                    psi.Domain = credential.Domain;
+            }
 
             return psi;
         }

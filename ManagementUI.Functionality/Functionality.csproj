@@ -42,11 +42,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Extensions\StartInfoExtensions.cs" />
-    <Compile Include="ILaunchable.cs" />
-    <Compile Include="IProcessCredential.cs" />
+    <Compile Include="Executable\InvalidCredentialException.cs" />
+    <Compile Include="Executable\EditorEventHandler.cs" />
+    <Compile Include="Executable\Extensions\StartInfoExtensions.cs" />
+    <Compile Include="Executable\ILaunchable.cs" />
+    <Compile Include="Executable\IProcessCredential.cs" />
+    <Compile Include="Executable\LaunchableBase.cs" />
     <Compile Include="Models\AppModel.cs" />
-    <None Include="Models\Converters\ArgumentsConverter.cs" />
+    <Compile Include="Settings\CustomEditor.cs" />
+    <Compile Include="Settings\EditorBase.cs" />
+    <Compile Include="Models\EditorManagerBase.cs" />
+    <Compile Include="Settings\IEditor.cs" />
+    <Compile Include="Settings\NotepadEditor.cs" />
+    <Compile Include="Settings\NotepadPlusPlusEditor.cs" />
+    <Compile Include="Settings\VisualStudioCodeEditor.cs" />
+    <Compile Include="Models\Converters\EditorConverter.cs" />
     <Compile Include="Models\Collections\IndexerExtensions.cs" />
     <Compile Include="Models\Collections\UniqueObservableList.cs" />
     <Compile Include="Models\Collections\UniqueListBase.cs" />
@@ -57,5 +67,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
