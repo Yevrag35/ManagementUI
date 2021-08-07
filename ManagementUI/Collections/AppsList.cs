@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using ManagementUI.Functionality.Models;
+using ManagementUI.Models;
 
-namespace ManagementUI.Models.Collections
+namespace ManagementUI.Collections
 {
     public class AppsList : UniqueObservableList<AppItem>
     {

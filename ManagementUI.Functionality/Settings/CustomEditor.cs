@@ -6,7 +6,7 @@ using ManagementUI.Functionality.Executable;
 namespace ManagementUI.Functionality.Settings
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public class CustomEditor : EditorBase, IDisposable, IEditor, ILaunchable
+    public class CustomEditor : EditorBase, IEditor, ILaunchable
     {
 
         [JsonProperty("key", Order = 1)]
@@ -22,11 +22,6 @@ namespace ManagementUI.Functionality.Settings
         public CustomEditor()
             : base()
         {
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(true);
         }
     }
 }

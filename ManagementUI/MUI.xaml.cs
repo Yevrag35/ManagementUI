@@ -14,7 +14,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
+using ManagementUI.Functionality.Executable;
 using ManagementUI.Functionality.Settings;
+using ManagementUI.Collections;
+using ManagementUI.Models;
 
 namespace ManagementUI
 {
@@ -28,7 +31,8 @@ namespace ManagementUI
 
         internal static ADCredential Creds { get; set; }
         //private AppSettingCollection AppList { get; set; }
-        private AppListViewCollection AppList { get; set; }
+        //private AppListViewCollection AppList { get; set; }
+        private AppsList AppList { get; set; }
         //internal IEnumerable<string> AllTags => this.AppList?.Tags;
 
         public MUI()
@@ -36,6 +40,13 @@ namespace ManagementUI
             _ftEquality = new FilterTagEquality();
             //new PreferencesModel();
             InitializeComponent();
+            App.JsonSettings.EditorManager.EditorExited += this.Editor_Closed;
+        }
+
+        private async Task OnLoad()
+        {
+            await this.ReadApps(JsonAppsFile.GetFullPath());
+
         }
 
         internal static bool IsElevated()
@@ -50,38 +61,40 @@ namespace ManagementUI
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                foreach (AppIconSetting ais in this.AppList)
-                {
-                    if (!ais.Tags.IsSupersetOf(Checked))
-                        ais.IsChecked = false;
+                //foreach (AppIconSetting ais in this.AppList)
+                //{
+                //    if (!ais.Tags.IsSupersetOf(Checked))
+                //        ais.IsChecked = false;
 
-                    else
-                        ais.IsChecked = true;
-                }
+                //    else
+                //        ais.IsChecked = true;
+                //}
             });
         }
 
         #endregion
 
         #region EVENT HANDLERS
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             this.IdentityBlock.Text = WindowsIdentity.GetCurrent().Name;
             App.MyHandle = new WindowInteropHelper(this).Handle;
 
-            this.AppList = App.JsonSettings.Settings.Apps;
-            Checked = new HashSet<string>(this.AppList.Tags.Count);
+            //this.AppList = App.JsonSettings.Settings.Apps;
+            await this.OnLoad();
+            Checked = new HashSet<string>(1);
+            this.AppListView.ItemsSource = this.AppList?.View;
+            //this.FilterTags.ItemsSource = this.AppList?.Tags.View;
 
-            this.AppListView.ItemsSource = this.AppList.View;
-            this.FilterTags.ItemsSource = this.AppList.Tags.View;
-
-            this.AppList.CollectionChanged += this.AppList_Changed;
+            //if (this.AppList.Count > 0)
+            //{
+            //    this.AppList.CollectionChanged += this.AppList_Changed;
+            //}
         }
-
 
         private void AppList_Changed(object sender, NotifyCollectionChangedEventArgs e)
         {
-            this.AppList.RefreshAll();
+            //this.AppList.RefreshAll();
             //    //await Task.Run(() =>
             //    //{
             //    if (e.Action == NotifyCollectionChangedAction.Remove)
@@ -145,9 +158,10 @@ namespace ManagementUI
             }
         }
 
-        private async void SettsButton_Click(object sender, RoutedEventArgs e)
+        private void SettsButton_Click(object sender, RoutedEventArgs e)
         {
-            var editor = App.JsonSettings.EditorManager[App.JsonSettings.Editor.ToString()];
+            string key = App.JsonSettings.Editor.ToString();
+            var editor = App.JsonSettings.EditorManager[key];
             if (!editor.IsUsable())
             {
                 editor = App.JsonSettings.EditorManager.FirstOrDefault(x => x.Value.IsUsable()).Value;
@@ -157,11 +171,13 @@ namespace ManagementUI
                     return;
                 }
             }
+            App.JsonSettings.EditorManager.Start(key, IsElevated());
 
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                editor.Start(IsElevated(), false);
-            });
+            //await this.Dispatcher.InvokeAsync(() =>
+            //{
+                
+            //    //editor.Start(IsElevated(), false);
+            //});
             //var editor = new SettingsEditor(App.JsonSettings);
             //await Task.Run(() =>
             //{
@@ -174,9 +190,17 @@ namespace ManagementUI
             //});
         }
 
+        private async void Editor_Closed(object sender, EditorEventArgs e)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                
+            });
+        }
+
         private void SettingsUpdateBtn_Click(object sender, RoutedEventArgs e)
         {
-            App.JsonSettings.Read(MG.Settings.Json.SettingChangedAction.Reload);
+            //App.JsonSettings.Read(MG.Settings.Json.SettingChangedAction.Reload);
         }
 
         private async void ListViewItem_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -223,7 +247,7 @@ namespace ManagementUI
             if (result.HasValue && result.Value)
             {
                 //await this.WriteAppToFile(newApp.CreatedApp);
-                AppList.Add(newApp.CreatedApp);
+                //AppList.Add(newApp.CreatedApp);
             }
         }
 
@@ -234,7 +258,7 @@ namespace ManagementUI
             {
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    ((MUI)Application.Current.MainWindow).AppList.Remove(ali);
+                    //((MUI)Application.Current.MainWindow).AppList.Remove(ali);
                 });
             }
         }
@@ -247,7 +271,7 @@ namespace ManagementUI
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     var ali = ((MUI)Application.Current.MainWindow).AppListView.SelectedItem as AppIconSetting;
-                    ((MUI)Application.Current.MainWindow).AppList.Remove(ali);
+                    //((MUI)Application.Current.MainWindow).AppList.Remove(ali);
                 });
             }
         }
@@ -270,48 +294,48 @@ namespace ManagementUI
 
         private void EditTagsBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is MenuItem mi && mi.DataContext is MUI mui &&
-                mui.AppListView.SelectedItem is AppIconSetting ais)
-            {
-                var editTags = new EditTags(ais, this.AppList.Tags)
-                {
-                    Owner = this
-                };
-                bool? result = editTags.ShowDialog();
-                this.HandleOkEdit(result.GetValueOrDefault(), editTags.Application);
-            }
+            //if (sender is MenuItem mi && mi.DataContext is MUI mui &&
+            //    mui.AppListView.SelectedItem is AppIconSetting ais)
+            //{
+            //    var editTags = new EditTags(ais, this.AppList.Tags)
+            //    {
+            //        Owner = this
+            //    };
+            //    bool? result = editTags.ShowDialog();
+            //    this.HandleOkEdit(result.GetValueOrDefault(), editTags.Application);
+            //}
         }
 
         // Handle Edit OK
         private async Task HandleOkEdit(bool result, AppIconSetting modifiedApp)
         {
-            if (result)
-            {
-                if (!modifiedApp.Tags.IsSubsetOf(this.AppList.Tags.GetTagsAsStrings()))
-                {
-                    await this.AddTagsToTagList(modifiedApp.Tags, this.AppList.Tags);
-                }
-                await this.RemoveAnyTagsFromTagList(this.AppList);
+            //if (result)
+            //{
+            //    if (!modifiedApp.Tags.IsSubsetOf(this.AppList.Tags.GetTagsAsStrings()))
+            //    {
+            //        await this.AddTagsToTagList(modifiedApp.Tags, this.AppList.Tags);
+            //    }
+            //    await this.RemoveAnyTagsFromTagList(this.AppList);
 
-                await this.ApplyCheckBoxFilter();
+            //    await this.ApplyCheckBoxFilter();
 
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.AppList.View.Refresh();
-                });
-            }
+            //    await this.Dispatcher.InvokeAsync(() =>
+            //    {
+            //        this.AppList.View.Refresh();
+            //    });
+            //}
         }
 
         private Task AddTagsToTagList(ISet<string> containingAddedTags, TagList tagList)
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
-                tagList.AddMany(containingAddedTags.Where(x => !this.AppList.Tags.ContainsKey(x)).Select(ft => new FilterTag(ft)));
-                tagList.View.Refresh();
-                foreach (FilterTag ft in tagList.Where(x => Checked.Contains(x.Tag)))
-                {
-                    ft.IsChecked = true;
-                }
+                //tagList.AddMany(containingAddedTags.Where(x => !this.AppList.Tags.ContainsKey(x)).Select(ft => new FilterTag(ft)));
+                //tagList.View.Refresh();
+                //foreach (FilterTag ft in tagList.Where(x => Checked.Contains(x.Tag)))
+                //{
+                //    ft.IsChecked = true;
+                //}
             }).Task;
         }
         private async Task RemoveAnyTagsFromTagList(AppListViewCollection appList)

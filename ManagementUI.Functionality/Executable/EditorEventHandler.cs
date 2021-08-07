@@ -10,13 +10,15 @@ namespace ManagementUI.Functionality.Executable
     {
         public int ExitCode { get; }
         public bool HasExited { get; } = true;
+        public int ProcessId { get; }
         
-        public EditorEventArgs(int exitCode)
+        public EditorEventArgs(int exitCode, int processId)
         {
             this.ExitCode = exitCode;
+            this.ProcessId = processId;
         }
-        public EditorEventArgs(int exitCode, bool hasExited)
-            : this(exitCode)
+        public EditorEventArgs(int exitCode, int processId, bool hasExited)
+            : this(exitCode, processId)
         {
             this.HasExited = hasExited;
         }

@@ -7,13 +7,13 @@ using ManagementUI.Functionality.Executable;
 
 namespace ManagementUI.Functionality.Settings
 {
-    public interface IEditor : ILaunchable, IDisposable
+    public interface IEditor : ILaunchable
     {
         event EditorEventHandler ProcessExited;
 
         IProcessCredential Credentials { get; set; }
 
         bool IsUsable();
-        void Start(bool isParentElevated, bool runAs);
+        Process Start(bool isParentElevated, bool runAs);
     }
 }

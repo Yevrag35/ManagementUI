@@ -50,7 +50,8 @@
       <HintPath>..\packages\WPF.ListViewLayoutManager.2.0.0\lib\net40\Itenso.Windows.Controls.ListViewLayout.dll</HintPath>
     </Reference>
     <Reference Include="MG.Settings.Json, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MG.Settings.Json.1.1.1\lib\netstandard1.3\MG.Settings.Json.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>E:\Local_Repos\MG.Settings\MG.Settings.Json\bin\Release\netstandard1.3\MG.Settings.Json.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -87,8 +88,10 @@
     <Compile Include="EditTags.xaml.cs">
       <DependentUpon>EditTags.xaml</DependentUpon>
     </Compile>
+    <Compile Include="File\ReadOperations.cs" />
     <Compile Include="Models\AppItem.cs" />
-    <Compile Include="Models\Collections\AppsList.cs" />
+    <Compile Include="Collections\AppsList.cs" />
+    <Compile Include="Models\JsonAppsFile.cs" />
     <Compile Include="NewApp.xaml.cs">
       <DependentUpon>NewApp.xaml</DependentUpon>
     </Compile>
@@ -119,7 +122,6 @@
     <Compile Include="Objects\Items\ChangeableItem.cs" />
     <Compile Include="Objects\Items\FilterTag.cs" />
     <Compile Include="Helpers\StartInfoFactory.cs" />
-    <Compile Include="Objects\Json\Apps\AppModel.cs" />
     <Compile Include="Objects\Json\Preferences\EditorManager.cs" />
     <Compile Include="Objects\Settings_Old\Settings.cs" />
     <None Include="Objects\Settings_Old\SettingsEditor.cs" />
@@ -195,5 +197,6 @@
       <Name>Functionality</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

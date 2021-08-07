@@ -4,7 +4,7 @@ using ManagementUI.Functionality.Executable;
 
 namespace ManagementUI.Functionality.Settings
 {
-    public class NotepadPlusPlusEditor : EditorBase, IDisposable, IEditor, ILaunchable
+    public class NotepadPlusPlusEditor : EditorBase, IEditor, ILaunchable
     {
         private const string PATH = "{0}\\Notepad++\\notepad++.exe";
 
@@ -22,11 +22,6 @@ namespace ManagementUI.Functionality.Settings
             }
             else
                 return p64;
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(true);
         }
     }
 }

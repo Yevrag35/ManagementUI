@@ -3,7 +3,7 @@ using ManagementUI.Functionality.Executable;
 
 namespace ManagementUI.Functionality.Settings
 {
-    public class NotepadEditor : EditorBase, IDisposable, IEditor, ILaunchable
+    public class NotepadEditor : EditorBase, IEditor, ILaunchable
     {
         private const string PATH = "{0}\\notepad.exe";
 
@@ -15,9 +15,5 @@ namespace ManagementUI.Functionality.Settings
         private static string GetPath() => string.Format(PATH, Environment.GetFolderPath(
             Environment.SpecialFolder.Windows));
 
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(true);
-        }
     }
 }

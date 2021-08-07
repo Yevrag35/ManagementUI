@@ -7,10 +7,9 @@ using ManagementUI.Functionality.Executable;
 
 namespace ManagementUI.Functionality.Settings
 {
-    public abstract class EditorBase : LaunchableBase, IDisposable, IEditor, ILaunchable
+    public abstract class EditorBase : LaunchableBase, IEditor, ILaunchable
     {
-        private bool _disposed;
-        private Process _process;
+        //private bool _disposed;
 
         public event EditorEventHandler ProcessExited;
 
@@ -43,19 +42,20 @@ namespace ManagementUI.Functionality.Settings
             return File.Exists(this.ExePath);
         }
 
-        public void Start(bool parentIsElevated, bool runAs)
+        public Process Start(bool parentIsElevated, bool runAs)
         {
             Process process = this.MakeProcess(parentIsElevated, runAs, this.Credentials);
             process.EnableRaisingEvents = true;
             process.Exited += this.Process_Exited;
             process.Start();
+            return process;
         }
 
         private static EditorEventArgs NewEventArgs(Process process)
         {
             return null != process
-                ? new EditorEventArgs(process.ExitCode, process.HasExited)
-                : new EditorEventArgs(int.MinValue);
+                ? new EditorEventArgs(process.ExitCode, process.Id, process.HasExited)
+                : new EditorEventArgs(int.MinValue, -1);
         }
         private void Process_Exited(object sender, EventArgs e)
         {
@@ -67,22 +67,22 @@ namespace ManagementUI.Functionality.Settings
         }
 
         #region IDISPOSABLE
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
-                return;
+        //public void Dispose()
+        //{
+        //    this.Dispose(true);
+        //    GC.SuppressFinalize(this);
+        //}
+        //protected virtual void Dispose(bool disposing)
+        //{
+        //    if (_disposed)
+        //        return;
 
-            if (disposing)
-            {
-                _process?.Dispose();
-                _disposed = true;
-            }
-        }
+        //    if (disposing)
+        //    {
+        //        _process?.Dispose();
+        //        _disposed = true;
+        //    }
+        //}
 
         #endregion
     }

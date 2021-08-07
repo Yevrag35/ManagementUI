@@ -11,7 +11,7 @@ namespace ManagementUI.Json.Converters
     public class EditorManagerConverter : EditorConverter<EditorManager>
     {
         public EditorManagerConverter()
-            : base(App.JsonSettings.FilePath)
+            : base()
         {
         }
     }

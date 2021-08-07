@@ -19,11 +19,11 @@ namespace ManagementUI
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            string path = Environment.GetEnvironmentVariable("LOCALAPPDATA") + 
-                "\\Mike Garvey\\ManagementUI\\settings.json";
+            //string path = Environment.GetEnvironmentVariable("LOCALAPPDATA") + 
+            //    "\\Mike Garvey\\ManagementUI\\settings.json";
 
             //JsonSettings = SettingsJson.ReadFromFile(path);
-            JsonSettings = new SettingsJson(path);
+            JsonSettings = new SettingsJson();
             JsonSettings.Read();
             var main = new MUI();
             main.Show();

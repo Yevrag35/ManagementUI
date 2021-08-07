@@ -10,17 +10,9 @@ namespace ManagementUI.Functionality.Models.Converters
     public abstract class EditorConverter<T> : JsonConverter<T>
         where T : EditorManagerBase, new()
     {
-        public string FilePath { get; set; }
-
-        public EditorConverter(string filePath)
-        {
-            this.FilePath = filePath;
-        }
-
         public override T ReadJson(JsonReader reader, Type objectType, T existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var manager = new T();
-            manager.AddDefaults(this.FilePath);
             if (reader.TokenType == JsonToken.StartArray)
             {
                 foreach (JObject job in JToken.ReadFrom(reader))

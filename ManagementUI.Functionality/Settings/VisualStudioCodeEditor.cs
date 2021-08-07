@@ -4,7 +4,7 @@ using ManagementUI.Functionality.Executable;
 
 namespace ManagementUI.Functionality.Settings
 {
-    public class VisualStudioCodeEditor : EditorBase, IDisposable, IEditor, ILaunchable
+    public class VisualStudioCodeEditor : EditorBase, IEditor, ILaunchable
     {
         private const string PATH = "{0}\\Microsoft VS Code\\bin\\code.cmd";
 
@@ -22,11 +22,6 @@ namespace ManagementUI.Functionality.Settings
             }
             else
                 return p64;
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(true);
         }
     }
 }
