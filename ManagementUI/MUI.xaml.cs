@@ -94,29 +94,29 @@ namespace ManagementUI
             //}
         }
 
-        [Obsolete]
-        private void AppList_Changed(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            //this.AppList.RefreshAll();
-            //    //await Task.Run(() =>
-            //    //{
-            //    if (e.Action == NotifyCollectionChangedAction.Remove)
-            //    {
-            //        IEnumerable<AppIconSetting> alis = e.OldItems.Cast<AppIconSetting>();
-            //        int removed = this.Settings.Settings.Apps.RemoveAll(app => alis.Contains(app));
-            //    }
-            //    //}).ConfigureAwait(false);
-            //    this.Dispatcher.Invoke(() =>
-            //    {
-            //        ((MUI)Application.Current.MainWindow).AppList.UpdateView();
-            //        ((MUI)Application.Current.MainWindow).AppListView.Items.Refresh();
-            //    });
-            //    this.Settings.Save();
-            //    //await this.Dispatcher.InvokeAsync(() =>
-            //    //{
+        //[Obsolete]
+        //private void AppList_Changed(object sender, NotifyCollectionChangedEventArgs e)
+        //{
+        //    //this.AppList.RefreshAll();
+        //    //    //await Task.Run(() =>
+        //    //    //{
+        //    //    if (e.Action == NotifyCollectionChangedAction.Remove)
+        //    //    {
+        //    //        IEnumerable<AppIconSetting> alis = e.OldItems.Cast<AppIconSetting>();
+        //    //        int removed = this.Settings.Settings.Apps.RemoveAll(app => alis.Contains(app));
+        //    //    }
+        //    //    //}).ConfigureAwait(false);
+        //    //    this.Dispatcher.Invoke(() =>
+        //    //    {
+        //    //        ((MUI)Application.Current.MainWindow).AppList.UpdateView();
+        //    //        ((MUI)Application.Current.MainWindow).AppListView.Items.Refresh();
+        //    //    });
+        //    //    this.Settings.Save();
+        //    //    //await this.Dispatcher.InvokeAsync(() =>
+        //    //    //{
 
-            //    //});
-        }
+        //    //    //});
+        //}
 
         private void CredButton_Click(object sender, RoutedEventArgs e)
         {
@@ -192,11 +192,6 @@ namespace ManagementUI
             this.Settings.EditorManager.EditorExited += this.Editor_Closed;
         }
 
-        private void SettingsUpdateBtn_Click(object sender, RoutedEventArgs e)
-        {
-            //this.Settings.Read(MG.Settings.Json.SettingChangedAction.Reload);
-        }
-
         private async void ListViewItem_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (sender is ListViewItem lvi && lvi.DataContext is AppIconSetting ali)
@@ -226,6 +221,7 @@ namespace ManagementUI
                     ShowErrorMessage(ex);
                 }
             }
+
             this.Close();
         }
 
