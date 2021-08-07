@@ -43,23 +43,50 @@ namespace ManagementUI
             return settings;
         }
 
-        private async Task ReadApps(string appsFile)
+        private async Task ReadApps()
         {
-            string rawJson = await ReadFileAsync(appsFile);
+            string rawJson = await ReadFileAsync(JsonAppsFile.GetFullPath());
 
-            JsonSerializerSettings settings = this.GetSerializerSettings(
-                (s) => s.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy())));
+            JsonSerializerSettings settings = this.GetSerializerSettings();
 
             await this.Dispatcher.InvokeAsync(() => 
             {
                 JsonAppsFile jsonApps = JsonConvert.DeserializeObject<JsonAppsFile>(rawJson, settings);
-                this.AppList = jsonApps.Apps;
+                this.JsonAppsRead = jsonApps;
                 this.AppList.CreateView();
             });
         }
 
-        //private 
+        private void ReadSettings()
+        {
+            string rawJson = ReadFile(SettingsJson.GetFullPath());
+            JsonSerializerSettings settings = this.GetSerializerSettings(
+                (s) => s.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy())));
 
+            this.Dispatcher.Invoke(() =>
+            {
+                this.Settings = JsonConvert.DeserializeObject<SettingsJson>(rawJson, settings);
+
+            });
+        }
+        private async Task ReadSettingsAsync()
+        {
+            string rawJson = await ReadFileAsync(SettingsJson.GetFullPath());
+
+            JsonSerializerSettings settings = this.GetSerializerSettings(
+                (s) => s.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy())));
+
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.Settings = JsonConvert.DeserializeObject<SettingsJson>(rawJson, settings);
+
+            }, DispatcherPriority.Send);
+        }
+
+        private static string ReadFile(string filePath)
+        {
+            return File.ReadAllText(filePath, SettingsJson.GetEncoding());
+        }
         private static async Task<string> ReadFileAsync(string filePath)
         {
             using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))

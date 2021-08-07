@@ -79,36 +79,7 @@ namespace ManagementUI
         #endregion
 
         #region BACKEND/PRIVATE METHODS
-        //private void CreateAppFolders()
-        //{
-        //    string dir1 = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        //    try
-        //    {
-        //        string dir2 = dir1 + "\\Mike Garvey";
-        //        string dir3 = dir2 + "\\ManagementUI";
-        //        Directory.CreateDirectory(dir1);
-        //        Directory.CreateDirectory(dir2);
-        //        Directory.CreateDirectory(dir3);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        MessageBox.Show(string.Format(
-        //            "An error occurred: {0}{1}{1}{2}{1}{1}{3}",
-        //            e.GetType().FullName,
-        //            Environment.NewLine,
-        //            e.Message,
-        //            string.Format("LOCALAPPDATA: {0}", dir1)),
-        //            "ERROR", MessageBoxButton.OK, MessageBoxImage.Error);
-        //    }
-        //}
-
         internal static Encoding GetEncoding() => Encoding.UTF8;
-
-        internal static string GetFolderPath()
-        {
-            return Environment.ExpandEnvironmentVariables(Strings.SettingsPath);
-        }
-
         private static string GetFileName()
         {
 #if DEBUG
@@ -117,7 +88,14 @@ namespace ManagementUI
             return Strings.SettingsFileName;
 #endif
         }
-
+        internal static string GetFolderPath()
+        {
+            return Environment.ExpandEnvironmentVariables(Strings.SettingsPath);
+        }
+        internal static string GetFullPath()
+        {
+            return Path.Combine(GetFolderPath(), GetFileName());
+        }
         private static string GetJsonName<TProp>(Expression<Func<SettingsJson, TProp>> expression)
         {
             MemberInfo memInfo = GetPropertyInfo(expression);

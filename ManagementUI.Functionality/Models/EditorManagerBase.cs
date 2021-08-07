@@ -45,7 +45,7 @@ namespace ManagementUI.Functionality.Models
         {
             this.FilePath = Environment.ExpandEnvironmentVariables(filePath);
             this.RunningProcesses = Hashtable.Synchronized(new Hashtable(1));
-            _editors = new Dictionary<string, IEditor>(5);
+            _editors = new Dictionary<string, IEditor>(5, StringComparer.CurrentCultureIgnoreCase);
             this.AddDefaults();
         }
         //public EditorManagerBase()

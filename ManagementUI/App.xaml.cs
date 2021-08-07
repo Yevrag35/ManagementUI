@@ -15,7 +15,7 @@ namespace ManagementUI
     public partial class App : Application
     {
         internal static IntPtr MyHandle { get; set; }
-        internal static SettingsJson JsonSettings { get; set; }
+        //internal static SettingsJson JsonSettings { get; set; }
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
@@ -23,8 +23,8 @@ namespace ManagementUI
             //    "\\Mike Garvey\\ManagementUI\\settings.json";
 
             //JsonSettings = SettingsJson.ReadFromFile(path);
-            JsonSettings = new SettingsJson();
-            JsonSettings.Read();
+            //JsonSettings = new SettingsJson();
+            //JsonSettings.Read();
             var main = new MUI();
             main.Show();
         }

@@ -26,27 +26,29 @@ namespace ManagementUI
     /// </summary>
     public partial class MUI : Window
     {
+        #region PROPERTIES/FIELDS
         private static HashSet<string> Checked;
         private FilterTagEquality _ftEquality;
 
+        private AppsList AppList => this.JsonAppsRead.Apps;
         internal static ADCredential Creds { get; set; }
-        //private AppSettingCollection AppList { get; set; }
-        //private AppListViewCollection AppList { get; set; }
-        private AppsList AppList { get; set; }
-        //internal IEnumerable<string> AllTags => this.AppList?.Tags;
+        private JsonAppsFile JsonAppsRead { get; set; }
+        private SettingsJson Settings { get; set; }
+
+        #endregion
 
         public MUI()
         {
+            this.ReadSettings();
             _ftEquality = new FilterTagEquality();
             //new PreferencesModel();
-            InitializeComponent();
-            App.JsonSettings.EditorManager.EditorExited += this.Editor_Closed;
+            this.InitializeComponent();
+            this.Settings.EditorManager.EditorExited += this.Editor_Closed;
         }
 
-        private async Task OnLoad()
+        private Task OnLoad()
         {
-            await this.ReadApps(JsonAppsFile.GetFullPath());
-
+            return this.ReadApps();
         }
 
         internal static bool IsElevated()
@@ -80,7 +82,7 @@ namespace ManagementUI
             this.IdentityBlock.Text = WindowsIdentity.GetCurrent().Name;
             App.MyHandle = new WindowInteropHelper(this).Handle;
 
-            //this.AppList = App.JsonSettings.Settings.Apps;
+            //this.AppList = this.Settings.Settings.Apps;
             await this.OnLoad();
             Checked = new HashSet<string>(1);
             this.AppListView.ItemsSource = this.AppList?.View;
@@ -92,6 +94,7 @@ namespace ManagementUI
             //}
         }
 
+        [Obsolete]
         private void AppList_Changed(object sender, NotifyCollectionChangedEventArgs e)
         {
             //this.AppList.RefreshAll();
@@ -100,7 +103,7 @@ namespace ManagementUI
             //    if (e.Action == NotifyCollectionChangedAction.Remove)
             //    {
             //        IEnumerable<AppIconSetting> alis = e.OldItems.Cast<AppIconSetting>();
-            //        int removed = App.JsonSettings.Settings.Apps.RemoveAll(app => alis.Contains(app));
+            //        int removed = this.Settings.Settings.Apps.RemoveAll(app => alis.Contains(app));
             //    }
             //    //}).ConfigureAwait(false);
             //    this.Dispatcher.Invoke(() =>
@@ -108,7 +111,7 @@ namespace ManagementUI
             //        ((MUI)Application.Current.MainWindow).AppList.UpdateView();
             //        ((MUI)Application.Current.MainWindow).AppListView.Items.Refresh();
             //    });
-            //    App.JsonSettings.Save();
+            //    this.Settings.Save();
             //    //await this.Dispatcher.InvokeAsync(() =>
             //    //{
 
@@ -158,49 +161,40 @@ namespace ManagementUI
             }
         }
 
-        private void SettsButton_Click(object sender, RoutedEventArgs e)
+        private async void SettsButton_Click(object sender, RoutedEventArgs e)
         {
-            string key = App.JsonSettings.Editor.ToString();
-            var editor = App.JsonSettings.EditorManager[key];
-            if (!editor.IsUsable())
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                editor = App.JsonSettings.EditorManager.FirstOrDefault(x => x.Value.IsUsable()).Value;
-                if (null == editor)
+                string key = this.Settings.Editor.ToString();
+                var editor = this.Settings.EditorManager[key];
+                if (!editor.IsUsable())
                 {
-                    ShowErrorMessage(new InvalidOperationException("No openable editors :("));
-                    return;
+                    editor = this.Settings.EditorManager.FirstOrDefault(x => x.Value.IsUsable()).Value;
+                    if (null == editor)
+                    {
+                        ShowErrorMessage(new InvalidOperationException("No openable editors :("));
+                        return;
+                    }
                 }
-            }
-            App.JsonSettings.EditorManager.Start(key, IsElevated());
 
-            //await this.Dispatcher.InvokeAsync(() =>
-            //{
-                
-            //    //editor.Start(IsElevated(), false);
-            //});
-            //var editor = new SettingsEditor(App.JsonSettings);
-            //await Task.Run(() =>
-            //{
-            //    editor.Launch();
-            //    var click = new RoutedEventArgs(Button.ClickEvent);
-            //    this.Dispatcher.Invoke(() =>
-            //    {
-            //        ((MUI)Application.Current.MainWindow).SettingsUpdateBtn.RaiseEvent(click);
-            //    });
-            //});
+                this.Settings.EditorManager.Start(key, IsElevated());
+            });
         }
 
         private async void Editor_Closed(object sender, EditorEventArgs e)
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                
+                this.Settings.EditorManager.Dispose();
             });
+
+            await this.ReadSettingsAsync();
+            this.Settings.EditorManager.EditorExited += this.Editor_Closed;
         }
 
         private void SettingsUpdateBtn_Click(object sender, RoutedEventArgs e)
         {
-            //App.JsonSettings.Read(MG.Settings.Json.SettingChangedAction.Reload);
+            //this.Settings.Read(MG.Settings.Json.SettingChangedAction.Reload);
         }
 
         private async void ListViewItem_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
