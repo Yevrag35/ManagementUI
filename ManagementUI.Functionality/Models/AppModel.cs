@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using ManagementUI.Functionality.Executable;
 using ManagementUI.Functionality.Executable.Extensions;
+using ManagementUI.Functionality.Models.Converters;
 
 namespace ManagementUI.Functionality.Models
 {
@@ -18,7 +19,7 @@ namespace ManagementUI.Functionality.Models
     public class AppModel : UIModelBase, IComparable<AppModel>, IEquatable<AppModel>, INotifyPropertyChanged,
         ILaunchable
     {
-        private HashSet<string> _tagSet = new HashSet<string>(StringComparer.CurrentCultureIgnoreCase);
+        private SortedSet<UserTag> _tagSet = new SortedSet<UserTag>();
         private string _arguments;
         private string _exePath;
         private string _name;
@@ -106,7 +107,8 @@ namespace ManagementUI.Functionality.Models
         }
 
         [JsonProperty("tags", Order = 6)]
-        public HashSet<string> Tags
+        [JsonConverter(typeof(UserTagConverter))]
+        public SortedSet<UserTag> Tags
         {
             get => _tagSet;
             set

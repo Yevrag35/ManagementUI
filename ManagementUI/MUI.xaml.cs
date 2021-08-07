@@ -15,6 +15,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using ManagementUI.Functionality.Executable;
+using ManagementUI.Functionality.Models;
 using ManagementUI.Functionality.Settings;
 using ManagementUI.Collections;
 using ManagementUI.Models;
@@ -34,6 +35,7 @@ namespace ManagementUI
         internal static ADCredential Creds { get; set; }
         private JsonAppsFile JsonAppsRead { get; set; }
         private SettingsJson Settings { get; set; }
+        private UniqueObservableList<UserTag> Tags { get; set; }
 
         #endregion
 
@@ -82,41 +84,11 @@ namespace ManagementUI
             this.IdentityBlock.Text = WindowsIdentity.GetCurrent().Name;
             App.MyHandle = new WindowInteropHelper(this).Handle;
 
-            //this.AppList = this.Settings.Settings.Apps;
             await this.OnLoad();
             Checked = new HashSet<string>(1);
             this.AppListView.ItemsSource = this.AppList?.View;
             //this.FilterTags.ItemsSource = this.AppList?.Tags.View;
-
-            //if (this.AppList.Count > 0)
-            //{
-            //    this.AppList.CollectionChanged += this.AppList_Changed;
-            //}
         }
-
-        //[Obsolete]
-        //private void AppList_Changed(object sender, NotifyCollectionChangedEventArgs e)
-        //{
-        //    //this.AppList.RefreshAll();
-        //    //    //await Task.Run(() =>
-        //    //    //{
-        //    //    if (e.Action == NotifyCollectionChangedAction.Remove)
-        //    //    {
-        //    //        IEnumerable<AppIconSetting> alis = e.OldItems.Cast<AppIconSetting>();
-        //    //        int removed = this.Settings.Settings.Apps.RemoveAll(app => alis.Contains(app));
-        //    //    }
-        //    //    //}).ConfigureAwait(false);
-        //    //    this.Dispatcher.Invoke(() =>
-        //    //    {
-        //    //        ((MUI)Application.Current.MainWindow).AppList.UpdateView();
-        //    //        ((MUI)Application.Current.MainWindow).AppListView.Items.Refresh();
-        //    //    });
-        //    //    this.Settings.Save();
-        //    //    //await this.Dispatcher.InvokeAsync(() =>
-        //    //    //{
-
-        //    //    //});
-        //}
 
         private void CredButton_Click(object sender, RoutedEventArgs e)
         {

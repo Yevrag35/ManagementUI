@@ -45,7 +45,7 @@ namespace ManagementUI.Collections
             _backingView.Filter = x =>
                 x is AppItem ai && !ai.DontShow;
         }
-        public void EnableByTags(IEnumerable<string> tagsToEnable)
+        public void EnableByTags(IEnumerable<UserTag> tagsToEnable)
         {
             this.EnableItems(ai => ai.Tags.IsSupersetOf(tagsToEnable));
         }

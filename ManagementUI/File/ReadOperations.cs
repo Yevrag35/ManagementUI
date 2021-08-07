@@ -17,6 +17,8 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using ManagementUI.Collections;
 using ManagementUI.Models;
+using ManagementUI.Functionality.Models;
+using ManagementUI.Functionality.Models.Converters;
 
 using Strings = ManagementUI.Properties.Resources;
 
@@ -54,6 +56,8 @@ namespace ManagementUI
                 JsonAppsFile jsonApps = JsonConvert.DeserializeObject<JsonAppsFile>(rawJson, settings);
                 this.JsonAppsRead = jsonApps;
                 this.AppList.CreateView();
+
+                this.Tags = new UniqueObservableList<UserTag>(UserTagConverter.GetLoadedTags());
             });
         }
 

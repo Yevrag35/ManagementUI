@@ -49,6 +49,9 @@
     <Compile Include="Executable\IProcessCredential.cs" />
     <Compile Include="Executable\LaunchableBase.cs" />
     <Compile Include="Models\AppModel.cs" />
+    <Compile Include="Models\Collections\TagIdDictionary.cs" />
+    <Compile Include="Models\Converters\UserTagConverter.cs" />
+    <Compile Include="Models\UserTag.cs" />
     <Compile Include="Settings\CustomEditor.cs" />
     <Compile Include="Settings\EditorBase.cs" />
     <Compile Include="Models\EditorManagerBase.cs" />
@@ -61,7 +64,6 @@
     <Compile Include="Models\Collections\UniqueObservableList.cs" />
     <Compile Include="Models\Collections\UniqueListBase.cs" />
     <Compile Include="Models\UIModelBase.cs" />
-    <None Include="Models\UserTag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
