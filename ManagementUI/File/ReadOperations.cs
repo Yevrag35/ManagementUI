@@ -57,7 +57,7 @@ namespace ManagementUI
                 this.JsonAppsRead = jsonApps;
                 this.AppList.CreateView();
 
-                this.Tags = new UniqueObservableList<UserTag>(UserTagConverter.GetLoadedTags());
+                this.Tags = new TagCollection(UserTagConverter.GetLoadedTags());
             });
         }
 

@@ -165,7 +165,7 @@
                    HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                    Grid.Row="0"/>
 
-            <ListView x:Name="FilterTags" Grid.Row="1" Grid.RowSpan="3">
+            <ListView x:Name="FilterTags" Grid.Row="1" Grid.RowSpan="3" >
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -176,7 +176,7 @@
                                 </Grid.ColumnDefinitions>
                                 <CheckBox IsChecked="{Binding IsChecked}" Grid.Column="0" Checked="CheckBox_Checked"
                                           Unchecked="CheckBox_Unchecked"/>
-                                <TextBlock Text="{Binding Tag}" Grid.Column="1"
+                                <TextBlock Text="{Binding Value}" Grid.Column="1"
                                          Background="Transparent" Focusable="False" />
                             </Grid>
                         </StackPanel>

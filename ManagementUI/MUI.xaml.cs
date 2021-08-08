@@ -35,7 +35,7 @@ namespace ManagementUI
         internal static ADCredential Creds { get; set; }
         private JsonAppsFile JsonAppsRead { get; set; }
         private SettingsJson Settings { get; set; }
-        private UniqueObservableList<UserTag> Tags { get; set; }
+        private TagCollection Tags { get; set; }
 
         #endregion
 
@@ -86,8 +86,12 @@ namespace ManagementUI
 
             await this.OnLoad();
             Checked = new HashSet<string>(1);
-            this.AppListView.ItemsSource = this.AppList?.View;
-            //this.FilterTags.ItemsSource = this.AppList?.Tags.View;
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.AppListView.ItemsSource = this.AppList?.View;
+                this.FilterTags.ItemsSource = this.Tags;
+            });
+            
         }
 
         private void CredButton_Click(object sender, RoutedEventArgs e)
@@ -330,14 +334,33 @@ namespace ManagementUI
         #region CHECKBOX EVENTS
         private async void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            Checked.Add(((e.Source as CheckBox).DataContext as FilterTag).Tag);
-            await this.ApplyCheckBoxFilter();
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (sender is CheckBox cb && cb.DataContext is ToggleTag tag)
+                {
+                    _ = this.Tags.Enable(tag);
+                    this.AppList.EnableByTags(this.Tags.EnabledTags);
+                }
+            });
         }
 
         private async void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
-            Checked.Remove(((e.Source as CheckBox).DataContext as FilterTag).Tag);
-            await this.ApplyCheckBoxFilter();
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (sender is CheckBox cb && cb.DataContext is ToggleTag tag)
+                {
+                    int enabledCount = this.Tags.Disable(tag);
+                    if (enabledCount <= 0)
+                    {
+                        this.AppList.ResetItems();
+                    }
+                    else
+                    {
+                        this.AppList.EnableByTags(this.Tags.EnabledTags);
+                    }
+                }
+            });
         }
 
         #endregion

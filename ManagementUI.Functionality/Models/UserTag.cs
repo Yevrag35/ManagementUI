@@ -12,13 +12,13 @@ namespace ManagementUI.Functionality.Models
         IComparable<UserTag>, IComparable<string>, IEquatable<UserTag>, IEquatable<string>, IEquatable<int>
     {
         #region JSON PROPERTIES
-        public int Id;
-        public string Value;
+        public int Id { get; set; }
+        public string Value { get; set; }
 
         public UserTag(int id, string value)
         {
-            Id = id;
-            Value = value;
+            this.Id = id;
+            this.Value = value;
         }
 
         public IEnumerator<char> GetEnumerator()
