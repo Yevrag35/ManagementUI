@@ -212,34 +212,35 @@ namespace ManagementUI
             bool? result = newApp.ShowDialog();
             if (result.HasValue && result.Value)
             {
+                Console.WriteLine("hey");
                 //await this.WriteAppToFile(newApp.CreatedApp);
                 //AppList.Add(newApp.CreatedApp);
             }
         }
 
-        private async void ALMIRemove_Click(object sender, RoutedEventArgs e)
+        private void ALMIRemove_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is MenuItem mi && mi.DataContext is MUI mui &&
-                mui.AppListView.SelectedItem is AppIconSetting ali)
-            {
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    //((MUI)Application.Current.MainWindow).AppList.Remove(ali);
-                });
-            }
+            //if (sender is MenuItem mi && mi.DataContext is MUI mui &&
+            //    mui.AppListView.SelectedItem is AppIconSetting ali)
+            //{
+            //    await this.Dispatcher.InvokeAsync(() =>
+            //    {
+            //        //((MUI)Application.Current.MainWindow).AppList.Remove(ali);
+            //    });
+            //}
         }
 
-        private async void AppListView_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void AppListView_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (e.Key == System.Windows.Input.Key.Delete)
-            {
-                var click = new RoutedEventArgs(Button.ClickEvent);
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    var ali = ((MUI)Application.Current.MainWindow).AppListView.SelectedItem as AppIconSetting;
-                    //((MUI)Application.Current.MainWindow).AppList.Remove(ali);
-                });
-            }
+            //if (e.Key == System.Windows.Input.Key.Delete)
+            //{
+            //    var click = new RoutedEventArgs(Button.ClickEvent);
+            //    await this.Dispatcher.InvokeAsync(() =>
+            //    {
+            //        var ali = ((MUI)Application.Current.MainWindow).AppListView.SelectedItem as AppIconSetting;
+            //        //((MUI)Application.Current.MainWindow).AppList.Remove(ali);
+            //    });
+            //}
         }
 
         private void AppListView_MouseRightButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -257,7 +258,6 @@ namespace ManagementUI
             }
         }
 
-
         private async void EditTagsBtn_Click(object sender, RoutedEventArgs e)
         {
             await this.Dispatcher.InvokeAsync(() =>
@@ -274,75 +274,6 @@ namespace ManagementUI
                     }
                 }
             });
-            //if (sender is MenuItem mi && mi.DataContext is MUI mui &&
-            //    mui.AppListView.SelectedItem is AppIconSetting ais)
-            //{
-            //    var editTags = new EditTags(ais, this.AppList.Tags)
-            //    {
-            //        Owner = this
-            //    };
-            //    bool? result = editTags.ShowDialog();
-            //    this.HandleOkEdit(result.GetValueOrDefault(), editTags.Application);
-            //}
-        }
-
-        // Handle Edit OK
-        private async Task HandleOkEdit(bool result, AppIconSetting modifiedApp)
-        {
-            //if (result)
-            //{
-            //    if (!modifiedApp.Tags.IsSubsetOf(this.AppList.Tags.GetTagsAsStrings()))
-            //    {
-            //        await this.AddTagsToTagList(modifiedApp.Tags, this.AppList.Tags);
-            //    }
-            //    await this.RemoveAnyTagsFromTagList(this.AppList);
-
-            //    await this.ApplyCheckBoxFilter();
-
-            //    await this.Dispatcher.InvokeAsync(() =>
-            //    {
-            //        this.AppList.View.Refresh();
-            //    });
-            //}
-        }
-
-        private Task AddTagsToTagList(ISet<string> containingAddedTags, TagList tagList)
-        {
-            return this.Dispatcher.InvokeAsync(() =>
-            {
-                //tagList.AddMany(containingAddedTags.Where(x => !this.AppList.Tags.ContainsKey(x)).Select(ft => new FilterTag(ft)));
-                //tagList.View.Refresh();
-                //foreach (FilterTag ft in tagList.Where(x => Checked.Contains(x.Tag)))
-                //{
-                //    ft.IsChecked = true;
-                //}
-            }).Task;
-        }
-        private async Task RemoveAnyTagsFromTagList(AppListViewCollection appList)
-        {
-            HashSet<FilterTag> allTags = appList.GetAllTagsAsSet(_ftEquality);
-            if (allTags.IsProperSubsetOf(appList.Tags))
-            {
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    appList.Tags.Reset(allTags);
-                });
-
-                string[] tagsAsStrings = appList.Tags.GetTagsAsStrings();
-                if (!Checked.IsSubsetOf(tagsAsStrings))
-                {
-                    Checked.IntersectWith(tagsAsStrings);
-                }
-
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    appList.Tags.View.Refresh();
-                    foreach (FilterTag ft in appList.Tags.Where(x => Checked.Contains(x.Tag)))
-                    {
-                        ft.IsChecked = true;
-                    }
-                });
-            }
         }
 
         #region CHECKBOX EVENTS

@@ -50,6 +50,10 @@ namespace ManagementUI.Functionality.Models
         {
             return StringComparer.CurrentCultureIgnoreCase.Equals(Value, str);
         }
+        public bool TextEquals(string text, IEqualityComparer<string> equalityComparer)
+        {
+            return equalityComparer.Equals(this.Value, text);
+        }
 
         #endregion
 

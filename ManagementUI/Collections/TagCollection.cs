@@ -80,7 +80,14 @@ namespace ManagementUI.Collections
 
         private static IEnumerable<ToggleTag> AsToggleTags(IEnumerable<UserTag> tags)
         {
-            return tags.Select(x => new ToggleTag { UserTag = x });
+            IEqualityComparer<string> equalityComparer = StringComparer.CurrentCultureIgnoreCase;
+            return tags
+                .Select(x =>
+                    new ToggleTag(equalityComparer)
+                    {
+                        UserTag = x
+                    }
+                );
         }
     }
 }

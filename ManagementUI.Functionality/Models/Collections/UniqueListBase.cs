@@ -128,6 +128,24 @@ namespace ManagementUI.Functionality.Models
         {
             _ = this.Add(item, true);
         }
+
+        public int AddInitial(IEnumerable<T> items)
+        {
+            if (InnerList.Count > 0 || InnerSet.Count > 0)
+                return 0;
+
+            int added = 0;
+            foreach (T item in items)
+            {
+                if (InnerSet.Add(item))
+                {
+                    InnerList.Add(item);
+                    added++;
+                }
+            }
+
+            return added;
+        }
         /// <summary>
         /// Removes all elements from the <see cref="UniqueListBase{T}"/>.
         /// </summary>

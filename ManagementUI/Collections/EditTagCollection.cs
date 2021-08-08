@@ -18,6 +18,8 @@ namespace ManagementUI.Collections
         private ListCollectionView _appliedView;
         private UniqueObservableList<ToggleTag> _available;
         private UniqueObservableList<ToggleTag> _applied;
+        private IEqualityComparer<string> _currentComparer;
+        private int _nextId;
 
         public ICollectionView Available => _availableView;
         public ICollectionView Applied => _appliedView;
@@ -43,7 +45,10 @@ namespace ManagementUI.Collections
         public EditTagCollection(IEnumerable<ToggleTag> tags)
         {
             _available = new UniqueObservableList<ToggleTag>(tags);
+            _currentComparer = this.GetFirstComparer();
+            _nextId = _available.Max(x => x.UserTag.Id) + 1;
             _applied = new UniqueObservableList<ToggleTag>(_available);
+
             this.CreateViews();
         }
 
@@ -52,11 +57,27 @@ namespace ManagementUI.Collections
             int index = -1;
             if (value is ToggleTag tag)
             {
-                _applied.Add(tag);
-                _available.Add(tag);
-
-                index = _available.IndexOf(tag);
+                return this.Add(tag);
             }
+            else if (value is string newTag)
+            {
+                return this.Add(new ToggleTag(_currentComparer)
+                {
+                    IsChecked = true,
+                    UserTag = new UserTag(_nextId, newTag)
+                });
+            }
+
+            return index;
+        }
+        public int Add(ToggleTag tag)
+        {
+            _applied.Add(tag);
+            _available.Add(tag);
+
+            int index = _available.IndexOf(tag);
+            if (index > -1)
+                _nextId++;
 
             return index;
         }
@@ -69,12 +90,40 @@ namespace ManagementUI.Collections
         {
             return value is ToggleTag tag && _applied.Contains(tag) && _available.Contains(tag);
         }
+        public bool ContainsText(string text)
+        {
+            bool result = false;
+
+            for (int i = 0; i < _available.Count; i++)
+            {
+                if (_available[i].TextEquals(text))
+                {
+                    result = true;
+                    break;
+                }
+            }
+
+            return result;
+        }
         public void CopyTo(Array array, int arrayIndex)
         {
             if (array is ToggleTag[] tArr)
             {
                 _available.CopyTo(tArr, arrayIndex);
             }
+        }
+        private IEqualityComparer<string> GetFirstComparer()
+        {
+            if (null == _currentComparer && _available.Count > 0)
+            {
+                ToggleTag tag = _available[0];
+                if (null != tag.Comparer)
+                    return tag.Comparer;
+            }
+            else if (null != _currentComparer)
+                return _currentComparer;
+
+            return StringComparer.CurrentCultureIgnoreCase;
         }
         public void ForEach(Action<ToggleTag> action)
         {

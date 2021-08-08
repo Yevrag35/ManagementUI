@@ -12,16 +12,18 @@ namespace ManagementUI
     public class ToggleTag : UIModelBase, ICloneable, IEquatable<ToggleTag>, INotifyPropertyChanged
     {
         private bool _isChecked;
+        private IEqualityComparer<string> _comparer;
 
-        internal UserTag UserTag { get; set; }
-        public string Value
+        public IEqualityComparer<string> Comparer
         {
-            get => this.UserTag.Value;
+            get => _comparer;
             set
             {
-                var tag = this.UserTag;
-                this.UserTag = new UserTag(tag.Id, value);
-                this.NotifyOfChange(nameof(Value));
+                if (null == value)
+                    _comparer = StringComparer.CurrentCultureIgnoreCase;
+
+                else
+                    _comparer = value;
             }
         }
         public bool IsChecked
@@ -33,11 +35,33 @@ namespace ManagementUI
                 this.NotifyOfChange(nameof(IsChecked));
             }
         }
+        internal UserTag UserTag { get; set; }
+        public string Value
+        {
+            get => this.UserTag.Value;
+            set
+            {
+                var tag = this.UserTag;
+                this.UserTag = new UserTag(tag.Id, value);
+                this.NotifyOfChange(nameof(Value));
+            }
+        }
+        
+
+        public ToggleTag()
+            : this(StringComparer.CurrentCultureIgnoreCase)
+        {
+        }
+        public ToggleTag(IEqualityComparer<string> equalityComparer)
+        {
+            _comparer = equalityComparer;
+        }
 
         public ToggleTag Clone()
         {
             return new ToggleTag
             {
+                _comparer = _comparer,
                 _isChecked = _isChecked,
                 UserTag = new UserTag(this.UserTag.Id, this.UserTag.Value)
             };
@@ -46,6 +70,30 @@ namespace ManagementUI
         public bool Equals(ToggleTag other)
         {
             return this.UserTag.Equals((other?.UserTag).GetValueOrDefault());
+        }
+        public bool TextEquals(string text)
+        {
+            return this.UserTag.TextEquals(text, _comparer);
+        }
+
+        public IEqualityComparer<ToggleTag> NewValueComparer()
+        {
+            return new TagValueEqualityComparer(_comparer);
+        }
+
+        private class TagValueEqualityComparer : IEqualityComparer<ToggleTag>
+        {
+            private IEqualityComparer<string> _comparer;
+            public TagValueEqualityComparer(IEqualityComparer<string> stringComparer)
+            {
+                _comparer = stringComparer;
+            }
+
+            public bool Equals(ToggleTag x, ToggleTag y)
+            {
+                return _comparer.Equals(x?.Value, y?.Value);
+            }
+            public int GetHashCode(ToggleTag o) => _comparer.GetHashCode(o?.Value);
         }
     }
 }

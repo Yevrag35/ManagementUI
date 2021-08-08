@@ -25,15 +25,19 @@ namespace ManagementUI
     /// </summary>
     public partial class EditTags : Window
     {
-        public HashSet<FilterTag> AllFilterTags { get; }
-        public EditTagList AllTags { get; }
-        public AppIconSetting Application { get; }
+        //public HashSet<FilterTag> AllFilterTags { get; }
+        //public EditTagList AllTags { get; }
+        //public AppIconSetting Application { get; }
         public AppItem ChosenApp { get; }
         public EditTagCollection Tags { get; }
+        private HashSet<UserTag> PendingAdd { get; }
+        private HashSet<UserTag> PendingRemove { get; }
         public string WindowName { get; set; }
 
         public EditTags(AppItem chosenApp, EditTagCollection tags)
         {
+            this.PendingAdd = new HashSet<UserTag>(tags.Count);
+            this.PendingRemove = new HashSet<UserTag>(tags.Count);
             this.WindowName = chosenApp.Name;
             this.Tags = tags;
             this.ChosenApp = chosenApp;
@@ -50,16 +54,16 @@ namespace ManagementUI
             this.AvailableTagsList.ItemsSource = this.Tags.Available;
             this.AppliedTagsList.ItemsSource = this.Tags.Applied;
         }
-        public EditTags(AppIconSetting chosenApp, IEnumerable<FilterTag> allTags)
-        {
-            this.AllFilterTags = new HashSet<FilterTag>(allTags);
-            this.Application = chosenApp;
-            this.AllTags = new EditTagList(allTags, chosenApp);
-            this.InitializeComponent();
+        //public EditTags(AppIconSetting chosenApp, IEnumerable<FilterTag> allTags)
+        //{
+        //    //this.AllFilterTags = new HashSet<FilterTag>(allTags);
+        //    //this.Application = chosenApp;
+        //    //this.AllTags = new EditTagList(allTags, chosenApp);
+        //    //this.InitializeComponent();
 
-            this.AppliedTagsList.ItemsSource = this.AllTags.Applied;
-            this.AvailableTagsList.ItemsSource = this.AllTags.Available;
-        }
+        //    //this.AppliedTagsList.ItemsSource = this.AllTags.Applied;
+        //    //this.AvailableTagsList.ItemsSource = this.AllTags.Available;
+        //}
 
         private async void ApplyTagBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -70,6 +74,8 @@ namespace ManagementUI
                     foreach (ToggleTag tag in this.AvailableTagsList.SelectedItems)
                     {
                         tag.IsChecked = true;
+                        this.PendingAdd.Add(tag.UserTag);
+                        this.PendingRemove.Remove(tag.UserTag);
                     }
                 }
             });
@@ -84,61 +90,97 @@ namespace ManagementUI
                     foreach (ToggleTag tag in this.AppliedTagsList.SelectedItems)
                     {
                         tag.IsChecked = false;
+                        this.PendingAdd.Remove(tag.UserTag);
+                        this.PendingRemove.Add(tag.UserTag);
                     }
                 }
             });
         }
 
+        private async void InputBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (e.NewValue is bool isVis && !isVis)
+                {
+                    this.InputTextBox.Clear();
+                }
+
+                this.FlipDefaults();
+
+            });
+        }
+
         private void OKBtn_Click(object sender, RoutedEventArgs e)
         {
-            //this.Application.Tags.Clear();
-            //this.Application.Tags.UnionWith(this.AllTags.Where(x => x.Status == EditingStatus.Applied).Select(x => x.Title));
+            this.ChosenApp.Tags.ExceptWith(this.PendingRemove);
+            this.ChosenApp.Tags.UnionWith(this.PendingAdd);
+
+            this.DialogResult = true;
+            this.Close();
+        }
+
+        private void ExitBtn_Click(object sender, RoutedEventArgs e)
+        {
+            this.PendingAdd.Clear();
+            this.PendingRemove.Clear();
+            this.Tags.Clear();
             this.DialogResult = false;
             this.Close();
         }
 
-        private void NewTagBtn_Click(object sender, RoutedEventArgs e)
+        private async void NewTagBtn_Click(object sender, RoutedEventArgs e)
         {
-            InputBox.Visibility = Visibility.Visible;
-
-            //var newTag = Interaction.InputBox(
-            //    "Enter the name of a new tag:",
-            //    "New Tag",
-            //    "<new tag>"
-            //);
-            //if (!string.IsNullOrWhiteSpace(newTag) && newTag != "<new tag>")
-            //{
-            //    var ft = new EditTagItem
-            //    {
-            //        IsChecked = false,
-            //        Status = EditingStatus.Available,
-            //        Title = newTag
-            //    };
-            //    this.Dispatcher.Invoke(() =>
-            //    {
-            //        this.AllTags.Add(ft);
-            //        this.AllFilterTags.Add(ft.Title);
-            //        this.AllTags.Available.Refresh();
-            //        this.AllTags.Applied.Refresh();
-            //    });
-            //}
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.InputBox.Visibility = Visibility.Visible;
+            });
         }
 
-        private void YesButton_Click(object sender, RoutedEventArgs e)
+        private async void YesButton_Click(object sender, RoutedEventArgs e)
         {
-            InputBox.Visibility = Visibility.Collapsed;
-            InputTextBox.Clear();
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                string newTag = this.InputTextBox.Text.Trim();
+                if (this.Tags.ContainsText(newTag))
+                {
+                    if (MUI.ShowErrorMessage(new ArgumentException(string.Format("{0} already exists as a tag", newTag)), true))
+                    {
+                        e.Handled = true;
+                        this.InputTextBox.Focus();
+                        this.InputTextBox.SelectAll();
+                        return;
+                    }
+                }
+                else
+                {
+                    _ = this.Tags.Add(newTag);
+                }
+
+                InputBox.Visibility = Visibility.Collapsed;
+            });
         }
-
-        private void NoButton_Click(object sender, RoutedEventArgs e)
+        private async void NoButton_Click(object sender, RoutedEventArgs e)
         {
-            InputBox.Visibility = Visibility.Collapsed;
-            InputTextBox.Clear();
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                InputBox.Visibility = Visibility.Collapsed;
+            });
         }
-
-        private void YesAndApplyButton_Click(object sender, RoutedEventArgs e)
+        private void FlipDefaults()
         {
+            this.OKBtn.IsDefault = !this.OKBtn.IsDefault;
+            this.YesButton.IsDefault = !this.YesButton.IsDefault;
 
+            this.ExitBtn.IsCancel = !this.ExitBtn.IsCancel;
+            this.NoButton.IsCancel = !this.NoButton.IsCancel;
+        }
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            if (this.NoButton.IsCancel)
+            {
+                e.Cancel = true;
+            }
         }
     }
 }
