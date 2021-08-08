@@ -11,40 +11,18 @@ using ManagementUI.Models;
 
 namespace ManagementUI.Collections
 {
-    public class AppsList : UniqueObservableList<AppItem>
+    public class AppsList : ObservableViewBase<AppItem>
     {
-        private ListCollectionView _backingView;
-
+        protected override Predicate<object> Filter => x => x is AppItem ai && !ai.DontShow;
         public bool IsFiltered { get; private set; }
-        public ICollectionView View
-        {
-            get => _backingView;
-            set
-            {
-                if (value is ListCollectionView lcv)
-                {
-                    _backingView = lcv;
-                    this.NotifyChange(nameof(View));
-                }
-            }
-        }
+        protected override string[] LiveFilteringProperties => new string[1] { nameof(AppItem.DontShow) };
+        protected override string[] LiveSortingProperties => new string[1] { nameof(AppItem.Name) };
 
         public AppsList(IEnumerable<AppItem> apps)
             : base(apps)
         {
         }
 
-        public void CreateView()
-        {
-            _backingView = CollectionViewSource.GetDefaultView(this) as ListCollectionView;
-            _backingView.IsLiveFiltering = true;
-            _backingView.IsLiveSorting = true;
-            _backingView.LiveSortingProperties.Add(nameof(AppItem.Name));
-            _backingView.LiveFilteringProperties.Add(nameof(AppItem.DontShow));
-
-            _backingView.Filter = x =>
-                x is AppItem ai && !ai.DontShow;
-        }
         public void EnableByTags(IEnumerable<UserTag> tagsToEnable)
         {
             this.EnableItems(ai => ai.Tags.IsSupersetOf(tagsToEnable));
@@ -72,11 +50,6 @@ namespace ManagementUI.Collections
                 ai.DontShow = false;
             });
             this.IsFiltered = false;
-        }
-
-        internal static Predicate<AppItem> Negate(Predicate<AppItem> predicate)
-        {
-            return x => !predicate(x);
         }
     }
 }

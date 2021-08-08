@@ -9,7 +9,7 @@ using ManagementUI.Models;
 
 namespace ManagementUI.Collections
 {
-    public class TagCollection : UniqueObservableList<ToggleTag>
+    public class TagCollection : ObservableViewBase<ToggleTag>
     {
         private HashSet<ToggleTag> Enabled;
         private HashSet<ToggleTag> Disabled;
@@ -17,11 +17,15 @@ namespace ManagementUI.Collections
         public IEnumerable<UserTag> EnabledTags => this.Enabled.Select(x => x.UserTag);
         public IEnumerable<UserTag> DisabledTags => this.Disabled.Select(x => x.UserTag);
 
+        protected override bool IsLiveFiltering => false;
+        protected override string[] LiveSortingProperties => new string[1] { nameof(ToggleTag.Value) };
+
         public TagCollection(IEnumerable<UserTag> tags)
             : base(AsToggleTags(tags))
         {
             this.Disabled = new HashSet<ToggleTag>(this.InnerList);
             this.Enabled = new HashSet<ToggleTag>(this.InnerList.Count);
+            this.CreateView();
         }
 
         public int Disable(ToggleTag tag)
