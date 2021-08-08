@@ -1,6 +1,7 @@
 ﻿using ManagementUI.Editing;
 using ManagementUI.Extensions;
 using Microsoft.VisualBasic;
+using Ookii.Dialogs.Wpf;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -98,6 +99,8 @@ namespace ManagementUI
 
         private void NewTagBtn_Click(object sender, RoutedEventArgs e)
         {
+            InputBox.Visibility = Visibility.Visible;
+
             //var newTag = Interaction.InputBox(
             //    "Enter the name of a new tag:",
             //    "New Tag",
@@ -119,6 +122,23 @@ namespace ManagementUI
             //        this.AllTags.Applied.Refresh();
             //    });
             //}
+        }
+
+        private void YesButton_Click(object sender, RoutedEventArgs e)
+        {
+            InputBox.Visibility = Visibility.Collapsed;
+            InputTextBox.Clear();
+        }
+
+        private void NoButton_Click(object sender, RoutedEventArgs e)
+        {
+            InputBox.Visibility = Visibility.Collapsed;
+            InputTextBox.Clear();
+        }
+
+        private void YesAndApplyButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

@@ -99,7 +99,7 @@
             <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
     </Window.Resources>
-    <Grid>
+    <Grid Background="WhiteSmoke">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="15"/>
             <ColumnDefinition Width="150"/>
@@ -136,7 +136,7 @@
                 <RowDefinition Height="75"/>
             </Grid.RowDefinitions>
             <Button x:Name="NewTagBtn" Grid.Row="1" Grid.Column="1" Style="{StaticResource DefaultBtnStyle}" Content="NEW..."
-                    Click="NewTagBtn_Click"/>
+                    Click="NewTagBtn_Click" FontWeight="Bold"/>
 
             <Button x:Name="ApplyTagBtn" Grid.Column="1" Grid.Row="3" Background="Transparent" BorderThickness="0"
                     Click="ApplyTagBtn_Click">
@@ -177,5 +177,36 @@
         <Button x:Name="ExitBtn" Grid.Column="3" Grid.Row="3" Content="Cancel" IsCancel="True"
                 FontSize="20" FontWeight="Bold" Style="{StaticResource DefaultBtnStyle}"/>
 
+        <!-- It's important that this is in the end of the XAML as it needs to be on top of everything else! -->
+        <Grid x:Name="InputBox" Visibility="Collapsed" Grid.Column="0" Grid.Row="0"
+              Grid.ColumnSpan="5" Grid.RowSpan="5">
+            <Grid Background="Black" Opacity="0.5"/>
+            <Border
+            MinWidth="250"
+            Background="Red" 
+            BorderBrush="Black" 
+            BorderThickness="1" 
+            CornerRadius="0,55,0,55" 
+            HorizontalAlignment="Center" 
+            VerticalAlignment="Center">
+                <StackPanel Width="350" Height="100">
+                    <TextBlock Margin="5" Text="Enter a new tag..." FontWeight="Bold" FontFamily="Segoe UI"
+                               FontSize="19"
+                               Foreground="WhiteSmoke"/>
+                    <TextBox x:Name="InputTextBox" MinWidth="150" Width="200"
+                             Background="WhiteSmoke"
+                             HorizontalAlignment="Center" VerticalAlignment="Center"
+                             FontFamily="Segoe UI"
+                             FontSize="18" BorderBrush="Transparent" BorderThickness="0"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Width="150" Height="40">
+                        <Button x:Name="YesButton" Margin="5" Content="OK" Style="{StaticResource DefaultBtnStyle}" Click="YesButton_Click"
+                                Width="60" FontSize="15" FontWeight="Bold"/>
+                        <Button x:Name="NoButton" Margin="5" Content="Cancel" Style="{StaticResource DefaultBtnStyle}" Click="NoButton_Click"
+                                Width="60" FontSize="15" FontWeight="Bold"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+        
     </Grid>
 </Window>
