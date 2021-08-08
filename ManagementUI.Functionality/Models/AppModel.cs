@@ -23,7 +23,7 @@ namespace ManagementUI.Functionality.Models
         private string _arguments;
         private string _exePath;
         private string _name;
-        private int _iconIndex;
+        private uint _iconIndex;
         private string _iconPath;
 
         [JsonProperty("arguments", Order = 3)]
@@ -59,7 +59,7 @@ namespace ManagementUI.Functionality.Models
         }
 
         [JsonProperty("iconIndex", Order = 5)]
-        public int IconIndex
+        public uint IconIndex
         {
             get => _iconIndex;
             set
@@ -172,10 +172,36 @@ namespace ManagementUI.Functionality.Models
             this.NotifyOfChange(nameof(Tags));
         }
 
+        protected Bitmap GetBitmap(IntPtr appHandle)
+        {
+            if (string.IsNullOrWhiteSpace(this.IconPath) || !File.Exists(this.IconPath))
+                return null;
+
+            Bitmap bitMap = null;
+
+            IntPtr imageHandle = ExtractIconA(appHandle, this.IconPath, this.IconIndex);
+            Icon appIcon = null;
+            try
+            {
+                appIcon = Icon.FromHandle(imageHandle);
+            }
+            catch (ArgumentException)
+            {
+                appIcon = Icon.ExtractAssociatedIcon(this.IconPath);
+            }
+
+            if (null != appIcon)
+            {
+                bitMap = appIcon.ToBitmap();
+            }
+
+            return bitMap;
+        }
+
         [DllImport("gdi32.dll")]
-        public static extern bool DeleteObject(IntPtr hObject);
+        protected static extern bool DeleteObject(IntPtr hObject);
 
         [DllImport("shell32.dll")]
-        public static extern IntPtr ExtractIconA(IntPtr hInst, string pszExeFileName, uint nIconIndex);
+        private static extern IntPtr ExtractIconA(IntPtr hInst, string pszExeFileName, uint nIconIndex);
     }
 }

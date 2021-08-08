@@ -1,5 +1,4 @@
-﻿using ManagementUI.Editing;
-using ManagementUI.Extensions;
+﻿using ManagementUI.Extensions;
 using Microsoft.VisualBasic;
 using Ookii.Dialogs.Wpf;
 using System;

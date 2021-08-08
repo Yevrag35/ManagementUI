@@ -48,6 +48,9 @@ namespace ManagementUI.Models
 
         private BitmapSource Bitmap2BitmapImage(Bitmap bitmap)
         {
+            if (null == bitmap)
+                return null;
+
             IntPtr hBitmap = bitmap.GetHbitmap();
             BitmapSource retVal;
 
@@ -84,24 +87,13 @@ namespace ManagementUI.Models
             if (this.Initialized)
                 return;
 
-            if (null != this.Image || string.IsNullOrWhiteSpace(this.IconPath))
+            if (null == this.Image)
             {
-                this.Initialized = true;
-                return;
+                Bitmap bitMap = this.GetBitmap(App.MyHandle);
+                this.Image = this.Bitmap2BitmapImage(bitMap);
+                this.Image?.Freeze();
             }
 
-            IntPtr imageHandle = ExtractIconA(App.MyHandle, this.IconPath, Convert.ToUInt32(this.IconIndex));
-            Icon appIcon = null;
-            try
-            {
-                appIcon = Icon.FromHandle(imageHandle);
-            }
-            catch (ArgumentException)
-            {
-                appIcon = Icon.ExtractAssociatedIcon(this.IconPath);
-            }
-
-            this.Image = this.Bitmap2BitmapImage(appIcon.ToBitmap());
             this.Initialized = true;
         }
 

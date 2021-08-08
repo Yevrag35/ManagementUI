@@ -100,9 +100,9 @@
       <DependentUpon>NewApp.xaml</DependentUpon>
     </Compile>
     <Compile Include="Auth\ADCreds.cs" />
-    <Compile Include="EditTags\EditTagItem.cs" />
+    <None Include="EditTags\EditTagItem.cs" />
     <Compile Include="Helpers\FilterTagEquality.cs" />
-    <Compile Include="Objects\Collections\EditTagList.cs" />
+    <None Include="Objects\Collections\EditTagList.cs" />
     <Compile Include="Models\Converters\EditorManagerConverter.cs" />
     <Compile Include="Objects\Converters\JsonFilterTagConverter.cs" />
     <Compile Include="MUIExtensions\ListSortDirectionExtensions.cs" />
