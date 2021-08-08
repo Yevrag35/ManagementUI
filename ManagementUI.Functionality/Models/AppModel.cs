@@ -16,7 +16,7 @@ using ManagementUI.Functionality.Models.Converters;
 namespace ManagementUI.Functionality.Models
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public class AppModel : UIModelBase, IComparable<AppModel>, IEquatable<AppModel>, INotifyPropertyChanged,
+    public class AppModel : LaunchableBase, IComparable<AppModel>, IEquatable<AppModel>, INotifyPropertyChanged,
         ILaunchable
     {
         private SortedSet<UserTag> _tagSet = new SortedSet<UserTag>();
@@ -158,6 +158,18 @@ namespace ManagementUI.Functionality.Models
 
             return this.Name.Equals(other.Name, StringComparison.CurrentCultureIgnoreCase)
                 && (this.Arguments?.Equals(other.Arguments, StringComparison.CurrentCultureIgnoreCase)).GetValueOrDefault();
+        }
+        public void UpdateTags(ISet<UserTag> toAdd, ISet<UserTag> toRemove)
+        {
+            if (toAdd.Count <= 0 && toRemove.Count <= 0)
+                return;
+
+            if (toRemove.Overlaps(toAdd))
+                toRemove.SymmetricExceptWith(toAdd);
+
+            _tagSet.ExceptWith(toRemove);
+            _tagSet.UnionWith(toAdd);
+            this.NotifyOfChange(nameof(Tags));
         }
 
         [DllImport("gdi32.dll")]

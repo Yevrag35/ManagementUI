@@ -30,6 +30,7 @@ namespace ManagementUI
         #region PROPERTIES/FIELDS
         private static HashSet<string> Checked;
         private FilterTagEquality _ftEquality;
+        private bool _overItem;
 
         private AppsList AppList => this.JsonAppsRead.Apps;
         internal static ADCredential Creds { get; set; }
@@ -88,6 +89,7 @@ namespace ManagementUI
             Checked = new HashSet<string>(1);
             await this.Dispatcher.InvokeAsync(() =>
             {
+
                 this.AppListView.ItemsSource = this.AppList.View;
                 this.FilterTags.ItemsSource = this.Tags.View;
             });
@@ -270,7 +272,14 @@ namespace ManagementUI
                     };
                     if (editTags.ShowDialog().GetValueOrDefault())
                     {
-                        Console.WriteLine("Cool");
+                        if (this.Tags.EnabledCount > 0)
+                        {
+                            if (!ai.DontShow && !ai.Tags.IsSupersetOf(this.Tags.EnabledTags))
+                                ai.DontShow = true;
+
+                            else if (ai.DontShow && ai.Tags.IsSupersetOf(this.Tags.EnabledTags))
+                                ai.DontShow = false;
+                        }
                     }
                 }
             });
@@ -309,5 +318,29 @@ namespace ManagementUI
         }
 
         #endregion
+
+        private void AppListContextMenu_PreviewMouseRightButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (!_overItem)
+            {
+                e.Handled = true;
+            }
+        }
+        private async void ListViewItem_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                _overItem = true;
+
+            }, System.Windows.Threading.DispatcherPriority.Send);
+        }
+        private async void ListViewItem_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                _overItem = false;
+
+            }, System.Windows.Threading.DispatcherPriority.Send);
+        }
     }
 }

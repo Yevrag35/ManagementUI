@@ -4,10 +4,11 @@ using System.ComponentModel;
 using System.Diagnostics;
 using ManagementUI.Functionality.Executable;
 using ManagementUI.Functionality.Executable.Extensions;
+using ManagementUI.Functionality.Models;
 
 namespace ManagementUI.Functionality.Executable
 {
-    public abstract class LaunchableBase : ILaunchable
+    public abstract class LaunchableBase : UIModelBase, ILaunchable
     {
         public virtual string Arguments { get; set; }
         public virtual string ExePath { get; set; }

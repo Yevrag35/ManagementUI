@@ -16,6 +16,7 @@ namespace ManagementUI.Collections
         private int _nextId;
 
         public IEnumerable<UserTag> EnabledTags => this.Enabled.Select(x => x.UserTag);
+        public int EnabledCount => this.Enabled.Count;
         public IEnumerable<UserTag> DisabledTags => this.Disabled.Select(x => x.UserTag);
 
         protected override bool IsLiveFiltering => false;

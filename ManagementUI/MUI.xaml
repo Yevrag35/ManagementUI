@@ -193,7 +193,8 @@
                 <ColumnDefinition Width="10"/>
             </Grid.ColumnDefinitions>
             <ListView x:Name="AppListView" Grid.Column="0" Background="Transparent" BorderBrush="Transparent" BorderThickness="0"
-                      MouseRightButtonUp="AppListView_MouseRightButtonUp" KeyDown="AppListView_KeyDown">
+                      MouseRightButtonUp="AppListView_MouseRightButtonUp" KeyDown="AppListView_KeyDown"
+                      PreviewMouseRightButtonUp="AppListContextMenu_PreviewMouseRightButtonUp">
                 <ListView.Resources>
                     <Style TargetType="{x:Type GridViewColumnHeader}">
                         <Setter Property="Template">
@@ -231,6 +232,8 @@
                         <Setter Property="FontSize" Value="20" />
                         <Setter Property="Background" Value="Transparent"/>
                         <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"/>
+                        <EventSetter Event="MouseEnter" Handler="ListViewItem_MouseEnter"/>
+                        <EventSetter Event="MouseLeave" Handler="ListViewItem_MouseLeave"/>
                         <Style.Triggers>
                             <Trigger Property="ItemsControl.AlternationIndex" Value="0">
                                 <Setter Property="Background" Value="White" />
@@ -253,7 +256,7 @@
                     </GridView>
                 </ListView.View>
                 <ListView.ContextMenu>
-                    <ContextMenu x:Name="AppListContextMenu">
+                    <ContextMenu x:Name="AppListContextMenu" PreviewMouseRightButtonUp="AppListContextMenu_PreviewMouseRightButtonUp">
                         <MenuItem x:Name="EditTagsBtn" Header="Edit Tags..." InputGestureText="E" Click="EditTagsBtn_Click"/>
                         
                         <MenuItem x:Name="ALMIRemove" Header="Remove from List"

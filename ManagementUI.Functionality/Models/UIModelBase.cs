@@ -5,7 +5,7 @@ using ManagementUI.Functionality.Executable;
 
 namespace ManagementUI.Functionality.Models
 {
-    public abstract class UIModelBase : LaunchableBase, INotifyPropertyChanged
+    public abstract class UIModelBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

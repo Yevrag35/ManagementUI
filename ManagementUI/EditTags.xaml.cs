@@ -111,10 +111,13 @@ namespace ManagementUI
             });
         }
 
-        private void OKBtn_Click(object sender, RoutedEventArgs e)
+        private async void OKBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.ChosenApp.Tags.ExceptWith(this.PendingRemove);
-            this.ChosenApp.Tags.UnionWith(this.PendingAdd);
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.ChosenApp.UpdateTags(this.PendingAdd, this.PendingRemove);
+                
+            });
 
             this.DialogResult = true;
             this.Close();
