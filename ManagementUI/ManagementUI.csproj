@@ -85,6 +85,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Collections\EditTagCollection.cs" />
     <Compile Include="Collections\ObservableViewBase.cs" />
     <Compile Include="Collections\TagCollection.cs" />
     <Compile Include="EditTags.xaml.cs">

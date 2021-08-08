@@ -9,7 +9,7 @@ using ManagementUI.Models;
 
 namespace ManagementUI
 {
-    public class ToggleTag : UIModelBase, IEquatable<ToggleTag>, INotifyPropertyChanged
+    public class ToggleTag : UIModelBase, ICloneable, IEquatable<ToggleTag>, INotifyPropertyChanged
     {
         private bool _isChecked;
 
@@ -34,6 +34,15 @@ namespace ManagementUI
             }
         }
 
+        public ToggleTag Clone()
+        {
+            return new ToggleTag
+            {
+                _isChecked = _isChecked,
+                UserTag = new UserTag(this.UserTag.Id, this.UserTag.Value)
+            };
+        }
+        object ICloneable.Clone() => this.Clone();
         public bool Equals(ToggleTag other)
         {
             return this.UserTag.Equals((other?.UserTag).GetValueOrDefault());

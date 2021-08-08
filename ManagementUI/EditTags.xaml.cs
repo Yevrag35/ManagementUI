@@ -12,6 +12,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using ManagementUI.Functionality.Models;
+using ManagementUI.Models;
+using ManagementUI.Collections;
 
 namespace ManagementUI
 {
@@ -24,7 +27,28 @@ namespace ManagementUI
         public HashSet<FilterTag> AllFilterTags { get; }
         public EditTagList AllTags { get; }
         public AppIconSetting Application { get; }
+        public AppItem ChosenApp { get; }
+        public EditTagCollection Tags { get; }
+        public string WindowName { get; set; }
 
+        public EditTags(AppItem chosenApp, EditTagCollection tags)
+        {
+            this.WindowName = chosenApp.Name;
+            this.Tags = tags;
+            this.ChosenApp = chosenApp;
+            this.Tags.ForEach((t) =>
+            {
+                if (chosenApp.Tags.Contains(t.UserTag))
+                {
+                    t.IsChecked = true;
+                }
+            });
+
+            this.InitializeComponent();
+
+            this.AvailableTagsList.ItemsSource = this.Tags.Available;
+            this.AppliedTagsList.ItemsSource = this.Tags.Applied;
+        }
         public EditTags(AppIconSetting chosenApp, IEnumerable<FilterTag> allTags)
         {
             this.AllFilterTags = new HashSet<FilterTag>(allTags);
@@ -36,59 +60,65 @@ namespace ManagementUI
             this.AvailableTagsList.ItemsSource = this.AllTags.Available;
         }
 
-        private async void RemoveTagBtn_Click(object sender, RoutedEventArgs e)
-        {
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                foreach (EditTagItem eti in this.AppliedTagsList.SelectedItems)
-                {
-                    eti.Status = EditingStatus.Available;
-                }
-            });
-        }
-
         private async void ApplyTagBtn_Click(object sender, RoutedEventArgs e)
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                foreach (EditTagItem eti in this.AvailableTagsList.SelectedItems)
+                if (this.AvailableTagsList.SelectedItems.Count > 0)
                 {
-                    eti.Status = EditingStatus.Applied;
+                    foreach (ToggleTag tag in this.AvailableTagsList.SelectedItems)
+                    {
+                        tag.IsChecked = true;
+                    }
+                }
+            });
+        }
+
+        private async void RemoveTagBtn_Click(object sender, RoutedEventArgs e)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.AppliedTagsList.SelectedItems.Count > 0)
+                {
+                    foreach (ToggleTag tag in this.AppliedTagsList.SelectedItems)
+                    {
+                        tag.IsChecked = false;
+                    }
                 }
             });
         }
 
         private void OKBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.Application.Tags.Clear();
-            this.Application.Tags.UnionWith(this.AllTags.Where(x => x.Status == EditingStatus.Applied).Select(x => x.Title));
-            this.DialogResult = true;
+            //this.Application.Tags.Clear();
+            //this.Application.Tags.UnionWith(this.AllTags.Where(x => x.Status == EditingStatus.Applied).Select(x => x.Title));
+            this.DialogResult = false;
             this.Close();
         }
 
         private void NewTagBtn_Click(object sender, RoutedEventArgs e)
         {
-            var newTag = Interaction.InputBox(
-                "Enter the name of a new tag:",
-                "New Tag",
-                "<new tag>"
-            );
-            if (!string.IsNullOrWhiteSpace(newTag) && newTag != "<new tag>")
-            {
-                var ft = new EditTagItem
-                {
-                    IsChecked = false,
-                    Status = EditingStatus.Available,
-                    Title = newTag
-                };
-                this.Dispatcher.Invoke(() =>
-                {
-                    this.AllTags.Add(ft);
-                    this.AllFilterTags.Add(ft.Title);
-                    this.AllTags.Available.Refresh();
-                    this.AllTags.Applied.Refresh();
-                });
-            }
+            //var newTag = Interaction.InputBox(
+            //    "Enter the name of a new tag:",
+            //    "New Tag",
+            //    "<new tag>"
+            //);
+            //if (!string.IsNullOrWhiteSpace(newTag) && newTag != "<new tag>")
+            //{
+            //    var ft = new EditTagItem
+            //    {
+            //        IsChecked = false,
+            //        Status = EditingStatus.Available,
+            //        Title = newTag
+            //    };
+            //    this.Dispatcher.Invoke(() =>
+            //    {
+            //        this.AllTags.Add(ft);
+            //        this.AllFilterTags.Add(ft.Title);
+            //        this.AllTags.Available.Refresh();
+            //        this.AllTags.Applied.Refresh();
+            //    });
+            //}
         }
     }
 }

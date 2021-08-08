@@ -25,6 +25,10 @@ namespace ManagementUI.Collections
             get => _backingView;
         }
 
+        protected ObservableViewBase()
+            : base()
+        {
+        }
         public ObservableViewBase(IEnumerable<T> items)
             : base(items)
         {

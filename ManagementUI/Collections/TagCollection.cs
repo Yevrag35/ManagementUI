@@ -13,6 +13,7 @@ namespace ManagementUI.Collections
     {
         private HashSet<ToggleTag> Enabled;
         private HashSet<ToggleTag> Disabled;
+        private int _nextId;
 
         public IEnumerable<UserTag> EnabledTags => this.Enabled.Select(x => x.UserTag);
         public IEnumerable<UserTag> DisabledTags => this.Disabled.Select(x => x.UserTag);
@@ -25,9 +26,28 @@ namespace ManagementUI.Collections
         {
             this.Disabled = new HashSet<ToggleTag>(this.InnerList);
             this.Enabled = new HashSet<ToggleTag>(this.InnerList.Count);
+            _nextId = this.Disabled.Count + 1;
             this.CreateView();
         }
 
+        protected override bool Add(ToggleTag item, bool adding)
+        {
+            UserTag tag = item.UserTag;
+            item.UserTag = new UserTag(_nextId, tag.Value);
+            if (this.Disabled.Add(item) && base.Add(item, true))
+            {
+                _nextId++;
+                return true;
+            }
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// Disables the specified tag.
+        /// </summary>
+        /// <param name="tag">The tag to disable.</param>
+        /// <returns>The number of 'Enabled' tags after disabling <paramref name="tag"/>.</returns>
         public int Disable(ToggleTag tag)
         {
             if (!tag.IsChecked && this.Enabled.Remove(tag))
@@ -37,6 +57,12 @@ namespace ManagementUI.Collections
 
             return this.Enabled.Count;
         }
+
+        /// <summary>
+        /// Enables the specified tag.
+        /// </summary>
+        /// <param name="tag">The tag to enable.</param>
+        /// <returns>The number of 'Enabled' tags after enabling <paramref name="tag"/>.</returns>
         public int Enable(ToggleTag tag)
         {
             if (tag.IsChecked && this.Disabled.Remove(tag))
@@ -45,6 +71,11 @@ namespace ManagementUI.Collections
             }
 
             return this.Enabled.Count;
+        }
+
+        public EditTagCollection ToEditCollection()
+        {
+            return new EditTagCollection(this.Select(x => x.Clone()));
         }
 
         private static IEnumerable<ToggleTag> AsToggleTags(IEnumerable<UserTag> tags)

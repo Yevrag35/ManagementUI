@@ -88,8 +88,8 @@ namespace ManagementUI
             Checked = new HashSet<string>(1);
             await this.Dispatcher.InvokeAsync(() =>
             {
-                this.AppListView.ItemsSource = this.AppList?.View;
-                this.FilterTags.ItemsSource = this.Tags;
+                this.AppListView.ItemsSource = this.AppList.View;
+                this.FilterTags.ItemsSource = this.Tags.View;
             });
             
         }
@@ -258,8 +258,22 @@ namespace ManagementUI
         }
 
 
-        private void EditTagsBtn_Click(object sender, RoutedEventArgs e)
+        private async void EditTagsBtn_Click(object sender, RoutedEventArgs e)
         {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.AppListView.SelectedItem is AppItem ai)
+                {
+                    var editTags = new EditTags(ai, this.Tags.ToEditCollection())
+                    {
+                        Owner = this
+                    };
+                    if (editTags.ShowDialog().GetValueOrDefault())
+                    {
+                        Console.WriteLine("Cool");
+                    }
+                }
+            });
             //if (sender is MenuItem mi && mi.DataContext is MUI mui &&
             //    mui.AppListView.SelectedItem is AppIconSetting ais)
             //{
@@ -351,13 +365,13 @@ namespace ManagementUI
                 if (sender is CheckBox cb && cb.DataContext is ToggleTag tag)
                 {
                     int enabledCount = this.Tags.Disable(tag);
-                    if (enabledCount <= 0)
+                    if (enabledCount > 0)
                     {
-                        this.AppList.ResetItems();
+                        this.AppList.EnableByTags(this.Tags.EnabledTags);
                     }
                     else
                     {
-                        this.AppList.EnableByTags(this.Tags.EnabledTags);
+                        this.AppList.ResetItems();
                     }
                 }
             });
