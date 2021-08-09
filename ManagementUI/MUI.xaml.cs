@@ -43,6 +43,7 @@ namespace ManagementUI
         public MUI()
         {
             this.ReadSettings();
+            LaunchFactory.Initialize();
             _ftEquality = new FilterTagEquality();
             //new PreferencesModel();
             this.InitializeComponent();
@@ -54,12 +55,7 @@ namespace ManagementUI
             return this.ReadApps();
         }
 
-        internal static bool IsElevated()
-        {
-            var winId = WindowsIdentity.GetCurrent();
-            var prinId = new WindowsPrincipal(winId);
-            return prinId.IsInRole(WindowsBuiltInRole.Administrator);
-        }
+        
 
         #region CHECKBOX FILTER
         //private async Task ApplyCheckBoxFilter()
@@ -98,19 +94,30 @@ namespace ManagementUI
 
         private async void CredButton_Click(object sender, RoutedEventArgs e)
         {
-            using (var box = new CredentialBox())
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                //box.PasswordChanged += this.Box_PasswordChanged;
-                if (box.ShowDialog())
-                { 
-                    if (null != this.Creds)
+                using (var box = new CredentialBox())
+                {
+                    if (box.ShowDialog())
                     {
-                        this.Creds.Dispose();
-                    }
+                        if (null != this.Creds)
+                        {
+                            this.Creds.Dispose();
+                        }
 
-                    this.Creds = new UserIdentity(box.UserName, box.GetPassword());
+                        IUserIdentity userId = new UserIdentity(box.UserName, box.GetPassword());
+                        if (userId.IsValid())
+                        {
+                            LaunchFactory.AddCredentials(userId);
+                        }
+                        else
+                        {
+                            userId.Dispose();
+                            ShowErrorMessage(new InvalidCredentialException(userId.UserName, userId.Domain, null));
+                        }
+                    }
                 }
-            }
+            });
             
             //var click = new RoutedEventArgs(Button.ClickEvent);
             //if ((string)this.CredsButton.Content == RUN_AS)
@@ -169,7 +176,7 @@ namespace ManagementUI
                     }
                 }
 
-                this.Settings.EditorManager.Start(key, IsElevated());
+                LaunchFactory.ExecuteEditor(this.Settings.EditorManager, key);
             });
         }
 

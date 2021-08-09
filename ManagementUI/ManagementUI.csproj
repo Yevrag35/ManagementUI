@@ -94,6 +94,7 @@
     </Compile>
     <Compile Include="File\ReadOperations.cs" />
     <Compile Include="File\WriteOperations.cs" />
+    <Compile Include="Helpers\LaunchFactory.cs" />
     <Compile Include="Models\AppItem.cs" />
     <Compile Include="Collections\AppsList.cs" />
     <Compile Include="Models\JsonAppsFile.cs" />

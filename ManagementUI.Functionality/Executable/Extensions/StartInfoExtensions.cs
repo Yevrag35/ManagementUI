@@ -34,13 +34,6 @@ namespace ManagementUI.Functionality.Executable.Extensions
             if (null != credential)
             {
                 _ = credential.AuthenticateProcess(psi);
-                //psi.UserName = credential.UserName;
-                //psi.LoadUserProfile = true;
-                //psi.UseShellExecute = false;
-                //psi.Password = credential.GetPassword();
-
-                //if (!string.IsNullOrWhiteSpace(credential.Domain))
-                //    psi.Domain = credential.Domain;
             }
 
             return psi;
