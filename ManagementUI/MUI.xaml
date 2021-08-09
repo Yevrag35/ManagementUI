@@ -121,7 +121,7 @@
         </Grid.ColumnDefinitions>
         
         <!-- SETTING UPDATE AND RELAUNCH HIDDEN BUTTONS -->
-        <Button x:Name="RelaunchBtn" Height="0" Width="0" Click="RelaunchBtn_Click"/>
+        <!--<Button x:Name="RelaunchBtn" Height="0" Width="0" Click="RelaunchBtn_Click"/>-->
         
         <!-- IDENTITY BANNER -->
         <Label x:Name="IdentityLbl" Content="Current User:" Grid.Row="1" Grid.Column="1" 

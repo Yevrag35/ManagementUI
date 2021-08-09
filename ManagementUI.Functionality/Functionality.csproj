@@ -37,6 +37,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Security" />
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -44,6 +45,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Auth\IdentityFactory.cs" />
+    <Compile Include="Auth\IUserIdentity.cs" />
+    <Compile Include="Auth\UserIdentity.cs" />
+    <Compile Include="Auth\PrincipalInfo.cs" />
     <Compile Include="Executable\InvalidCredentialException.cs" />
     <Compile Include="Executable\EditorEventHandler.cs" />
     <Compile Include="Executable\Extensions\StartInfoExtensions.cs" />

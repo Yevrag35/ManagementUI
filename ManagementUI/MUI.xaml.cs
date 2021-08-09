@@ -1,6 +1,4 @@
-﻿using ManagementUI.Auth;
-//using ManagementUI.Json.Preferences;
-using Ookii.Dialogs.Wpf;
+﻿using Ookii.Dialogs.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -14,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
+using ManagementUI.Functionality.Auth;
 using ManagementUI.Functionality.Executable;
 using ManagementUI.Functionality.Models;
 using ManagementUI.Functionality.Settings;
@@ -97,7 +96,7 @@ namespace ManagementUI
             
         }
 
-        private void CredButton_Click(object sender, RoutedEventArgs e)
+        private async void CredButton_Click(object sender, RoutedEventArgs e)
         {
             using (var box = new CredentialBox())
             {
@@ -193,30 +192,30 @@ namespace ManagementUI
             //}
         }
 
-        private void RelaunchBtn_Click(object sender, RoutedEventArgs e)
-        {
-            //AppDomain appId = AppDomain.CurrentDomain;
-            //string appPath = Path.Combine(appId.BaseDirectory, appId.FriendlyName);
-            //ProcessStartInfo psi = StartInfoFactory.Create(appPath, false, false, Creds);
-            //psi.LoadUserProfile = true;
+        //private void RelaunchBtn_Click(object sender, RoutedEventArgs e)
+        //{
+        //    //AppDomain appId = AppDomain.CurrentDomain;
+        //    //string appPath = Path.Combine(appId.BaseDirectory, appId.FriendlyName);
+        //    //ProcessStartInfo psi = StartInfoFactory.Create(appPath, false, false, Creds);
+        //    //psi.LoadUserProfile = true;
 
-            //using (var relaunch = new Process
-            //{
-            //    StartInfo = psi
-            //})
-            //{
-            //    try
-            //    {
-            //        relaunch.Start();
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        ShowErrorMessage(ex);
-            //    }
-            //}
+        //    //using (var relaunch = new Process
+        //    //{
+        //    //    StartInfo = psi
+        //    //})
+        //    //{
+        //    //    try
+        //    //    {
+        //    //        relaunch.Start();
+        //    //    }
+        //    //    catch (Exception ex)
+        //    //    {
+        //    //        ShowErrorMessage(ex);
+        //    //    }
+        //    //}
 
-            //this.Close();
-        }
+        //    //this.Close();
+        //}
 
         #endregion
 
