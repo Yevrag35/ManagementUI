@@ -123,6 +123,18 @@
   <data name="Apps_SchemaUrl" xml:space="preserve">
     <value>https://json.yevrag35.com/uimanagement-apps/v1.1.0/schema.json</value>
   </data>
+  <data name="CredBox_Content" xml:space="preserve">
+    <value>Enter the credentials to relaunch Management UI as:</value>
+  </data>
+  <data name="CredBox_MainInstruction" xml:space="preserve">
+    <value>Relaunch Credentials</value>
+  </data>
+  <data name="CredBox_Target" xml:space="preserve">
+    <value>MUI</value>
+  </data>
+  <data name="CredBox_WindowTitle" xml:space="preserve">
+    <value>ManagementUI Credentials</value>
+  </data>
   <data name="SettingsFileName" xml:space="preserve">
     <value>settings.json</value>
   </data>

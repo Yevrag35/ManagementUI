@@ -79,6 +79,42 @@ namespace ManagementUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enter the credentials to relaunch Management UI as:.
+        /// </summary>
+        internal static string CredBox_Content {
+            get {
+                return ResourceManager.GetString("CredBox_Content", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Relaunch Credentials.
+        /// </summary>
+        internal static string CredBox_MainInstruction {
+            get {
+                return ResourceManager.GetString("CredBox_MainInstruction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MUI.
+        /// </summary>
+        internal static string CredBox_Target {
+            get {
+                return ResourceManager.GetString("CredBox_Target", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ManagementUI Credentials.
+        /// </summary>
+        internal static string CredBox_WindowTitle {
+            get {
+                return ResourceManager.GetString("CredBox_WindowTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to notepad.
         /// </summary>
         internal static string Settings_DefaultEditor {

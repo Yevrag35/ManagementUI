@@ -26,22 +26,22 @@ namespace ManagementUI.Functionality.Executable
             return proc;
         }
 
-        public Process MakeProcess(bool parentIsElevated, bool runAs, IProcessCredential credential, bool validateCreds)
-        {
-            if (validateCreds)
-            {
-                if (null == credential)
-                    throw new ArgumentException(string.Format("{0} cannot be null if '{1}' is true",
-                        nameof(credential), nameof(validateCreds)));
+        //public Process MakeProcess(bool parentIsElevated, bool runAs, IProcessCredential credential, bool validateCreds)
+        //{
+        //    if (validateCreds)
+        //    {
+        //        if (null == credential)
+        //            throw new ArgumentException(string.Format("{0} cannot be null if '{1}' is true",
+        //                nameof(credential), nameof(validateCreds)));
 
-                if (!credential.Validate(out Exception e))
-                {
-                    throw new InvalidCredentialException(credential.UserName, credential.Domain, e);
-                }
-            }
+        //        if (!credential.Validate(out Exception e))
+        //        {
+        //            throw new InvalidCredentialException(credential.UserName, credential.Domain, e);
+        //        }
+        //    }
 
-            return this.MakeProcess(parentIsElevated, runAs, credential);
-        }
+        //    return this.MakeProcess(parentIsElevated, runAs, credential);
+        //}
         private static ProcessStartInfo NewProcessStartInfo(bool parentIsElevated, bool runAs, IProcessCredential credential,
             string exe, string arguments)
         {

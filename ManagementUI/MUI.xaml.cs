@@ -33,7 +33,8 @@ namespace ManagementUI
         private bool _overItem;
 
         private AppsList AppList => this.JsonAppsRead.Apps;
-        internal static ADCredential Creds { get; set; }
+        //internal static ADCredential Creds { get; set; }
+        private UserIdentity Creds { get; set; }
         private JsonAppsFile JsonAppsRead { get; set; }
         private SettingsJson Settings { get; set; }
         private TagCollection Tags { get; set; }
@@ -62,20 +63,20 @@ namespace ManagementUI
         }
 
         #region CHECKBOX FILTER
-        private async Task ApplyCheckBoxFilter()
-        {
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                //foreach (AppIconSetting ais in this.AppList)
-                //{
-                //    if (!ais.Tags.IsSupersetOf(Checked))
-                //        ais.IsChecked = false;
+        //private async Task ApplyCheckBoxFilter()
+        //{
+        //    await this.Dispatcher.InvokeAsync(() =>
+        //    {
+        //        //foreach (AppIconSetting ais in this.AppList)
+        //        //{
+        //        //    if (!ais.Tags.IsSupersetOf(Checked))
+        //        //        ais.IsChecked = false;
 
-                //    else
-                //        ais.IsChecked = true;
-                //}
-            });
-        }
+        //        //    else
+        //        //        ais.IsChecked = true;
+        //        //}
+        //    });
+        //}
 
         #endregion
 
@@ -98,45 +99,59 @@ namespace ManagementUI
 
         private void CredButton_Click(object sender, RoutedEventArgs e)
         {
-            var click = new RoutedEventArgs(Button.ClickEvent);
-            if ((string)this.CredsButton.Content == RUN_AS)
+            using (var box = new CredentialBox())
             {
-                using (CredentialDialog dialog = this.CreateCredentialDialog())
-                {
-                    bool res = false;
-                    do
+                //box.PasswordChanged += this.Box_PasswordChanged;
+                if (box.ShowDialog())
+                { 
+                    if (null != this.Creds)
                     {
-                        bool done = dialog.ShowDialog(this);
-                        if (done)
-                        {
-                            Creds = (ADCredential)dialog.Credentials;
-                            if (!Creds.TryAuthenticate(out Exception caught))
-                            {
-                                res = ShowErrorMessage(caught, true);
-                                if (res)
-                                    continue;
-
-                                else
-                                    break;
-                            }
-                            else
-                                res = false;
-                            
-                            break;
-                        }
+                        this.Creds.Dispose();
                     }
-                    while (res);
 
-                    this.HandleReprompt(click);
+                    this.Creds = new UserIdentity(box.UserName, box.GetPassword());
                 }
             }
-            else
-            {
-                this.Dispatcher.Invoke(() =>
-                {
-                    this.RelaunchBtn.RaiseEvent(click);
-                });
-            }
+            
+            //var click = new RoutedEventArgs(Button.ClickEvent);
+            //if ((string)this.CredsButton.Content == RUN_AS)
+            //{
+            //    using (CredentialDialog dialog = this.CreateCredentialDialog())
+            //    {
+            //        bool res = false;
+            //        do
+            //        {
+            //            bool done = dialog.ShowDialog(this);
+            //            if (done)
+            //            {
+            //                Creds = (ADCredential)dialog.Credentials;
+            //                if (!Creds.TryAuthenticate(out Exception caught))
+            //                {
+            //                    res = ShowErrorMessage(caught, true);
+            //                    if (res)
+            //                        continue;
+
+            //                    else
+            //                        break;
+            //                }
+            //                else
+            //                    res = false;
+                            
+            //                break;
+            //            }
+            //        }
+            //        while (res);
+
+            //        this.HandleReprompt(click);
+            //    }
+            //}
+            //else
+            //{
+            //    this.Dispatcher.Invoke(() =>
+            //    {
+            //        this.RelaunchBtn.RaiseEvent(click);
+            //    });
+            //}
         }
 
         private async void SettsButton_Click(object sender, RoutedEventArgs e)
@@ -172,35 +187,35 @@ namespace ManagementUI
 
         private async void ListViewItem_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (sender is ListViewItem lvi && lvi.DataContext is AppIconSetting ali)
-            {
-                await ali.LaunchAsync();
-            }
+            //if (sender is ListViewItem lvi && lvi.DataContext is AppIconSetting ali)
+            //{
+            //    await ali.LaunchAsync();
+            //}
         }
 
         private void RelaunchBtn_Click(object sender, RoutedEventArgs e)
         {
-            AppDomain appId = AppDomain.CurrentDomain;
-            string appPath = Path.Combine(appId.BaseDirectory, appId.FriendlyName);
-            ProcessStartInfo psi = StartInfoFactory.Create(appPath, false, false, Creds);
-            psi.LoadUserProfile = true;
+            //AppDomain appId = AppDomain.CurrentDomain;
+            //string appPath = Path.Combine(appId.BaseDirectory, appId.FriendlyName);
+            //ProcessStartInfo psi = StartInfoFactory.Create(appPath, false, false, Creds);
+            //psi.LoadUserProfile = true;
 
-            using (var relaunch = new Process
-            {
-                StartInfo = psi
-            })
-            {
-                try
-                {
-                    relaunch.Start();
-                }
-                catch (Exception ex)
-                {
-                    ShowErrorMessage(ex);
-                }
-            }
+            //using (var relaunch = new Process
+            //{
+            //    StartInfo = psi
+            //})
+            //{
+            //    try
+            //    {
+            //        relaunch.Start();
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        ShowErrorMessage(ex);
+            //    }
+            //}
 
-            this.Close();
+            //this.Close();
         }
 
         #endregion

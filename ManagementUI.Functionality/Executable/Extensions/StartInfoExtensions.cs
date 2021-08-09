@@ -33,13 +33,14 @@ namespace ManagementUI.Functionality.Executable.Extensions
         {
             if (null != credential)
             {
-                psi.UserName = credential.UserName;
-                psi.LoadUserProfile = true;
-                psi.UseShellExecute = false;
-                psi.Password = credential.GetPassword();
+                _ = credential.AuthenticateProcess(psi);
+                //psi.UserName = credential.UserName;
+                //psi.LoadUserProfile = true;
+                //psi.UseShellExecute = false;
+                //psi.Password = credential.GetPassword();
 
-                if (!string.IsNullOrWhiteSpace(credential.Domain))
-                    psi.Domain = credential.Domain;
+                //if (!string.IsNullOrWhiteSpace(credential.Domain))
+                //    psi.Domain = credential.Domain;
             }
 
             return psi;

@@ -58,7 +58,8 @@
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Ookii.Dialogs.Wpf, Version=3.0.0.0, Culture=neutral, PublicKeyToken=66aa232afad40158, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ookii.Dialogs.Wpf.3.1.0\lib\net45\Ookii.Dialogs.Wpf.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>E:\Local_Repos\Ookii.Dialogs.Wpf-YEV\src\Ookii.Dialogs.Wpf\bin\Release\net45\Ookii.Dialogs.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
@@ -85,12 +86,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Auth\UserIdentity.cs" />
     <Compile Include="Collections\EditTagCollection.cs" />
     <Compile Include="Collections\ObservableViewBase.cs" />
     <Compile Include="Collections\TagCollection.cs" />
     <Compile Include="EditTags.xaml.cs">
       <DependentUpon>EditTags.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Extensions\CredentialBoxExtensions.cs" />
     <Compile Include="File\ReadOperations.cs" />
     <Compile Include="File\WriteOperations.cs" />
     <Compile Include="Models\AppItem.cs" />
@@ -99,30 +102,32 @@
     <Compile Include="NewApp.xaml.cs">
       <DependentUpon>NewApp.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Auth\ADCreds.cs" />
+    <None Include="Auth\ADCreds.cs" />
     <None Include="EditTags\EditTagItem.cs" />
     <Compile Include="Helpers\FilterTagEquality.cs" />
     <None Include="Objects\Collections\EditTagList.cs" />
     <Compile Include="Models\Converters\EditorManagerConverter.cs" />
     <Compile Include="Objects\Converters\JsonFilterTagConverter.cs" />
-    <Compile Include="MUIExtensions\ListSortDirectionExtensions.cs" />
-    <Compile Include="MUIExtensions\SortDescriptionCollectionExtensions.cs" />
-    <Compile Include="Objects\Collections\AppListViewCollection.cs" />
-    <Compile Include="Objects\Collections\BaseViewCollection.cs" />
-    <Compile Include="Objects\Collections\ObservableSortedList.cs" />
-    <Compile Include="Objects\Collections\TagList.cs" />
-    <Compile Include="Objects\Collections\TagViewCollection.cs" />
+    <Compile Include="Extensions\ListSortDirectionExtensions.cs" />
+    <Compile Include="Extensions\SortDescriptionCollectionExtensions.cs" />
+    <None Include="Objects\Collections\AppListViewCollection.cs" />
+    <None Include="Objects\Collections\BaseViewCollection.cs" />
+    <None Include="Objects\Collections\ObservableSortedList.cs" />
+    <None Include="Objects\Collections\TagList.cs" />
+    <None Include="Objects\Collections\TagViewCollection.cs" />
     <Compile Include="Objects\Converters\FilterTagConverter.cs" />
+    <Compile Include="Objects\CredentialBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Objects\Interfaces\ICreatesProcessStartInfo.cs" />
-    <Compile Include="MUIExtensions\CredentialBox.cs" />
-    <Compile Include="MUIExtensions\ErrorHandling.cs" />
-    <Compile Include="MUIExtensions\LoadIcons.cs" />
+    <Compile Include="Extensions\CredentialBox.cs" />
+    <Compile Include="Extensions\ErrorHandling.cs" />
     <None Include="Objects\Collections\AppListCollection.cs" />
     <None Include="Objects\Collections\TagCollection.cs" />
     <Compile Include="Objects\Interfaces\Interfaces.cs" />
-    <Compile Include="Objects\Apps\AppIconSetting.cs" />
+    <None Include="Objects\Apps\AppIconSetting.cs" />
     <None Include="Objects\Collections\AppSettingCollection.cs" />
-    <Compile Include="Objects\Collections\BaseMuiCollection.cs" />
+    <None Include="Objects\Collections\BaseMuiCollection.cs" />
     <Compile Include="Objects\Items\ChangeableItem.cs" />
     <Compile Include="Objects\Items\FilterTag.cs" />
     <Compile Include="Helpers\StartInfoFactory.cs" />
@@ -161,20 +166,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

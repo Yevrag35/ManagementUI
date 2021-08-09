@@ -1,4 +1,5 @@
-﻿using Ookii.Dialogs.Wpf;
+﻿using ManagementUI.Models;
+using Ookii.Dialogs.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,8 @@ namespace ManagementUI
     public partial class NewApp : Window
     {
         private bool _answer;
-        public AppIconSetting CreatedApp { get; set; }
+        //public AppIconSetting CreatedApp { get; set; }
+        public AppItem CreatedApp { get; set; }
 
         public NewApp() => InitializeComponent();
 
@@ -59,26 +61,26 @@ namespace ManagementUI
 
         private void CreateBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(this.displayNameBox.Text) && !string.IsNullOrEmpty((string)this.findExeLbl.Content))
-            {
-                _answer = true;
-                CreatedApp = new AppIconSetting
-                {
-                    ExePath = this.findExeLbl.Content as string,
-                    Name = this.displayNameBox.Text,
-                };
-                if (!string.IsNullOrEmpty(this.argumentsBox.Text))
-                    CreatedApp.Arguments = this.argumentsBox.Text;
+            //if (!string.IsNullOrEmpty(this.displayNameBox.Text) && !string.IsNullOrEmpty((string)this.findExeLbl.Content))
+            //{
+            //    _answer = true;
+            //    CreatedApp = new AppIconSetting
+            //    {
+            //        ExePath = this.findExeLbl.Content as string,
+            //        Name = this.displayNameBox.Text,
+            //    };
+            //    if (!string.IsNullOrEmpty(this.argumentsBox.Text))
+            //        CreatedApp.Arguments = this.argumentsBox.Text;
 
-                if (!string.IsNullOrEmpty((string)this.findIconLbl.Content))
-                    CreatedApp.IconPath = this.findIconLbl.Content as string;
+            //    if (!string.IsNullOrEmpty((string)this.findIconLbl.Content))
+            //        CreatedApp.IconPath = this.findIconLbl.Content as string;
 
-                CreatedApp.Index = !string.IsNullOrEmpty(this.iconIndexBox.Text)
-                    ? Convert.ToInt32(this.iconIndexBox.Text)
-                    : 0;
+            //    CreatedApp.Index = !string.IsNullOrEmpty(this.iconIndexBox.Text)
+            //        ? Convert.ToInt32(this.iconIndexBox.Text)
+            //        : 0;
 
-                this.Close();
-            }
+            //    this.Close();
+            //}
         }
 
         private void FindExeBtn_Click(object sender, RoutedEventArgs e)

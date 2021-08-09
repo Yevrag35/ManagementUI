@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Security;
 
 namespace ManagementUI.Functionality.Executable
@@ -10,7 +10,9 @@ namespace ManagementUI.Functionality.Executable
         string Domain { get; }
         string UserName { get; }
 
-        SecureString GetPassword();
-        bool Validate(out Exception e);
+        ProcessStartInfo AuthenticateProcess(ProcessStartInfo processToAuthenticate);
+
+        //SecureString GetPassword();
+        //bool Validate(out Exception e);
     }
 }
