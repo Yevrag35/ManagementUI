@@ -12,6 +12,7 @@ namespace ManagementUI.Functionality.Executable
     {
         public virtual string Arguments { get; set; }
         public virtual string ExePath { get; set; }
+        public virtual bool NoNewWindow { get; set; } = true;
 
         public LaunchableBase()
             : base()
@@ -22,32 +23,16 @@ namespace ManagementUI.Functionality.Executable
         {
             this.ValidateParameters();
 
-            var proc = new Process { StartInfo = NewProcessStartInfo(parentIsElevated, runAs, credential, this.ExePath, this.Arguments) };
+            var proc = new Process { StartInfo = NewProcessStartInfo(parentIsElevated, runAs, credential, this.ExePath, this.Arguments, this.NoNewWindow) };
             return proc;
         }
-
-        //public Process MakeProcess(bool parentIsElevated, bool runAs, IProcessCredential credential, bool validateCreds)
-        //{
-        //    if (validateCreds)
-        //    {
-        //        if (null == credential)
-        //            throw new ArgumentException(string.Format("{0} cannot be null if '{1}' is true",
-        //                nameof(credential), nameof(validateCreds)));
-
-        //        if (!credential.Validate(out Exception e))
-        //        {
-        //            throw new InvalidCredentialException(credential.UserName, credential.Domain, e);
-        //        }
-        //    }
-
-        //    return this.MakeProcess(parentIsElevated, runAs, credential);
-        //}
         private static ProcessStartInfo NewProcessStartInfo(bool parentIsElevated, bool runAs, IProcessCredential credential,
-            string exe, string arguments)
+            string exe, string arguments, bool noWindow)
         {
             return StartInfoFactory
                 .Create()
                     .AddExe(exe)
+                    .CreateNoWindow(noWindow)
                     .AddArguments(arguments)
                     .AddRunAs(runAs)
                     .UseShellExecute(!parentIsElevated)

@@ -25,7 +25,7 @@ namespace ManagementUI.Collections
         protected override string[] LiveSortingProperties => new string[1] { nameof(ToggleTag.Value) };
 
         public TagCollection(IEnumerable<UserTag> tags)
-            : base(AsToggleTags(tags), _comparer)
+            : base(AsToggleTags(tags.OrderBy(x => x.Value)), _comparer)
         {
             this.Disabled = new HashSet<ToggleTag>(this.InnerList, _comparer);
             this.Enabled = new HashSet<ToggleTag>(this.InnerList.Count, _comparer);

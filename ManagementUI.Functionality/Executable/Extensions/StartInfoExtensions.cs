@@ -6,10 +6,7 @@ namespace ManagementUI.Functionality.Executable
 {
     public static class StartInfoFactory
     {
-        public static ProcessStartInfo Create() => new ProcessStartInfo
-        {
-            CreateNoWindow = true
-        };
+        public static ProcessStartInfo Create() => new ProcessStartInfo();
     }
 }
 
@@ -47,7 +44,12 @@ namespace ManagementUI.Functionality.Executable.Extensions
 
             return psi;
         }
-        public static ProcessStartInfo UseShellExecute(this ProcessStartInfo psi, bool toggle = true)
+        public static ProcessStartInfo CreateNoWindow(this ProcessStartInfo psi, bool toggle = true)
+        {
+            psi.CreateNoWindow = toggle;
+            return psi;
+        }
+        public static ProcessStartInfo UseShellExecute(this ProcessStartInfo psi, bool toggle = false)
         {
             psi.UseShellExecute = toggle;
             return psi;

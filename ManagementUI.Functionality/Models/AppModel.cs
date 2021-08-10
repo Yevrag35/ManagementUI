@@ -90,6 +90,9 @@ namespace ManagementUI.Functionality.Models
             }
         }
 
+        [JsonProperty("noWindow")]
+        public override bool NoNewWindow { get; set; } = true;
+
         [JsonProperty("name", Order = 1)]
         public string Name
         {

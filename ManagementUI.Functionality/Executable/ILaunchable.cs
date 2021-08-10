@@ -17,6 +17,8 @@ namespace ManagementUI.Functionality.Executable
         /// </summary>
         string ExePath { get; }
 
+        bool NoNewWindow { get; }
+
         /// <summary>
         /// Generates a new <see cref="Process"/> with a constructed <see cref="ProcessStartInfo"/>
         /// using the provided credential.
