@@ -76,6 +76,17 @@ namespace ManagementUI.Collections
             return this.Enabled.Count;
         }
 
+        public void ExceptWith(IEnumerable<ToggleTag> other)
+        {
+            this.Enabled.ExceptWith(other);
+            this.Disabled.ExceptWith(other);
+            foreach (ToggleTag tag in other)
+            {
+                tag.IsChecked = false;
+                _ = this.Remove(tag);
+            }
+        }
+
         public EditTagCollection ToEditCollection()
         {
             return new EditTagCollection(this.Select(x => x.Clone()));
@@ -114,23 +125,6 @@ namespace ManagementUI.Collections
                         UserTag = x
                     }
                 );
-        }
-
-        private static class TagEquality
-        {
-            public static new bool Equals(object x, object y)
-            {
-                if (x is ToggleTag tt && y is UserTag ut)
-                {
-                    return _comparer.StringComparer.Equals(tt.UserTag.Value, ut.Value);
-                }
-                else if (x is UserTag ut2 && y is ToggleTag tt2)
-                {
-                    return _comparer.StringComparer.Equals(ut2.Value, tt2.UserTag.Value);
-                }
-                else
-                    return false;
-            }
         }
     }
 }

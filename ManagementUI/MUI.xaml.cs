@@ -348,5 +348,24 @@ namespace ManagementUI
         {
             LaunchFactory.Deinitialize();
         }
+
+        private async void RemoveTag_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.FilterTags.SelectedItems.Count > 0)
+            {
+                
+
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    ToggleTag[] tags = this.FilterTags.SelectedItems.Cast<ToggleTag>().ToArray();
+                    this.Tags.ExceptWith(tags);
+
+                    foreach (AppItem ai in this.AppList)
+                    {
+                        ai.Tags.ExceptWith(tags.Select(x => x.UserTag));
+                    }
+                });
+            }
+        }
     }
 }

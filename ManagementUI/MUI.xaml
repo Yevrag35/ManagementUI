@@ -167,6 +167,11 @@
                    Grid.Row="0"/>
 
             <ListView x:Name="FilterTags" Grid.Row="1" Grid.RowSpan="3" >
+                <ListView.ContextMenu>
+                    <ContextMenu x:Name="FilterTagsContextMenu">
+                        <MenuItem x:Name="RemoveTag" Header="Remove..." Click="RemoveTag_Click"/>
+                    </ContextMenu>
+                </ListView.ContextMenu>
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -178,7 +183,8 @@
                                 <CheckBox IsChecked="{Binding IsChecked}" Grid.Column="0" Checked="CheckBox_Checked"
                                           Unchecked="CheckBox_Unchecked"/>
                                 <TextBlock Text="{Binding Value}" Grid.Column="1"
-                                         Background="Transparent" Focusable="False" />
+                                         Background="Transparent" Focusable="False">
+                                </TextBlock>
                             </Grid>
                         </StackPanel>
                     </DataTemplate>
