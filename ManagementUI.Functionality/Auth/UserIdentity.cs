@@ -67,7 +67,8 @@ namespace ManagementUI.Functionality.Auth
         {
             IntPtr pointer = Marshal.SecureStringToBSTR(_password.Copy());
             // password exposure begins
-            bool result = context.ValidateCredentials(this.UserName, Marshal.PtrToStringAuto(pointer));
+            string pass = Marshal.PtrToStringAuto(pointer);
+            bool result = context.ValidateCredentials(this.UserName, pass, ContextOptions.Signing | ContextOptions.Negotiate);
             Marshal.ZeroFreeBSTR(pointer);
             // password exposure ends
             return result;

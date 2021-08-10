@@ -6,6 +6,7 @@
         xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         xmlns:ctrl="clr-namespace:Itenso.Windows.Controls.ListViewLayout;assembly=Itenso.Windows.Controls.ListViewLayout"
         xmlns:local="clr-namespace:ManagementUI"
+        xmlns:mock="clr-namespace:ManagementUI.ViewModels"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Loaded="Window_Loaded"
         Closing="Window_Closing"
@@ -421,9 +422,17 @@
                 <ColumnDefinition Width="26"/>
                 <ColumnDefinition Width="10"/>
             </Grid.ColumnDefinitions>
-            <ListView x:Name="AppListView" Grid.Column="0" Background="Transparent" BorderBrush="Transparent" BorderThickness="0"
-                      MouseRightButtonUp="AppListView_MouseRightButtonUp" KeyDown="AppListView_KeyDown"
+            <ListView x:Name="AppListView" Grid.Column="0" Background="Transparent" BorderBrush="Transparent" 
+                      BorderThickness="0"
+                      KeyDown="AppListView_KeyDown"
                       PreviewMouseRightButtonUp="ContextMenu_PreviewMouseRightButtonUp">
+                <!--<d:ListView.ItemsSource>
+                    <x:Array Type="{x:Type mock:MockAppItem}">
+                        <mock:MockAppItem Name="Hi There" DontShow="False" ExePath="C:\Windows\notepad.exe"
+                                          Arguments="your mom" IconIndex="0" IconPath="C:\Windows\notepad.exe"
+                                          />
+                    </x:Array>
+                </d:ListView.ItemsSource>-->
                 <ListView.Resources>
                     <Style TargetType="{x:Type GridViewColumnHeader}">
                         <Setter Property="Template">
@@ -477,7 +486,7 @@
                     <GridView>
                         <GridView.Columns>
                             <GridViewColumn Header="" CellTemplate="{StaticResource CellTemplate}" />
-                            <GridViewColumn Header="Application Name" DisplayMemberBinding="{Binding Path=Name}" 
+                            <GridViewColumn Header="Application Name" DisplayMemberBinding="{Binding Path=Name}"
                                             ctrl:ProportionalColumn.Width="1"/>
                             <!--<GridViewColumn Header="Tags" DisplayMemberBinding="{Binding Path=Tags}"
                                             ctrl:FixedColumn.Width="300"/>-->
