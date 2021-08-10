@@ -20,13 +20,9 @@ namespace ManagementUI
 {
     /// <summary>
     /// Interaction logic for EditTags.xaml
-    /// TO DO - FIND A WAY TO LOAD THE EXISTING APPLIED EASILY
     /// </summary>
     public partial class EditTags : Window
     {
-        //public HashSet<FilterTag> AllFilterTags { get; }
-        //public EditTagList AllTags { get; }
-        //public AppIconSetting Application { get; }
         public AppItem ChosenApp { get; }
         public EditTagCollection Tags { get; }
         public HashSet<UserTag> PendingAdd { get; }
@@ -53,16 +49,6 @@ namespace ManagementUI
             this.AvailableTagsList.ItemsSource = this.Tags.Available;
             this.AppliedTagsList.ItemsSource = this.Tags.Applied;
         }
-        //public EditTags(AppIconSetting chosenApp, IEnumerable<FilterTag> allTags)
-        //{
-        //    //this.AllFilterTags = new HashSet<FilterTag>(allTags);
-        //    //this.Application = chosenApp;
-        //    //this.AllTags = new EditTagList(allTags, chosenApp);
-        //    //this.InitializeComponent();
-
-        //    //this.AppliedTagsList.ItemsSource = this.AllTags.Applied;
-        //    //this.AvailableTagsList.ItemsSource = this.AllTags.Available;
-        //}
 
         private async void ApplyTagBtn_Click(object sender, RoutedEventArgs e)
         {

@@ -48,10 +48,6 @@ namespace ManagementUI.Functionality.Models
             _editors = new Dictionary<string, IEditor>(5, StringComparer.CurrentCultureIgnoreCase);
             this.AddDefaults();
         }
-        //public EditorManagerBase()
-        //{
-        //    _editors = new Dictionary<string, IEditor>(5, StringComparer.CurrentCultureIgnoreCase);
-        //}
 
         private void AddDefaults()
         {

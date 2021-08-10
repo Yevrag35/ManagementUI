@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using ManagementUI.Functionality.Executable;
 
 namespace ManagementUI.Functionality.Models
 {
@@ -10,7 +8,6 @@ namespace ManagementUI.Functionality.Models
         public event PropertyChangedEventHandler PropertyChanged;
 
         public UIModelBase()
-            : base()
         {
         }
 

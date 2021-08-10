@@ -92,6 +92,7 @@
     <Compile Include="EditTags.xaml.cs">
       <DependentUpon>EditTags.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Extensions\ListExtensions.cs" />
     <Compile Include="File\ReadOperations.cs" />
     <Compile Include="File\WriteOperations.cs" />
     <Compile Include="Helpers\LaunchFactory.cs" />
@@ -105,9 +106,6 @@
     <Compile Include="Prompts\PromptFactory.cs" />
     <Compile Include="Prompts\TaskDialogExtensions.cs" />
     <Compile Include="ViewModels\MockAppItem.cs" />
-    <Compile Include="WindowBehavior\Relaunch.cs" />
-    <None Include="EditTags\EditTagItem.cs" />
-    <Compile Include="Helpers\FilterTagEquality.cs" />
     <None Include="Objects\Collections\EditTagList.cs" />
     <Compile Include="Models\Converters\EditorManagerConverter.cs" />
     <Compile Include="Objects\Converters\JsonFilterTagConverter.cs" />
@@ -132,7 +130,6 @@
     <None Include="Objects\Collections\BaseMuiCollection.cs" />
     <Compile Include="Objects\Items\ChangeableItem.cs" />
     <Compile Include="Objects\Items\FilterTag.cs" />
-    <Compile Include="Helpers\StartInfoFactory.cs" />
     <Compile Include="Models\EditorManager.cs" />
     <None Include="Objects\Settings_Old\SettingsEditor.cs" />
     <Compile Include="Models\SettingsJson.cs" />
@@ -199,6 +196,8 @@
       <Name>Functionality</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="WindowBehavior\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

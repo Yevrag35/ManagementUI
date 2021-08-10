@@ -61,7 +61,10 @@ namespace ManagementUI
             this.IdentityBlock.SelectAll();
             e.Handled = true;
         }
-
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            LaunchFactory.Deinitialize();
+        }
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             App.MyHandle = new WindowInteropHelper(this).Handle;
@@ -92,18 +95,17 @@ namespace ManagementUI
                 //AppList.Add(newApp.CreatedApp);
             }
         }
-
         private async void ALMIRemove_Click(object sender, RoutedEventArgs e)
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
                 if (this.AppListView.SelectedItem is AppItem ai)
                 {
-                    if (PromptFactory.DoYesNoPrompt(this, Strings.Prompt_DeleteTitle, TaskDialogIcon.Warning, true, 
+                    if (PromptFactory.DoYesNoPrompt(this, Strings.Prompt_AppDeleteTitle, TaskDialogIcon.Warning, true, 
                         (dialog) =>
                         {
-                            dialog.MainInstruction = Strings.Prompt_DeleteMainInstruction;
-                            dialog.AddContent(Strings.Prompt_DeleteContent, ai.Name, Environment.NewLine);
+                            dialog.MainInstruction = Strings.Prompt_AppDeleteMainInstruction;
+                            dialog.AddContent(Strings.Prompt_AppDeleteContent, ai.Name, Environment.NewLine);
                         }))
                     {
                         _ = this.AppList.Remove(ai);
@@ -111,7 +113,6 @@ namespace ManagementUI
                 }
             });
         }
-
         private void AppListView_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             //if (e.Key == System.Windows.Input.Key.Delete)
@@ -265,6 +266,36 @@ namespace ManagementUI
             });
         }
 
+        private async void RemoveTag_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.FilterTags.SelectedItems.Count > 0)
+            {
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    ToggleTag[] tags = this.FilterTags.SelectedItems.Get<ToggleTag>();
+                    string tagNames = string.Join(Environment.NewLine,
+                        tags.Select(x => x.Value).OrderBy(x => x));
+
+                    if (PromptFactory.DoYesNoPrompt(this, Strings.Prompt_TagDeleteTitle, TaskDialogIcon.Warning, true, 
+                        (dialog) =>
+                        {
+                            _ = dialog
+                                .AddInstruction(Strings.Prompt_TagDeleteMainInstruction)
+                                    .AddContent(Strings.Prompt_TagDeleteContent, tagNames, Environment.NewLine);
+                        }))
+                    {
+                        this.Tags.ExceptWith(tags);
+                        UserTag[] uTags = tags.ToArray(x => x.UserTag);
+
+                        this.AppList.ForEach((app) =>
+                        {
+                            app.Tags.ExceptWith(uTags);
+                        });
+                    }
+                });
+            }
+        }
+
         #endregion
 
         #region LAUNCH APP
@@ -346,30 +377,7 @@ namespace ManagementUI
 
         #endregion
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            LaunchFactory.Deinitialize();
-        }
-
-        private async void RemoveTag_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.FilterTags.SelectedItems.Count > 0)
-            {
-                
-
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    ToggleTag[] tags = this.FilterTags.SelectedItems.Cast<ToggleTag>().ToArray();
-                    this.Tags.ExceptWith(tags);
-
-                    foreach (AppItem ai in this.AppList)
-                    {
-                        ai.Tags.ExceptWith(tags.Select(x => x.UserTag));
-                    }
-                });
-            }
-        }
-
+        
         private async void FilterTags_LostFocus(object sender, RoutedEventArgs e)
         {
             await this.Dispatcher.InvokeAsync(() =>
@@ -380,7 +388,5 @@ namespace ManagementUI
                 }
             });
         }
-
-        
     }
 }

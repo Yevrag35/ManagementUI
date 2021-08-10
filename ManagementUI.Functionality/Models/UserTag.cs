@@ -40,7 +40,6 @@ namespace ManagementUI.Functionality.Models
         }
         public bool Equals(UserTag other)
         {
-            //return Id.Equals(other.Id);
             return (this.Value?.Equals(other.Value)).GetValueOrDefault();
         }
         public bool Equals(int other)
@@ -60,6 +59,5 @@ namespace ManagementUI.Functionality.Models
 
         public static explicit operator string(UserTag tag) => tag.Value;
         public static explicit operator char[](UserTag tag) => tag.Value?.ToCharArray();
-        public static implicit operator UserTag(string tag) => new UserTag { Value = tag };
     }
 }

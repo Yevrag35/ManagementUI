@@ -117,27 +117,54 @@ namespace ManagementUI.Properties {
         /// <summary>
         ///   Looks up a localized string similar to {0}{1}{1}Are you sure you want to delete this app?.
         /// </summary>
-        internal static string Prompt_DeleteContent {
+        internal static string Prompt_AppDeleteContent {
             get {
-                return ResourceManager.GetString("Prompt_DeleteContent", resourceCulture);
+                return ResourceManager.GetString("Prompt_AppDeleteContent", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Permanently Delete App.
         /// </summary>
-        internal static string Prompt_DeleteMainInstruction {
+        internal static string Prompt_AppDeleteMainInstruction {
             get {
-                return ResourceManager.GetString("Prompt_DeleteMainInstruction", resourceCulture);
+                return ResourceManager.GetString("Prompt_AppDeleteMainInstruction", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Management UI.
         /// </summary>
-        internal static string Prompt_DeleteTitle {
+        internal static string Prompt_AppDeleteTitle {
             get {
-                return ResourceManager.GetString("Prompt_DeleteTitle", resourceCulture);
+                return ResourceManager.GetString("Prompt_AppDeleteTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}{1}{1}Are you you want to delete these tags?.
+        /// </summary>
+        internal static string Prompt_TagDeleteContent {
+            get {
+                return ResourceManager.GetString("Prompt_TagDeleteContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete Tag(s).
+        /// </summary>
+        internal static string Prompt_TagDeleteMainInstruction {
+            get {
+                return ResourceManager.GetString("Prompt_TagDeleteMainInstruction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Management UI.
+        /// </summary>
+        internal static string Prompt_TagDeleteTitle {
+            get {
+                return ResourceManager.GetString("Prompt_TagDeleteTitle", resourceCulture);
             }
         }
         
