@@ -27,13 +27,13 @@ namespace ManagementUI
     public partial class MUI : Window
     {
         #region PROPERTIES/FIELDS
-        private static HashSet<string> Checked;
+        //private static HashSet<string> Checked;
         private FilterTagEquality _ftEquality;
         private bool _overItem;
 
         private AppsList AppList => this.JsonAppsRead.Apps;
         //internal static ADCredential Creds { get; set; }
-        private UserIdentity Creds { get; set; }
+        //private UserIdentity Creds { get; set; }
         private JsonAppsFile JsonAppsRead { get; set; }
         private SettingsJson Settings { get; set; }
         private TagCollection Tags { get; set; }
@@ -55,26 +55,6 @@ namespace ManagementUI
             return this.ReadApps();
         }
 
-        
-
-        #region CHECKBOX FILTER
-        //private async Task ApplyCheckBoxFilter()
-        //{
-        //    await this.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        //foreach (AppIconSetting ais in this.AppList)
-        //        //{
-        //        //    if (!ais.Tags.IsSupersetOf(Checked))
-        //        //        ais.IsChecked = false;
-
-        //        //    else
-        //        //        ais.IsChecked = true;
-        //        //}
-        //    });
-        //}
-
-        #endregion
-
         #region EVENT HANDLERS
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -82,7 +62,7 @@ namespace ManagementUI
             App.MyHandle = new WindowInteropHelper(this).Handle;
 
             await this.OnLoad();
-            Checked = new HashSet<string>(1);
+            //Checked = new HashSet<string>(1);
             await this.Dispatcher.InvokeAsync(() =>
             {
 
@@ -100,11 +80,6 @@ namespace ManagementUI
                 {
                     if (box.ShowDialog())
                     {
-                        if (null != this.Creds)
-                        {
-                            this.Creds.Dispose();
-                        }
-
                         IUserIdentity userId = new UserIdentity(box.UserName, box.GetPassword());
                         if (userId.IsValid())
                         {
@@ -293,6 +268,8 @@ namespace ManagementUI
                     };
                     if (editTags.ShowDialog().GetValueOrDefault())
                     {
+                        this.Tags.UnionWith(ai.Tags);
+
                         if (this.Tags.EnabledCount > 0)
                         {
                             if (!ai.DontShow && !ai.Tags.IsSupersetOf(this.Tags.EnabledTags))
@@ -362,6 +339,11 @@ namespace ManagementUI
                 _overItem = false;
 
             }, System.Windows.Threading.DispatcherPriority.Send);
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            LaunchFactory.Deinitialize();
         }
     }
 }

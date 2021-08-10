@@ -26,15 +26,18 @@ namespace ManagementUI
     public class SettingsJson : JsonSettings
     {
         #region PROPERTIES
-        [JsonProperty("$schema")]
+        [JsonProperty("$schema", Order = 1)]
         private string _schema;
 
-        [JsonProperty("customEditors")]
+        [JsonProperty("autoValidateCredentials")]
+        public bool AutoValidate { get; set; }
+
+        [JsonProperty("customEditors", Order = 4)]
         public EditorManager EditorManager { get; set; }
 
-        [JsonProperty("version")]
+        [JsonProperty("version", Order = 2)]
         public string Version { get; set; }
-        [JsonProperty("editor")]
+        [JsonProperty("editor", Order = 5)]
         public string Editor { get; set; }
 
         #endregion
@@ -65,6 +68,7 @@ namespace ManagementUI
             {
                 GetDefault(x => x._schema, Strings.Settings_SchemaUrl),
                 GetDefault(x => x.Version, Strings.Settings_Version),
+                GetDefault(x => x.AutoValidate, false),
                 GetDefault(x => x.Editor, Strings.Settings_DefaultEditor),
                 GetDefault(x => x.EditorManager, new JArray())
             };

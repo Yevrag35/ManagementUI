@@ -78,6 +78,10 @@ namespace ManagementUI.Collections
         {
             return new EditTagCollection(this.Select(x => x.Clone()));
         }
+        public void UnionWith(IEnumerable<UserTag> other)
+        {
+
+        }
 
         private static IEnumerable<ToggleTag> AsToggleTags(IEnumerable<UserTag> tags)
         {

@@ -20,6 +20,13 @@ namespace ManagementUI
         {
             _userId = userId;
         }
+        public static void Deinitialize()
+        {
+            if (null != _userId)
+            {
+                _userId.Dispose();
+            }
+        }
 
         public static bool Execute(ILaunchable launchable, out Exception caughtException)
         {
