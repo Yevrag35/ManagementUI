@@ -101,6 +101,7 @@
     <Compile Include="NewApp.xaml.cs">
       <DependentUpon>NewApp.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Objects\IToggleTagComparer.cs" />
     <Compile Include="WindowBehavior\Relaunch.cs" />
     <None Include="EditTags\EditTagItem.cs" />
     <Compile Include="Helpers\FilterTagEquality.cs" />

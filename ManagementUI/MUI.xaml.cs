@@ -268,7 +268,10 @@ namespace ManagementUI
                     };
                     if (editTags.ShowDialog().GetValueOrDefault())
                     {
-                        this.Tags.UnionWith(ai.Tags);
+                        if (!this.Tags.SetEquals(editTags.Tags))
+                        {
+                            this.Tags.UnionWith(editTags.Tags);
+                        }
 
                         if (this.Tags.EnabledCount > 0)
                         {

@@ -40,7 +40,8 @@ namespace ManagementUI.Functionality.Models
         }
         public bool Equals(UserTag other)
         {
-            return Id.Equals(other.Id);
+            //return Id.Equals(other.Id);
+            return (this.Value?.Equals(other.Value)).GetValueOrDefault();
         }
         public bool Equals(int other)
         {

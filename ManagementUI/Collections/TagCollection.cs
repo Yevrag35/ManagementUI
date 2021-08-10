@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,7 @@ namespace ManagementUI.Collections
 {
     public class TagCollection : ObservableViewBase<ToggleTag>
     {
+        private static IToggleTagComparer _comparer = ToggleTag.NewValueComparer(StringComparer.CurrentCultureIgnoreCase);
         private HashSet<ToggleTag> Enabled;
         private HashSet<ToggleTag> Disabled;
         private int _nextId;
@@ -23,10 +25,10 @@ namespace ManagementUI.Collections
         protected override string[] LiveSortingProperties => new string[1] { nameof(ToggleTag.Value) };
 
         public TagCollection(IEnumerable<UserTag> tags)
-            : base(AsToggleTags(tags))
+            : base(AsToggleTags(tags), _comparer)
         {
-            this.Disabled = new HashSet<ToggleTag>(this.InnerList);
-            this.Enabled = new HashSet<ToggleTag>(this.InnerList.Count);
+            this.Disabled = new HashSet<ToggleTag>(this.InnerList, _comparer);
+            this.Enabled = new HashSet<ToggleTag>(this.InnerList.Count, _comparer);
             _nextId = this.Disabled.Count + 1;
             this.CreateView();
         }
@@ -78,21 +80,57 @@ namespace ManagementUI.Collections
         {
             return new EditTagCollection(this.Select(x => x.Clone()));
         }
-        public void UnionWith(IEnumerable<UserTag> other)
+        public bool IsSupersetOf(IEnumerable<UserTag> tags)
         {
+            foreach (UserTag tag in tags)
+            {
+                if (!this.Exists(x => x.UserTag.Equals(tag)))
+                {
+                    return false;
+                }
+            }
 
+            return true;
+        }
+        public void UnionWith(IEnumerable<ToggleTag> other)
+        {
+            foreach (ToggleTag tag in other)
+            {
+                if (this.Add(tag, true))
+                {
+                    tag.IsChecked = false;
+                    this.Enabled.Add(tag);
+                    this.Disabled.Add(tag);
+                }
+            }
         }
 
         private static IEnumerable<ToggleTag> AsToggleTags(IEnumerable<UserTag> tags)
         {
-            IEqualityComparer<string> equalityComparer = StringComparer.CurrentCultureIgnoreCase;
             return tags
                 .Select(x =>
-                    new ToggleTag(equalityComparer)
+                    new ToggleTag(_comparer.StringComparer)
                     {
                         UserTag = x
                     }
                 );
+        }
+
+        private static class TagEquality
+        {
+            public static new bool Equals(object x, object y)
+            {
+                if (x is ToggleTag tt && y is UserTag ut)
+                {
+                    return _comparer.StringComparer.Equals(tt.UserTag.Value, ut.Value);
+                }
+                else if (x is UserTag ut2 && y is ToggleTag tt2)
+                {
+                    return _comparer.StringComparer.Equals(ut2.Value, tt2.UserTag.Value);
+                }
+                else
+                    return false;
+            }
         }
     }
 }

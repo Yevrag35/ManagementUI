@@ -129,6 +129,10 @@ namespace ManagementUI.Collections
         {
             _available.ForEach(action);
         }
+        public ToggleTag GetTag(int index)
+        {
+            return _available[index];
+        }
         public int IndexOf(object value)
         {
             int index = -1;

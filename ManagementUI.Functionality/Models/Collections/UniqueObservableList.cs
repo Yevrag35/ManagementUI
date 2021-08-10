@@ -167,6 +167,10 @@ namespace ManagementUI.Functionality.Models
 
         #region LIST METHODS
 
+        public bool Exists(Predicate<T> predicate)
+        {
+            return InnerList.Exists(predicate);
+        }
         public List<T> FindAll(Predicate<T> predicate)
         {
             return InnerList.FindAll(predicate);

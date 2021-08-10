@@ -69,21 +69,26 @@ namespace ManagementUI
         object ICloneable.Clone() => this.Clone();
         public bool Equals(ToggleTag other)
         {
-            return this.UserTag.Equals((other?.UserTag).GetValueOrDefault());
+            return _comparer.Equals(this.Value, other?.Value) || this.UserTag.Id.Equals(other.UserTag.Id);
         }
         public bool TextEquals(string text)
         {
             return this.UserTag.TextEquals(text, _comparer);
         }
 
-        public IEqualityComparer<ToggleTag> NewValueComparer()
+        public IToggleTagComparer NewValueComparer()
         {
-            return new TagValueEqualityComparer(_comparer);
+            return NewValueComparer(_comparer);
+        }
+        public static IToggleTagComparer NewValueComparer(IEqualityComparer<string> comparer)
+        {
+            return new TagValueEqualityComparer(comparer);
         }
 
-        private class TagValueEqualityComparer : IEqualityComparer<ToggleTag>
+        private class TagValueEqualityComparer : IToggleTagComparer, IEqualityComparer<ToggleTag>
         {
             private IEqualityComparer<string> _comparer;
+            public IEqualityComparer<string> StringComparer => _comparer;
             public TagValueEqualityComparer(IEqualityComparer<string> stringComparer)
             {
                 _comparer = stringComparer;

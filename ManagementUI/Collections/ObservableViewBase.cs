@@ -33,6 +33,10 @@ namespace ManagementUI.Collections
             : base(items)
         {
         }
+        public ObservableViewBase(IEnumerable<T> items, IEqualityComparer<T> equalityComparer)
+            : base(items, equalityComparer)
+        {
+        }
 
         public void CreateView()
         {

@@ -29,7 +29,7 @@ namespace ManagementUI
         //public AppIconSetting Application { get; }
         public AppItem ChosenApp { get; }
         public EditTagCollection Tags { get; }
-        private HashSet<UserTag> PendingAdd { get; }
+        public HashSet<UserTag> PendingAdd { get; }
         private HashSet<UserTag> PendingRemove { get; }
         public string WindowName { get; set; }
 
@@ -124,7 +124,7 @@ namespace ManagementUI
 
         private void ExitBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.PendingAdd.Clear();
+            //this.PendingAdd.Clear();
             this.PendingRemove.Clear();
             this.Tags.Clear();
             this.DialogResult = false;
@@ -156,7 +156,11 @@ namespace ManagementUI
                 }
                 else
                 {
-                    _ = this.Tags.Add(newTag);
+                    int index = this.Tags.Add(newTag);
+                    if (index > -1)
+                    {
+                        this.PendingAdd.Add(this.Tags.GetTag(index).UserTag);
+                    }
                 }
 
                 InputBox.Visibility = Visibility.Collapsed;
