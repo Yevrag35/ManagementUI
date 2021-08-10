@@ -1,4 +1,5 @@
 ﻿using ManagementUI.Functionality.Executable;
+using ManagementUI.Functionality.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,7 +12,8 @@ using System.Security.Principal;
 
 namespace ManagementUI.Functionality.Auth
 {
-    public class UserIdentity : IDisposable, IUserIdentity, IProcessCredential
+    public class UserIdentity : UIModelBase, IDisposable, INotifyPropertyChanged, IUserIdentity,
+        IProcessCredential
     {
         private const char AT_SIGN = (char)64;
         private const char BACKSLASH = (char)92;
@@ -23,9 +25,17 @@ namespace ManagementUI.Functionality.Auth
         private SecureString _password;
 
         public ContextType ContextType => _userId.ContextType;
+        public string DisplayPrincipal
+        {
+            get => this.Principal.Value;
+            set 
+            {
+                this.NotifyOfChange(nameof(DisplayPrincipal));
+            }
+        }
         public string Domain => _userId.Domain;
         public bool IsValidated { get; }
-        public NTAccount NTAccount { get; }
+        public NTAccount Principal { get; }
         public string UserName => _userId.Value;
 
         #region CONSTRUCTORS
@@ -33,7 +43,8 @@ namespace ManagementUI.Functionality.Auth
         {
             _userId = (PrincipalInfo)userAndDomain;
             _password = password;
-            this.NTAccount = new NTAccount(_userId.Domain, _userId.Value);
+            this.Principal = new NTAccount(_userId.Domain, _userId.Value);
+            this.NotifyOfChange(nameof(DisplayPrincipal));
         }
 
         #endregion
@@ -65,13 +76,19 @@ namespace ManagementUI.Functionality.Auth
 
         private bool Validate(PrincipalContext context)
         {
-            IntPtr pointer = Marshal.SecureStringToBSTR(_password.Copy());
-            // password exposure begins
-            string pass = Marshal.PtrToStringAuto(pointer);
-            bool result = context.ValidateCredentials(this.UserName, pass, ContextOptions.Signing | ContextOptions.Negotiate);
-            Marshal.ZeroFreeBSTR(pointer);
-            // password exposure ends
-            return result;
+            using (SecureString copyOfPassword = _password.Copy())
+            {
+                IntPtr pointer = Marshal.SecureStringToBSTR(copyOfPassword);
+                // password exposure begins
+                bool result = context.ValidateCredentials(
+                    this.UserName,
+                    Marshal.PtrToStringAuto(pointer),
+                    ContextOptions.Signing | ContextOptions.Negotiate
+                );
+                Marshal.ZeroFreeBSTR(pointer);
+                // password exposure ends
+                return result;
+            }
         }
 
         public void Dispose()

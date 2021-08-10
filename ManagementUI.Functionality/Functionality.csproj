@@ -47,6 +47,7 @@
   <ItemGroup>
     <None Include="Auth\IdentityFactory.cs" />
     <Compile Include="Auth\IUserIdentity.cs" />
+    <Compile Include="Auth\RunAsDisplay.cs" />
     <Compile Include="Auth\UserIdentity.cs" />
     <Compile Include="Auth\PrincipalInfo.cs" />
     <Compile Include="Executable\InvalidCredentialException.cs" />

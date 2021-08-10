@@ -27,14 +27,12 @@ namespace ManagementUI
     public partial class MUI : Window
     {
         #region PROPERTIES/FIELDS
-        //private static HashSet<string> Checked;
         private FilterTagEquality _ftEquality;
         private bool _overItem;
 
         private AppsList AppList => this.JsonAppsRead.Apps;
-        //internal static ADCredential Creds { get; set; }
-        //private UserIdentity Creds { get; set; }
         private JsonAppsFile JsonAppsRead { get; set; }
+        public static RunAsDisplay RunAsUser { get; set; }
         private SettingsJson Settings { get; set; }
         private TagCollection Tags { get; set; }
 
@@ -42,6 +40,7 @@ namespace ManagementUI
 
         public MUI()
         {
+            RunAsUser = new RunAsDisplay();
             this.ReadSettings();
             LaunchFactory.Initialize();
             _ftEquality = new FilterTagEquality();
@@ -56,25 +55,26 @@ namespace ManagementUI
         }
 
         #region EVENT HANDLERS
+        private void IdentityBlock_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            this.IdentityBlock.SelectAll();
+            e.Handled = true;
+        }
+
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.IdentityBlock.Text = WindowsIdentity.GetCurrent().Name;
             App.MyHandle = new WindowInteropHelper(this).Handle;
 
             await this.OnLoad();
             //Checked = new HashSet<string>(1);
             await this.Dispatcher.InvokeAsync(() =>
             {
-
+                
                 this.AppListView.ItemsSource = this.AppList.View;
                 this.FilterTags.ItemsSource = this.Tags.View;
             });
             
         }
-
-        
-
-        
 
         #endregion
 
@@ -93,8 +93,16 @@ namespace ManagementUI
             }
         }
 
-        private void ALMIRemove_Click(object sender, RoutedEventArgs e)
+        private async void ALMIRemove_Click(object sender, RoutedEventArgs e)
         {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.AppListView.SelectedItem is AppItem ai)
+                {
+                    _ = this.AppList.Remove(ai);
+                }
+            });
+
             //if (sender is MenuItem mi && mi.DataContext is MUI mui &&
             //    mui.AppListView.SelectedItem is AppIconSetting ali)
             //{
@@ -203,10 +211,11 @@ namespace ManagementUI
                 {
                     if (box.ShowDialog())
                     {
-                        IUserIdentity userId = new UserIdentity(box.UserName, box.GetPassword());
+                        UserIdentity userId = new UserIdentity(box.UserName, box.GetPassword());
                         if (userId.IsValid())
                         {
                             LaunchFactory.AddCredentials(userId);
+                            RunAsUser.ApplyFromCreds(userId);
                         }
                         else
                         {
@@ -215,47 +224,13 @@ namespace ManagementUI
                         }
                     }
                 }
+
             });
 
-            //var click = new RoutedEventArgs(Button.ClickEvent);
-            //if ((string)this.CredsButton.Content == RUN_AS)
-            //{
-            //    using (CredentialDialog dialog = this.CreateCredentialDialog())
-            //    {
-            //        bool res = false;
-            //        do
-            //        {
-            //            bool done = dialog.ShowDialog(this);
-            //            if (done)
-            //            {
-            //                Creds = (ADCredential)dialog.Credentials;
-            //                if (!Creds.TryAuthenticate(out Exception caught))
-            //                {
-            //                    res = ShowErrorMessage(caught, true);
-            //                    if (res)
-            //                        continue;
+            await this.Dispatcher.InvokeAsync(() =>
+            {
 
-            //                    else
-            //                        break;
-            //                }
-            //                else
-            //                    res = false;
-
-            //                break;
-            //            }
-            //        }
-            //        while (res);
-
-            //        this.HandleReprompt(click);
-            //    }
-            //}
-            //else
-            //{
-            //    this.Dispatcher.Invoke(() =>
-            //    {
-            //        this.RelaunchBtn.RaiseEvent(click);
-            //    });
-            //}
+            });
         }
 
         #endregion
@@ -406,5 +381,7 @@ namespace ManagementUI
                 }
             });
         }
+
+        
     }
 }

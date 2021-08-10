@@ -7,7 +7,7 @@ namespace ManagementUI.Functionality.Auth
     public interface IUserIdentity : IDisposable, IProcessCredential
     {
         bool IsValidated { get; }
-        NTAccount NTAccount { get; }
+        NTAccount Principal { get; }
 
         bool IsValid();
     }
