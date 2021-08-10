@@ -306,7 +306,7 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="FontSize" Value="14"/>
+                    <Setter Property="FontSize" Value="13"/>
                     <Setter Property="FontWeight" Value="Bold"/>
                 </Trigger>
                 <Trigger Property="IsMouseOver" Value="False">
@@ -378,7 +378,9 @@
                    HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                    Grid.Row="0"/>
 
-            <ListView x:Name="FilterTags" Grid.Row="1" Grid.RowSpan="3" >
+            <ListView x:Name="FilterTags" Grid.Row="1" Grid.RowSpan="3" 
+                      LostFocus="FilterTags_LostFocus"
+                      PreviewMouseRightButtonUp="ContextMenu_PreviewMouseRightButtonUp">
                 <ListView.ContextMenu>
                     <ContextMenu x:Name="FilterTagsContextMenu">
                         <Separator/>
@@ -386,6 +388,12 @@
                         <Separator/>
                     </ContextMenu>
                 </ListView.ContextMenu>
+                <ListView.Resources>
+                    <Style TargetType="{x:Type ListViewItem}">
+                        <EventSetter Event="MouseEnter" Handler="ListViewItem_MouseEnter"/>
+                        <EventSetter Event="MouseLeave" Handler="ListViewItem_MouseLeave"/>
+                    </Style>
+                </ListView.Resources>
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -415,7 +423,7 @@
             </Grid.ColumnDefinitions>
             <ListView x:Name="AppListView" Grid.Column="0" Background="Transparent" BorderBrush="Transparent" BorderThickness="0"
                       MouseRightButtonUp="AppListView_MouseRightButtonUp" KeyDown="AppListView_KeyDown"
-                      PreviewMouseRightButtonUp="AppListContextMenu_PreviewMouseRightButtonUp">
+                      PreviewMouseRightButtonUp="ContextMenu_PreviewMouseRightButtonUp">
                 <ListView.Resources>
                     <Style TargetType="{x:Type GridViewColumnHeader}">
                         <Setter Property="Template">
@@ -477,7 +485,7 @@
                     </GridView>
                 </ListView.View>
                 <ListView.ContextMenu>
-                    <ContextMenu x:Name="AppListContextMenu" PreviewMouseRightButtonUp="AppListContextMenu_PreviewMouseRightButtonUp">
+                    <ContextMenu x:Name="AppListContextMenu" PreviewMouseRightButtonUp="ContextMenu_PreviewMouseRightButtonUp">
                         <Separator/>
                         <MenuItem x:Name="EditTagsBtn" Header="Edit Tags..." Click="EditTagsBtn_Click"/>
                         <Separator/>

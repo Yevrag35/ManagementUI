@@ -63,15 +63,21 @@ namespace ManagementUI
 
         private void ReadSettings()
         {
-            string rawJson = ReadFile(SettingsJson.GetFullPath());
-            JsonSerializerSettings settings = this.GetSerializerSettings(
-                (s) => s.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy())));
-
+            SettingsJson settings = new SettingsJson();
+            settings.Read();
             this.Dispatcher.Invoke(() =>
             {
-                this.Settings = JsonConvert.DeserializeObject<SettingsJson>(rawJson, settings);
-
+                this.Settings = settings;
             });
+            //string rawJson = ReadFile(SettingsJson.GetFullPath());
+            //JsonSerializerSettings settings = this.GetSerializerSettings(
+            //    (s) => s.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy())));
+
+            //this.Dispatcher.Invoke(() =>
+            //{
+            //    this.Settings = JsonConvert.DeserializeObject<SettingsJson>(rawJson, settings);
+
+            //});
         }
         private async Task ReadSettingsAsync()
         {

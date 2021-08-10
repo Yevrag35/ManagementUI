@@ -320,7 +320,7 @@ namespace ManagementUI
 
         #endregion
 
-        private void AppListContextMenu_PreviewMouseRightButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void ContextMenu_PreviewMouseRightButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (!_overItem)
             {
@@ -366,6 +366,22 @@ namespace ManagementUI
                     }
                 });
             }
+        }
+
+        //private async void FilterTags_LostKeyboardFocus(object sender, System.Windows.Input.KeyboardFocusChangedEventArgs e)
+        //{
+            
+        //}
+
+        private async void FilterTags_LostFocus(object sender, RoutedEventArgs e)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (!this.FilterTags.IsMouseOver && this.FilterTags.SelectedItems.Count > 0)
+                {
+                    this.FilterTags.UnselectAll();
+                }
+            });
         }
     }
 }

@@ -27,7 +27,7 @@ namespace ManagementUI
     {
         #region PROPERTIES
         [JsonProperty("$schema", Order = 1)]
-        private string _schema;
+        public string Schema { get; private set; }
 
         [JsonProperty("autoValidateCredentials")]
         public bool AutoValidate { get; set; }
@@ -66,7 +66,7 @@ namespace ManagementUI
         {
             return new JObject()
             {
-                GetDefault(x => x._schema, Strings.Settings_SchemaUrl),
+                GetDefault(x => x.Schema, Strings.Settings_SchemaUrl),
                 GetDefault(x => x.Version, Strings.Settings_Version),
                 GetDefault(x => x.AutoValidate, false),
                 GetDefault(x => x.Editor, Strings.Settings_DefaultEditor),
@@ -86,11 +86,11 @@ namespace ManagementUI
         internal static Encoding GetEncoding() => Encoding.UTF8;
         private static string GetFileName()
         {
-#if DEBUG
-            return Strings.SettingsFileName_Debug;
-#else
+//#if DEBUG
+//            return Strings.SettingsFileName_Debug;
+//#else
             return Strings.SettingsFileName;
-#endif
+//#endif
         }
         internal static string GetFolderPath()
         {
@@ -149,46 +149,6 @@ namespace ManagementUI
             return serializer;
         }
 
-        //[OnDeserialized]
-        //private void OnDeserialized(StreamingContext ctx)
-        //{
-        //    if (this.Settings != null && this.Settings.Apps != null)
-        //    {
-        //        this.Settings.Apps.CollectionChanged += this.Settings_Changed;
-        //    }
-        //}
-
-        //private void Save(JObject saveThis, SettingChangedAction action)
-        //{
-        //    using (var streamWriter = new StreamWriter(this.FilePath))
-        //    {
-        //        using (var writer = new JsonTextWriter(streamWriter)
-        //        {
-        //            AutoCompleteOnClose = true,
-        //            CloseOutput = true,
-        //            DateFormatHandling = DateFormatHandling.IsoDateFormat,
-        //            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-        //            Formatting = Formatting.Indented,
-        //            IndentChar = char.Parse("\t"),
-        //            Indentation = 1
-        //        })
-        //        {
-        //            saveThis.WriteTo(writer, new StringEnumConverter(new CamelCaseNamingStrategy()));
-        //            streamWriter.Flush();
-        //            streamWriter.Close();
-        //        }
-        //    }
-
-        //    base.OnSettingsChanged(new SettingsChangedEventArgs(action));
-        //}
-
         #endregion
-    }
-
-    public enum SettingsLauncher
-    {
-        Notepad,
-        NotepadPlusPlus,
-        VsCode
     }
 }
