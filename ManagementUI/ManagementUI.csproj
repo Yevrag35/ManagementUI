@@ -102,6 +102,8 @@
       <DependentUpon>NewApp.xaml</DependentUpon>
     </Compile>
     <Compile Include="Objects\IToggleTagComparer.cs" />
+    <Compile Include="Prompts\PromptFactory.cs" />
+    <Compile Include="Prompts\TaskDialogExtensions.cs" />
     <Compile Include="ViewModels\MockAppItem.cs" />
     <Compile Include="WindowBehavior\Relaunch.cs" />
     <None Include="EditTags\EditTagItem.cs" />

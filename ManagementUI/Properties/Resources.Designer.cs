@@ -115,6 +115,33 @@ namespace ManagementUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0}{1}{1}Are you sure you want to delete this app?.
+        /// </summary>
+        internal static string Prompt_DeleteContent {
+            get {
+                return ResourceManager.GetString("Prompt_DeleteContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Permanently Delete App.
+        /// </summary>
+        internal static string Prompt_DeleteMainInstruction {
+            get {
+                return ResourceManager.GetString("Prompt_DeleteMainInstruction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Management UI.
+        /// </summary>
+        internal static string Prompt_DeleteTitle {
+            get {
+                return ResourceManager.GetString("Prompt_DeleteTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to notepad.
         /// </summary>
         internal static string Settings_DefaultEditor {

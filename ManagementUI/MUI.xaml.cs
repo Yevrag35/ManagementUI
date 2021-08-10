@@ -18,6 +18,9 @@ using ManagementUI.Functionality.Models;
 using ManagementUI.Functionality.Settings;
 using ManagementUI.Collections;
 using ManagementUI.Models;
+using ManagementUI.Prompts;
+
+using Strings = ManagementUI.Properties.Resources;
 
 namespace ManagementUI
 {
@@ -27,7 +30,6 @@ namespace ManagementUI
     public partial class MUI : Window
     {
         #region PROPERTIES/FIELDS
-        private FilterTagEquality _ftEquality;
         private bool _overItem;
 
         private AppsList AppList => this.JsonAppsRead.Apps;
@@ -43,8 +45,7 @@ namespace ManagementUI
             RunAsUser = new RunAsDisplay();
             this.ReadSettings();
             LaunchFactory.Initialize();
-            _ftEquality = new FilterTagEquality();
-            //new PreferencesModel();
+
             this.InitializeComponent();
             this.Settings.EditorManager.EditorExited += this.Editor_Closed;
         }
@@ -66,10 +67,9 @@ namespace ManagementUI
             App.MyHandle = new WindowInteropHelper(this).Handle;
 
             await this.OnLoad();
-            //Checked = new HashSet<string>(1);
+
             await this.Dispatcher.InvokeAsync(() =>
             {
-                
                 this.AppListView.ItemsSource = this.AppList.View;
                 this.FilterTags.ItemsSource = this.Tags.View;
             });
@@ -99,18 +99,17 @@ namespace ManagementUI
             {
                 if (this.AppListView.SelectedItem is AppItem ai)
                 {
-                    _ = this.AppList.Remove(ai);
+                    if (PromptFactory.DoYesNoPrompt(this, Strings.Prompt_DeleteTitle, TaskDialogIcon.Warning, true, 
+                        (dialog) =>
+                        {
+                            dialog.MainInstruction = Strings.Prompt_DeleteMainInstruction;
+                            dialog.AddContent(Strings.Prompt_DeleteContent, ai.Name, Environment.NewLine);
+                        }))
+                    {
+                        _ = this.AppList.Remove(ai);
+                    }
                 }
             });
-
-            //if (sender is MenuItem mi && mi.DataContext is MUI mui &&
-            //    mui.AppListView.SelectedItem is AppIconSetting ali)
-            //{
-            //    await this.Dispatcher.InvokeAsync(() =>
-            //    {
-            //        //((MUI)Application.Current.MainWindow).AppList.Remove(ali);
-            //    });
-            //}
         }
 
         private void AppListView_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
