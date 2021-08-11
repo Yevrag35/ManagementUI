@@ -382,7 +382,8 @@
                    Grid.Row="0"/>
 
             <ListView x:Name="FilterTags" Grid.Row="1" Grid.RowSpan="3" 
-                      LostFocus="FilterTags_LostFocus"
+                      LostFocus="FilterTags_LostFocus" Background="Transparent"
+                      BorderBrush="Transparent" BorderThickness="0"
                       PreviewMouseRightButtonUp="ContextMenu_PreviewMouseRightButtonUp">
                 <ListView.ContextMenu>
                     <ContextMenu x:Name="FilterTagsContextMenu">
@@ -393,6 +394,7 @@
                 </ListView.ContextMenu>
                 <ListView.Resources>
                     <Style TargetType="{x:Type ListViewItem}">
+                        <Setter Property="Background" Value="Transparent"/>
                         <EventSetter Event="MouseEnter" Handler="ListViewItem_MouseEnter"/>
                         <EventSetter Event="MouseLeave" Handler="ListViewItem_MouseLeave"/>
                     </Style>
@@ -406,8 +408,12 @@
                                     <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
                                 <CheckBox IsChecked="{Binding IsChecked}" Grid.Column="0" Checked="CheckBox_Checked"
-                                          Unchecked="CheckBox_Unchecked"/>
-                                <TextBlock Text="{Binding Value}" Grid.Column="1"
+                                          Unchecked="CheckBox_Unchecked">
+                                    <CheckBox.LayoutTransform>
+                                        <ScaleTransform ScaleX="1.25" ScaleY="1.25" CenterX="2"/>
+                                    </CheckBox.LayoutTransform>
+                                </CheckBox>
+                                <TextBlock Text="{Binding Value}" Grid.Column="1" FontWeight="Bold"
                                          Background="Transparent" Focusable="False">
                                 </TextBlock>
                             </Grid>
@@ -436,6 +442,14 @@
                     </x:Array>
                 </d:ListView.ItemsSource>-->
                 <ListView.Resources>
+
+                    <SolidColorBrush x:Key="Item.MouseOver.Background" Color="Gold"/>
+                    <SolidColorBrush x:Key="Item.MouseOver.Border" Color="#a826A0Da"/>
+                    <SolidColorBrush x:Key="Item.SelectedInactive.Background" Color="#3DDADADA"/>
+                    <SolidColorBrush x:Key="Item.SelectedInactive.Border" Color="#FFDADADA"/>
+                    <SolidColorBrush x:Key="Item.SelectedActive.Background" Color="#3D26A0DA"/>
+                    <SolidColorBrush x:Key="Item.SelectedActive.Border" Color="#FF26A0DA"/>
+
                     <Style TargetType="{x:Type GridViewColumnHeader}">
                         <Setter Property="Template">
                             <Setter.Value>
@@ -460,27 +474,42 @@
                             </Setter.Value>
                         </Setter>
                     </Style>
+
                     <DataTemplate x:Key="CellTemplate">
-                        <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Horizontal" Background="Transparent">
                             <Image Source="{Binding Path=Image}"/>
                         </StackPanel>
                     </DataTemplate>
+
                     <Style TargetType="{x:Type ListViewItem}">
+                        <Setter Property="OverridesDefaultStyle" Value="False"/>
+                        <Setter Property="SnapsToDevicePixels" Value="True"/>
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                        <!--<Setter Property="ToolTip" Value="{Binding Path=Url}" />-->
                         <Setter Property="FontFamily" Value="Global Sans Serif" />
+                        <Setter Property="Foreground" Value="Black"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
                         <Setter Property="FontSize" Value="20" />
                         <Setter Property="Background" Value="Transparent"/>
                         <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"/>
                         <EventSetter Event="MouseEnter" Handler="ListViewItem_MouseEnter"/>
                         <EventSetter Event="MouseLeave" Handler="ListViewItem_MouseLeave"/>
                         <Style.Triggers>
-                            <Trigger Property="ItemsControl.AlternationIndex" Value="0">
-                                <Setter Property="Background" Value="White" />
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="DarkGray"/>
+                                <Setter Property="Foreground" Value="Black"/>
                             </Trigger>
-                            <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-                                <Setter Property="Background" Value="LightGray" />
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="Black"/>
+                                <Setter Property="Foreground" Value="WhiteSmoke"/>
                             </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="False"/>
+                                    <Condition Property="IsSelected" Value="False"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Foreground" Value="Black"/>
+                            </MultiTrigger>
                         </Style.Triggers>
                     </Style>
                 </ListView.Resources>
@@ -489,9 +518,7 @@
                         <GridView.Columns>
                             <GridViewColumn Header="" CellTemplate="{StaticResource CellTemplate}" />
                             <GridViewColumn Header="Application Name" DisplayMemberBinding="{Binding Path=Name}"
-                                            ctrl:ProportionalColumn.Width="1"/>
-                            <!--<GridViewColumn Header="Tags" DisplayMemberBinding="{Binding Path=Tags}"
-                                            ctrl:FixedColumn.Width="300"/>-->
+                                            ctrl:ProportionalColumn.Width="1" />
                         </GridView.Columns>
                     </GridView>
                 </ListView.View>
