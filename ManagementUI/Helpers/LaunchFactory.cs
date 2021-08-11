@@ -12,8 +12,10 @@ namespace ManagementUI
     {
         private static bool _parentIsElevated;
         private static IUserIdentity _userId;
-        public static void Initialize()
+        private static EditorManager _manager;
+        public static void Initialize(EditorManager manager)
         {
+            _manager = manager;
             _parentIsElevated = IsElevated();
         }
         public static void AddCredentials(IUserIdentity userId)

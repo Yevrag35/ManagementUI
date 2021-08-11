@@ -44,10 +44,11 @@ namespace ManagementUI
         {
             RunAsUser = new RunAsDisplay();
             this.ReadSettings();
-            LaunchFactory.Initialize();
+            
 
             this.InitializeComponent();
             this.Settings.EditorManager.EditorExited += this.Editor_Closed;
+            LaunchFactory.Initialize(this.Settings.EditorManager);
         }
 
         private Task OnLoad()
@@ -238,29 +239,34 @@ namespace ManagementUI
         #region EDIT TAGS
         private async void EditTagsBtn_Click(object sender, RoutedEventArgs e)
         {
+            if (this.AppListView.SelectedItem is AppItem ai)
+            {
+                await this.EditAppTags(ai);
+            }
+        }
+
+        private async Task EditAppTags(AppItem ai)
+        {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                if (this.AppListView.SelectedItem is AppItem ai)
+                var editTags = new EditTags(ai, this.Tags.ToEditCollection())
                 {
-                    var editTags = new EditTags(ai, this.Tags.ToEditCollection())
+                    Owner = this
+                };
+                if (editTags.ShowDialog().GetValueOrDefault())
+                {
+                    if (!this.Tags.SetEquals(editTags.Tags))
                     {
-                        Owner = this
-                    };
-                    if (editTags.ShowDialog().GetValueOrDefault())
+                        this.Tags.UnionWith(editTags.Tags);
+                    }
+
+                    if (this.Tags.EnabledCount > 0)
                     {
-                        if (!this.Tags.SetEquals(editTags.Tags))
-                        {
-                            this.Tags.UnionWith(editTags.Tags);
-                        }
+                        if (!ai.DontShow && !ai.Tags.IsSupersetOf(this.Tags.EnabledTags))
+                            ai.DontShow = true;
 
-                        if (this.Tags.EnabledCount > 0)
-                        {
-                            if (!ai.DontShow && !ai.Tags.IsSupersetOf(this.Tags.EnabledTags))
-                                ai.DontShow = true;
-
-                            else if (ai.DontShow && ai.Tags.IsSupersetOf(this.Tags.EnabledTags))
-                                ai.DontShow = false;
-                        }
+                        else if (ai.DontShow && ai.Tags.IsSupersetOf(this.Tags.EnabledTags))
+                            ai.DontShow = false;
                     }
                 }
             });

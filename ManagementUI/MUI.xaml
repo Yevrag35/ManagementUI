@@ -22,6 +22,11 @@
             </LinearGradientBrush.GradientStops>
         </LinearGradientBrush>
     </Window.Background>
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding OpenAppsCommand}" Key="A" Modifiers="Shift"/>
+        <KeyBinding Command="{Binding OpenSettingsCommand}" Key="O" Modifiers="Shift"/>
+        <KeyBinding Command="{Binding EditTagsCommand}" Key="E"/>
+    </Window.InputBindings>
     <Window.Resources>
         <!--Control colors.-->
         <Color x:Key="ControlNormalColor">#000000</Color>

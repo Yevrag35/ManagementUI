@@ -86,11 +86,11 @@ namespace ManagementUI
         internal static Encoding GetEncoding() => Encoding.UTF8;
         private static string GetFileName()
         {
-//#if DEBUG
-//            return Strings.SettingsFileName_Debug;
-//#else
+#if DEBUG
+            return Strings.SettingsFileName_Debug;
+#else
             return Strings.SettingsFileName;
-//#endif
+#endif
         }
         internal static string GetFolderPath()
         {
