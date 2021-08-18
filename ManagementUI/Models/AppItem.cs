@@ -71,8 +71,10 @@ namespace ManagementUI.Models
         }
         public AppItem Clone()
         {
-            return new AppItem()
+            var app = new AppItem()
             {
+                Name = this.Name,
+                ExePath = this.ExePath,
                 Arguments = this.Arguments,
                 DontShow = this.DontShow,
                 IconIndex = this.IconIndex,
@@ -80,6 +82,9 @@ namespace ManagementUI.Models
                 Image = this.Image?.Clone(),
                 Tags = this.Tags
             };
+
+            app.Initialize();
+            return app;
         }
         object ICloneable.Clone() => this.Clone();
         public void Initialize()
@@ -91,8 +96,10 @@ namespace ManagementUI.Models
             {
                 Bitmap bitMap = this.GetBitmap(App.MyHandle);
                 this.Image = this.Bitmap2BitmapImage(bitMap);
-                this.Image?.Freeze();
             }
+
+            if (null != this.Image && !this.Image.IsFrozen)
+                this.Image.Freeze();
 
             this.Initialized = true;
         }

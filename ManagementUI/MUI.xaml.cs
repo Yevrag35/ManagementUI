@@ -82,18 +82,20 @@ namespace ManagementUI
 
         #endregion
 
-        private void NewAppButton_Click(object sender, RoutedEventArgs e)
+        private async void NewAppButton_Click(object sender, RoutedEventArgs e)
         {
-            var newApp = new NewApp
+            NewApp newApp = new NewApp(App.MyHandle)
             {
                 Owner = this
             };
             bool? result = newApp.ShowDialog();
-            if (result.HasValue && result.Value)
+            if (result.GetValueOrDefault())
             {
-                Console.WriteLine("hey");
-                //await this.WriteAppToFile(newApp.CreatedApp);
-                //AppList.Add(newApp.CreatedApp);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var app = newApp.GetFinalizedApp();
+                    this.AppList.Add(app);
+                });
             }
         }
         private async void ALMIRemove_Click(object sender, RoutedEventArgs e)

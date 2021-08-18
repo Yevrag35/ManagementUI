@@ -100,10 +100,12 @@
     <Compile Include="Helpers\LaunchFactory.cs" />
     <Compile Include="Models\AppItem.cs" />
     <Compile Include="Collections\AppsList.cs" />
+    <Compile Include="Models\Converters\UIntToStringConverter.cs" />
     <Compile Include="Models\JsonAppsFile.cs" />
     <Compile Include="NewApp.xaml.cs">
       <DependentUpon>NewApp.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Objects\IconPreviewer.cs" />
     <Compile Include="Objects\IToggleTagComparer.cs" />
     <Compile Include="Prompts\PromptFactory.cs" />
     <Compile Include="Prompts\TaskDialogExtensions.cs" />

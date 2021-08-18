@@ -19,7 +19,7 @@ namespace ManagementUI.Functionality.Models
     public class AppModel : LaunchableBase, IComparable<AppModel>, IEquatable<AppModel>, INotifyPropertyChanged,
         ILaunchable
     {
-        private SortedSet<UserTag> _tagSet = new SortedSet<UserTag>();
+        private readonly SortedSet<UserTag> _tagSet = new SortedSet<UserTag>();
         private string _arguments;
         private string _exePath;
         private string _name;
@@ -164,15 +164,28 @@ namespace ManagementUI.Functionality.Models
         }
         public void UpdateTags(ISet<UserTag> toAdd, ISet<UserTag> toRemove)
         {
-            if (toAdd.Count <= 0 && toRemove.Count <= 0)
+            if (!ConsolidateTags(toAdd, toRemove))
                 return;
 
-            if (toRemove.Overlaps(toAdd))
-                toRemove.SymmetricExceptWith(toAdd);
-
-            _tagSet.ExceptWith(toRemove);
-            _tagSet.UnionWith(toAdd);
+            PerformTagManip(toRemove,   (x) => _tagSet.ExceptWith(x));
+            PerformTagManip(toAdd,      (x) => _tagSet.UnionWith(x));
             this.NotifyOfChange(nameof(Tags));
+        }
+        private static bool ConsolidateTags(ISet<UserTag> toAdd, ISet<UserTag> toRemove)
+        {
+            bool result = false;
+            if (null != toAdd && null != toRemove && toRemove.Count > 0)
+            {
+                toRemove.SymmetricExceptWith(toAdd);
+                result = true;
+            }
+
+            return result;
+        }
+        private static void PerformTagManip(ISet<UserTag> tags, Action<ISet<UserTag>> action)
+        {
+            if (tags.Count > 0)
+                action(tags);
         }
 
         protected Bitmap GetBitmap(IntPtr appHandle)
@@ -200,6 +213,7 @@ namespace ManagementUI.Functionality.Models
 
             return bitMap;
         }
+
 
         [DllImport("gdi32.dll")]
         protected static extern bool DeleteObject(IntPtr hObject);
