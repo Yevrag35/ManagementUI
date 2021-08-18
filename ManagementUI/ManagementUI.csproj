@@ -48,18 +48,19 @@
   <ItemGroup>
     <Reference Include="Itenso.Windows.Controls.ListViewLayout, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\WPF.ListViewLayoutManager.2.0.0\lib\net40\Itenso.Windows.Controls.ListViewLayout.dll</HintPath>
-    </Reference>
-    <Reference Include="MG.Settings.Json, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>E:\Local_Repos\MG.Settings\MG.Settings.Json\bin\Release\netstandard1.3\MG.Settings.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="MG.Settings.Json, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MG.Settings.Json.2.2.0\lib\net462\MG.Settings.Json.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Ookii.Dialogs.Wpf, Version=3.0.0.0, Culture=neutral, PublicKeyToken=66aa232afad40158, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>E:\Local_Repos\Ookii.Dialogs.Wpf-YEV\src\Ookii.Dialogs.Wpf\bin\Release\net45\Ookii.Dialogs.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="Ookii.Dialogs.Wpf, Version=3.0.35.0, Culture=neutral, PublicKeyToken=66aa232afad40158, processorArchitecture=MSIL">
+      <HintPath>Assemblies\Ookii.Dialogs.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
@@ -198,7 +199,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Assemblies\" />
     <Folder Include="WindowBehavior\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
