@@ -45,16 +45,13 @@ namespace ManagementUI
             return settings;
         }
 
-        private async Task ReadApps()
+        private async Task ReadAppsAsync()
         {
-            string rawJson = await ReadFileAsync(JsonAppsFile.GetFullPath());
-
-            JsonSerializerSettings settings = this.GetSerializerSettings();
-
             await this.Dispatcher.InvokeAsync(() => 
             {
-                JsonAppsFile jsonApps = JsonConvert.DeserializeObject<JsonAppsFile>(rawJson, settings);
-                this.JsonAppsRead = jsonApps;
+                JsonAppsFile jsonAppsFile = new JsonAppsFile();
+                jsonAppsFile.Read();
+                this.JsonAppsRead = jsonAppsFile;
                 this.AppList.CreateView();
 
                 this.Tags = new TagCollection(UserTagConverter.GetLoadedTags());

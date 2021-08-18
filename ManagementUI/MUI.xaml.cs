@@ -53,7 +53,7 @@ namespace ManagementUI
 
         private Task OnLoad()
         {
-            return this.ReadApps();
+            return this.ReadAppsAsync();
         }
 
         #region EVENT HANDLERS
