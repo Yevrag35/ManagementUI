@@ -94,7 +94,7 @@ namespace ManagementUI.Models
 
             if (null == this.Image)
             {
-                Bitmap bitMap = this.GetBitmap(App.MyHandle);
+                Bitmap bitMap = GetBitmap(App.MyHandle, this.IconPath, this.IconIndex);
                 this.Image = this.Bitmap2BitmapImage(bitMap);
             }
 

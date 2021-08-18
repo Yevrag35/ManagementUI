@@ -17,38 +17,6 @@ namespace ManagementUI
     public class IconPreviewer
     {
         private IntPtr _appHandle;
-        //private uint _iconIndex;
-        //private string _iconPath;
-
-        //public uint IconIndex
-        //{
-        //    get => _iconIndex;
-        //    private set => _iconIndex = value;
-        //    //set
-        //    //{
-        //    //    _iconIndex = value;
-        //    //    this.NotifyOfChange(nameof(IconIndex));
-        //    //}
-        //}
-        //public string IconPath
-        //{
-        //    get => _iconPath;
-        //    private set => _iconPath = value;
-        //    //set
-        //    //{
-        //    //    _iconPath = value;
-        //    //    this.NotifyOfChange(nameof(IconPath));
-        //    //}
-        //}
-        //public BitmapSource Image
-        //{
-        //    get => _image;
-        //    set
-        //    {
-        //        _image = value;
-        //        this.NotifyOfChange(nameof(Image));
-        //    }
-        //}
 
         public IconPreviewer(IntPtr appHandle)
         {

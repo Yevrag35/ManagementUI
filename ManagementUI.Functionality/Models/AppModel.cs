@@ -188,14 +188,14 @@ namespace ManagementUI.Functionality.Models
                 action(tags);
         }
 
-        protected Bitmap GetBitmap(IntPtr appHandle)
+        protected static Bitmap GetBitmap(IntPtr appHandle, string iconPath, uint iconIndex)
         {
-            if (string.IsNullOrWhiteSpace(this.IconPath) || !File.Exists(this.IconPath))
+            if (string.IsNullOrWhiteSpace(iconPath) || !File.Exists(iconPath))
                 return null;
 
             Bitmap bitMap = null;
 
-            IntPtr imageHandle = ExtractIconA(appHandle, this.IconPath, this.IconIndex);
+            IntPtr imageHandle = ExtractIconA(appHandle, iconPath, iconIndex);
             Icon appIcon = null;
             try
             {
@@ -203,7 +203,7 @@ namespace ManagementUI.Functionality.Models
             }
             catch (ArgumentException)
             {
-                appIcon = Icon.ExtractAssociatedIcon(this.IconPath);
+                appIcon = Icon.ExtractAssociatedIcon(iconPath);
             }
 
             if (null != appIcon)
