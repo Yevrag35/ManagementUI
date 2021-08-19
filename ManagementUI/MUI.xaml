@@ -338,10 +338,7 @@
             <ColumnDefinition Width="100"/>
             <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
-        
-        <!-- SETTING UPDATE AND RELAUNCH HIDDEN BUTTONS -->
-        <!--<Button x:Name="RelaunchBtn" Height="0" Width="0" Click="RelaunchBtn_Click"/>-->
-        
+
         <!-- IDENTITY BANNER -->
         <Label
                x:Name="IdentityLbl" Content="RunAs User:"
