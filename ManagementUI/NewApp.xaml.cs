@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -25,6 +26,8 @@ namespace ManagementUI
     /// </summary>
     public partial class NewApp : Window, INotifyPropertyChanged
     {
+        private uint _currentIndex;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public AppItem CreatedApp { get; set; }
@@ -91,27 +94,24 @@ namespace ManagementUI
         #endregion
 
         #region WINDOW EVENTS
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            //IconPreviewer?.ClearImage();
-        }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.displayNameBox.Focus();
+            _ = this.displayNameBox.Focus();
         }
 
         #endregion
 
         public AppItem GetFinalizedApp()
         {
-            var newApp = this.CreatedApp.Clone();
+            AppItem newApp = this.CreatedApp.Clone();
             return newApp;
         }
 
         private DispatcherOperation OnFileDialogOkAsync(string iconPath, uint iconIndex)
         {
             return this.Dispatcher.InvokeAsync(() => {
-                this.Image = IconPreviewer.Preview(iconPath, iconIndex);
+                this.Image = this.IconPreviewer.Preview(iconPath, iconIndex);
+                _currentIndex = iconIndex;
             });
         }
 
@@ -120,6 +120,13 @@ namespace ManagementUI
         {
             if (sender is TextBox tb && !string.IsNullOrEmpty(tb.Text))
                 tb.SelectAll();
+        }
+        private async void IconIndexBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            if (_currentIndex != this.IconIndex && !string.IsNullOrWhiteSpace(this.IconPath))
+            {
+                await this.OnFileDialogOkAsync(this.IconPath, this.IconIndex);
+            }
         }
         private void TextBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -179,6 +186,14 @@ namespace ManagementUI
                 await previewTask;
             }
         }
+        private async void FindExeBtn_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.findExeBtn.Visibility = (Visibility)(Convert.ToInt32(this.findExeBtn.IsEnabled) * -1);
+                this.findExeLbl.IsEnabled = !this.findExeBtn.IsEnabled;
+            });
+        }
         private async void FindIconBtn_Click(object sender, RoutedEventArgs e)
         {
             var fileDialog = new VistaOpenFileDialog
@@ -212,6 +227,14 @@ namespace ManagementUI
 
                 await previewTask;
             }
+        }
+
+        private DispatcherOperation SetProgramFileName(string filePath)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+
+            });
         }
 
         #endregion

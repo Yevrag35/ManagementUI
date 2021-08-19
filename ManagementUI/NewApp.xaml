@@ -8,7 +8,6 @@
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Loaded="Window_Loaded"
-        Closed="Window_Closed"
         WindowStartupLocation="CenterOwner"
         Title="Add New App" Height="350" Width="660" MinHeight="320" MinWidth="600">
     <Window.Resources>
@@ -112,7 +111,8 @@
                Style="{StaticResource HiddenLabelFieldStyle}"/>
         
         <Button x:Name="findExeBtn" Content="Browse..." Grid.Column="5" Grid.Row="2" Grid.ColumnSpan="3" FontSize="15" FontWeight="SemiBold"
-                Click="FindExeBtn_Click"/>
+                Click="FindExeBtn_Click"
+                IsEnabledChanged="FindExeBtn_IsEnabledChanged"/>
 
         <TextBox x:Name="argumentsBox" Text="{Binding Arguments}"
                  Grid.Row="3" Grid.Column="5" Grid.ColumnSpan="7" Style="{StaticResource FieldBoxStyle}"/>
@@ -127,6 +127,7 @@
                Click="FindIconBtn_Click"/>
 
         <TextBox x:Name="iconIndexBox"
+                 LostKeyboardFocus="IconIndexBox_LostKeyboardFocus"
                  Text="{Binding IconIndex, Converter={StaticResource UIntToStringConverter}}"
                  Grid.Column="5" Grid.Row="5" Style="{StaticResource FieldBoxStyle}"/>
         
