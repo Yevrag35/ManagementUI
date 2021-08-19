@@ -170,18 +170,19 @@ namespace ManagementUI
             if (result.GetValueOrDefault())
             {
                 DispatcherOperation previewTask = this.OnFileDialogOkAsync(fileDialog.FileName, 0);
+                await this.SetProgramFileName(fileDialog.FileName);
+                //await this.Dispatcher.InvokeAsync(() =>
+                //{
 
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.findExeBtn.Visibility = Visibility.Hidden;
-                    this.findExeBtn.IsEnabled = false;
-                    this.findExeLbl.IsEnabled = true;
+                //    //this.findExeBtn.Visibility = Visibility.Hidden;
+                //    //this.findExeBtn.IsEnabled = false;
+                //    //this.findExeLbl.IsEnabled = true;
 
-                    this.CreatedApp.ExePath = fileDialog.FileName;
-                    this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ExePath)));
+                //    //this.CreatedApp.ExePath = fileDialog.FileName;
+                //    //this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ExePath)));
 
-                    this.findExeLbl.Visibility = Visibility.Visible;
-                });
+                //    //this.findExeLbl.Visibility = Visibility.Visible;
+                //});
 
                 await previewTask;
             }
@@ -190,8 +191,17 @@ namespace ManagementUI
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                this.findExeBtn.Visibility = (Visibility)(Convert.ToInt32(this.findExeBtn.IsEnabled) * -1);
+                int i = Convert.ToInt32(this.findExeBtn.IsEnabled);
+                // if 'true' - current will equate to 'Visibility.Visible'
+                // if 'false' - it equate to 'Visibility.Hidden'
+                Visibility current = (Visibility)i;
+
+                // opposite will the bitwise, opposite value of current.
+                Visibility opposite = (Visibility)((i - 1) * -1);
+
+                this.findExeBtn.Visibility = opposite;
                 this.findExeLbl.IsEnabled = !this.findExeBtn.IsEnabled;
+                this.findExeLbl.Visibility = current;
             });
         }
         private async void FindIconBtn_Click(object sender, RoutedEventArgs e)
@@ -233,7 +243,14 @@ namespace ManagementUI
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
+                this.Set(nameof(this.ExePath), filePath, (fp) => this.CreatedApp.ExePath = fp);
+                //this.CreatedApp.IconPath = filePath;
+                this.findExeBtn.IsEnabled = false;
 
+                if (string.IsNullOrWhiteSpace(this.CreatedApp.IconPath))
+                {
+                    this.CreatedApp.IconPath = filePath;
+                }
             });
         }
 

@@ -47,4 +47,13 @@ namespace ManagementUI
             return null != member;
         }
     }
+
+    public partial class NewApp
+    {
+        private void Set<T>(string name, T value, Action<T> action)
+        {
+            action(value);
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+    }
 }
