@@ -13,7 +13,7 @@ namespace ManagementUI.Functionality.Auth
             get => this.Principal.Value;
             set
             {
-                this.NotifyOfChange(nameof(DisplayPrincipal));
+                this.NotifyOfChange(nameof(this.DisplayPrincipal));
             }
         }
         public NTAccount Principal
@@ -22,7 +22,7 @@ namespace ManagementUI.Functionality.Auth
             set
             {
                 _nTAccount = value;
-                this.NotifyOfChange(nameof(DisplayPrincipal));
+                this.NotifyOfChange(nameof(this.DisplayPrincipal));
             }
         }
 

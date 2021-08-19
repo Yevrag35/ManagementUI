@@ -23,6 +23,7 @@
         </LinearGradientBrush>
     </Window.Background>
     <Window.InputBindings>
+        <KeyBinding Command="{Binding DeleteAppCommand}" Key="Delete" />
         <KeyBinding Command="{Binding OpenAppsCommand}" Key="A" Modifiers="Shift"/>
         <KeyBinding Command="{Binding OpenSettingsCommand}" Key="O" Modifiers="Shift"/>
         <KeyBinding Command="{Binding EditTagsCommand}" Key="E"/>
@@ -346,7 +347,8 @@
                x:Name="IdentityLbl" Content="RunAs User:"
                Grid.Row="1" Grid.Column="1"
                FontFamily="Global Sans Serif" FontSize="14" VerticalContentAlignment="Center"/>
-        <TextBox x:Name="IdentityBlock" Text="{Binding Path=RunAsUser.DisplayPrincipal}" Grid.Column="2" Grid.Row="1" Width="200"
+        <TextBox x:Name="IdentityBlock" Text="{Binding RunAsUser, Mode=OneWay}"
+                 Grid.Column="2" Grid.Row="1" Width="200"
                HorizontalAlignment="Left" BorderThickness="0"
                FontFamily="Global Sans Serif" FontSize="15" VerticalContentAlignment="Center"
                Background="Transparent" BorderBrush="Transparent" FontWeight="Bold" IsReadOnly="True"
@@ -437,7 +439,6 @@
             </Grid.ColumnDefinitions>
             <ListView x:Name="AppListView" Grid.Column="0" Background="Transparent" BorderBrush="Transparent" 
                       BorderThickness="0"
-                      KeyDown="AppListView_KeyDown"
                       PreviewMouseRightButtonUp="ContextMenu_PreviewMouseRightButtonUp">
                 <!--<d:ListView.ItemsSource>
                     <x:Array Type="{x:Type mock:MockAppItem}">

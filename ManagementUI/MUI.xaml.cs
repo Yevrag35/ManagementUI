@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.DirectoryServices;
 using System.IO;
@@ -27,14 +28,25 @@ namespace ManagementUI
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MUI : Window
+    public partial class MUI : Window, INotifyPropertyChanged
     {
         #region PROPERTIES/FIELDS
         private bool _overItem;
+        private RunAsDisplay _runAs;
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private AppsList AppList => this.JsonAppsRead.Apps;
         private JsonAppsFile JsonAppsRead { get; set; }
-        public static RunAsDisplay RunAsUser { get; set; }
+        public string RunAsUser
+        {
+            get => _runAs?.DisplayPrincipal;
+            //set
+            //{
+            //    _runAs.DisplayPrincipal = value;
+            //    this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RunAsUser)));
+            //}
+        }
         private SettingsJson Settings { get; set; }
         private TagCollection Tags { get; set; }
 
@@ -42,13 +54,14 @@ namespace ManagementUI
 
         public MUI()
         {
-            RunAsUser = new RunAsDisplay();
+            
             this.ReadSettings();
             
-
             this.InitializeComponent();
             this.Settings.EditorManager.EditorExited += this.Editor_Closed;
             LaunchFactory.Initialize(this.Settings.EditorManager);
+            _runAs = new RunAsDisplay();
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RunAsUser)));
         }
 
         private Task OnLoad()
@@ -108,7 +121,7 @@ namespace ManagementUI
                         (dialog) =>
                         {
                             dialog.MainInstruction = Strings.Prompt_AppDeleteMainInstruction;
-                            dialog.AddContent(Strings.Prompt_AppDeleteContent, ai.Name, Environment.NewLine);
+                            _ = dialog.AddContent(Strings.Prompt_AppDeleteContent, ai.Name, Environment.NewLine);
                         }))
                     {
                         _ = this.AppList.Remove(ai);
@@ -116,18 +129,18 @@ namespace ManagementUI
                 }
             });
         }
-        private void AppListView_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            //if (e.Key == System.Windows.Input.Key.Delete)
-            //{
-            //    var click = new RoutedEventArgs(Button.ClickEvent);
-            //    await this.Dispatcher.InvokeAsync(() =>
-            //    {
-            //        var ali = ((MUI)Application.Current.MainWindow).AppListView.SelectedItem as AppIconSetting;
-            //        //((MUI)Application.Current.MainWindow).AppList.Remove(ali);
-            //    });
-            //}
-        }
+        //private void AppListView_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        //{
+        //    //if (e.Key == System.Windows.Input.Key.Delete)
+        //    //{
+        //    //    var click = new RoutedEventArgs(Button.ClickEvent);
+        //    //    await this.Dispatcher.InvokeAsync(() =>
+        //    //    {
+        //    //        var ali = ((MUI)Application.Current.MainWindow).AppListView.SelectedItem as AppIconSetting;
+        //    //        //((MUI)Application.Current.MainWindow).AppList.Remove(ali);
+        //    //    });
+        //    //}
+        //}
 
         #region CHECKBOX EVENTS
         private async void CheckBox_Checked(object sender, RoutedEventArgs e)
@@ -218,7 +231,8 @@ namespace ManagementUI
                         if (userId.IsValid())
                         {
                             LaunchFactory.AddCredentials(userId);
-                            RunAsUser.ApplyFromCreds(userId);
+                            _runAs.ApplyFromCreds(userId);
+                            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RunAsUser)));
                         }
                         else
                         {
@@ -385,7 +399,6 @@ namespace ManagementUI
 
         #endregion
 
-        
         private async void FilterTags_LostFocus(object sender, RoutedEventArgs e)
         {
             await this.Dispatcher.InvokeAsync(() =>

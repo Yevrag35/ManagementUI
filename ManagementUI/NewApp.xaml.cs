@@ -25,10 +25,6 @@ namespace ManagementUI
     /// </summary>
     public partial class NewApp : Window, INotifyPropertyChanged
     {
-        //private bool _answer;
-        private uint _previousIndex = 0u;
-        private uint _index = 0u;
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         public AppItem CreatedApp { get; set; }
