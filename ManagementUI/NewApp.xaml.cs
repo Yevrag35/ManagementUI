@@ -3,6 +3,8 @@ using Ookii.Dialogs.Wpf;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -58,20 +60,17 @@ namespace ManagementUI
         public string IconPath
         {
             get => IOPath.GetFileName(this.CreatedApp.IconPath);
-            set
-            {
-                //this.CreatedApp.IconPath = value;
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IconPath)));
-            }
         }
         public BitmapSource Image
         {
             get => this.CreatedApp.Image;
             set
             {
-                value.Freeze();
+                if (value.CanFreeze && !value.IsFrozen)
+                    value.Freeze();
+
                 this.CreatedApp.Image = value;
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Image)));
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Image)));
             }
         }
 
@@ -170,39 +169,12 @@ namespace ManagementUI
             if (result.GetValueOrDefault())
             {
                 DispatcherOperation previewTask = this.OnFileDialogOkAsync(fileDialog.FileName, 0);
+                DispatcherOperation iconTask = this.SetIcon(fileDialog.FileName);
                 await this.SetProgramFileName(fileDialog.FileName);
-                //await this.Dispatcher.InvokeAsync(() =>
-                //{
 
-                //    //this.findExeBtn.Visibility = Visibility.Hidden;
-                //    //this.findExeBtn.IsEnabled = false;
-                //    //this.findExeLbl.IsEnabled = true;
-
-                //    //this.CreatedApp.ExePath = fileDialog.FileName;
-                //    //this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ExePath)));
-
-                //    //this.findExeLbl.Visibility = Visibility.Visible;
-                //});
-
+                await iconTask;
                 await previewTask;
             }
-        }
-        private async void FindExeBtn_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                int i = Convert.ToInt32(this.findExeBtn.IsEnabled);
-                // if 'true' - current will equate to 'Visibility.Visible'
-                // if 'false' - it equate to 'Visibility.Hidden'
-                Visibility current = (Visibility)i;
-
-                // opposite will the bitwise, opposite value of current.
-                Visibility opposite = (Visibility)((i - 1) * -1);
-
-                this.findExeBtn.Visibility = opposite;
-                this.findExeLbl.IsEnabled = !this.findExeBtn.IsEnabled;
-                this.findExeLbl.Visibility = current;
-            });
         }
         private async void FindIconBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -214,7 +186,9 @@ namespace ManagementUI
                 DefaultExt = "exe",
                 Filter = "Windows Icons (*.ico;*.exe;*.dll)|*.ico;*.exe;*.dll|Icon files (*.ico)|*.ico|EXE Programs (*.exe)|*.exe|DLL files (*.dll)|*.dll",
                 Multiselect = false,
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                InitialDirectory = string.IsNullOrWhiteSpace(this.IconPath)
+                    ? Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
+                    : IOPath.GetDirectoryName(this.CreatedApp.IconPath),
                 RestoreDirectory = true,
                 Title = "Choose a icon file or one contained in a program"
             };
@@ -222,19 +196,7 @@ namespace ManagementUI
             if (result.GetValueOrDefault())
             {
                 DispatcherOperation previewTask = this.OnFileDialogOkAsync(fileDialog.FileName, this.IconIndex);
-
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.findIconBtn.Visibility = Visibility.Hidden;
-                    this.findIconBtn.IsEnabled = false;
-                    this.findIconLbl.IsEnabled = true;
-
-                    this.CreatedApp.IconPath = fileDialog.FileName;
-                    this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IconPath)));
-
-                    this.findIconLbl.Visibility = Visibility.Visible;
-                });
-
+                await this.SetIcon(fileDialog.FileName);
                 await previewTask;
             }
         }
@@ -244,13 +206,24 @@ namespace ManagementUI
             return this.Dispatcher.InvokeAsync(() =>
             {
                 this.Set(nameof(this.ExePath), filePath, (fp) => this.CreatedApp.ExePath = fp);
-                //this.CreatedApp.IconPath = filePath;
-                this.findExeBtn.IsEnabled = false;
-
-                if (string.IsNullOrWhiteSpace(this.CreatedApp.IconPath))
+                //this.findExeBtn.IsEnabled = false;
+                this.findExeBtn.Content = IOPath.GetFileName(filePath);
+                if (string.IsNullOrWhiteSpace(this.DisplayName))
                 {
-                    this.CreatedApp.IconPath = filePath;
+                    this.Set(nameof(this.DisplayName), FileVersionInfo.GetVersionInfo(filePath).FileDescription,
+                        (x) => this.CreatedApp.Name = x);
                 }
+            });
+        }
+
+        private DispatcherOperation SetIcon(string iconPath)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                this.Set(nameof(this.IconPath), iconPath, (ip) => this.CreatedApp.IconPath = ip);
+                this.findIconBtn.Content = IOPath.GetFileName(iconPath);
+                if (this.IconIndex != 0u)
+                    this.Set(nameof(this.IconIndex), 0u, (ii) => this.CreatedApp.IconIndex = ii);
             });
         }
 
