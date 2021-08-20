@@ -24,6 +24,11 @@ namespace ManagementUI
 {
     public partial class MUI
     {
+        private async void OnAppsListChanged(object sender, EventArgs e)
+        {
+            await this.SaveApps();
+        }
+
         private async Task SaveApps()
         {
             await this.JsonAppsRead.SaveAsync();

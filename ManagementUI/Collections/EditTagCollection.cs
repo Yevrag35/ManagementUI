@@ -24,6 +24,7 @@ namespace ManagementUI.Collections
         public ICollectionView Available => _availableView;
         public ICollectionView Applied => _appliedView;
         public int Count => _available.Count;
+        public bool IsModified { get; private set; }
         public bool IsReadOnly => false;
         public bool IsFixedSize => false;
         public bool IsSynchronized => false;
@@ -77,7 +78,10 @@ namespace ManagementUI.Collections
 
             int index = _available.IndexOf(tag);
             if (index > -1)
+            {
                 _nextId++;
+                this.IsModified = true;
+            }
 
             return index;
         }
@@ -85,6 +89,7 @@ namespace ManagementUI.Collections
         {
             _available.Clear();
             _applied.Clear();
+            this.IsModified = true;
         }
         public bool Contains(object value)
         {
@@ -149,6 +154,7 @@ namespace ManagementUI.Collections
             {
                 _available.Insert(index, tag);
                 _applied.Insert(index, tag);
+                this.IsModified = true;
             }
         }
         public void Remove(object value)
@@ -157,6 +163,7 @@ namespace ManagementUI.Collections
             {
                 _applied.Remove(tag);
                 _available.Remove(tag);
+                this.IsModified = true;
             }
         }
         public void RemoveAt(int index)

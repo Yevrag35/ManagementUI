@@ -24,6 +24,8 @@ namespace ManagementUI
     public partial class EditTags : Window
     {
         public AppItem ChosenApp { get; }
+        public bool IsModified { get; private set; }
+        public HashSet<UserTag> OriginalTags { get; }
         public EditTagCollection Tags { get; }
         public HashSet<UserTag> PendingAdd { get; }
         private HashSet<UserTag> PendingRemove { get; }
@@ -31,6 +33,7 @@ namespace ManagementUI
 
         public EditTags(AppItem chosenApp, EditTagCollection tags)
         {
+            this.OriginalTags = new HashSet<UserTag>(chosenApp.Tags);
             this.PendingAdd = new HashSet<UserTag>(tags.Count);
             this.PendingRemove = new HashSet<UserTag>(tags.Count);
             this.WindowName = chosenApp.Name;
@@ -101,7 +104,10 @@ namespace ManagementUI
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.ChosenApp.UpdateTags(this.PendingAdd, this.PendingRemove);
-                
+                if (this.Tags.IsModified || !this.OriginalTags.SetEquals(this.ChosenApp.Tags))
+                {
+                    this.IsModified = true;
+                }
             });
 
             this.DialogResult = true;
@@ -110,7 +116,7 @@ namespace ManagementUI
 
         private void ExitBtn_Click(object sender, RoutedEventArgs e)
         {
-            //this.PendingAdd.Clear();
+            this.PendingAdd.Clear();
             this.PendingRemove.Clear();
             this.Tags.Clear();
             this.DialogResult = false;

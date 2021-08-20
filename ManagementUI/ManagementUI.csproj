@@ -91,6 +91,7 @@
     <Compile Include="Collections\ObservableViewBase.cs" />
     <Compile Include="Collections\TagCollection.cs" />
     <Compile Include="Commands\Commands.cs" />
+    <Compile Include="Controls\UIntTextBox.cs" />
     <Compile Include="EditTags.xaml.cs">
       <DependentUpon>EditTags.xaml</DependentUpon>
     </Compile>
@@ -98,42 +99,27 @@
     <Compile Include="File\ReadOperations.cs" />
     <Compile Include="File\WriteOperations.cs" />
     <Compile Include="Helpers\LaunchFactory.cs" />
+    <Compile Include="Helpers\PropertyManager.cs" />
     <Compile Include="Models\AppItem.cs" />
     <Compile Include="Collections\AppsList.cs" />
+    <Compile Include="Models\Converters\UIntToStringConverter.cs" />
     <Compile Include="Models\JsonAppsFile.cs" />
     <Compile Include="NewApp.xaml.cs">
       <DependentUpon>NewApp.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Objects\IToggleTagComparer.cs" />
+    <Compile Include="Helpers\IconPreviewer.cs" />
+    <Compile Include="Models\IToggleTagComparer.cs" />
     <Compile Include="Prompts\PromptFactory.cs" />
     <Compile Include="Prompts\TaskDialogExtensions.cs" />
     <Compile Include="ViewModels\MockAppItem.cs" />
-    <None Include="Objects\Collections\EditTagList.cs" />
     <Compile Include="Models\Converters\EditorManagerConverter.cs" />
-    <Compile Include="Objects\Converters\JsonFilterTagConverter.cs" />
     <Compile Include="Extensions\ListSortDirectionExtensions.cs" />
     <Compile Include="Extensions\SortDescriptionCollectionExtensions.cs" />
-    <None Include="Objects\Collections\AppListViewCollection.cs" />
-    <None Include="Objects\Collections\BaseViewCollection.cs" />
-    <None Include="Objects\Collections\ObservableSortedList.cs" />
-    <None Include="Objects\Collections\TagList.cs" />
-    <None Include="Objects\Collections\TagViewCollection.cs" />
-    <Compile Include="Objects\Converters\FilterTagConverter.cs" />
-    <Compile Include="Objects\CredentialBox.cs">
+    <Compile Include="ViewModels\CredentialBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Objects\Interfaces\ICreatesProcessStartInfo.cs" />
     <Compile Include="Extensions\ErrorHandling.cs" />
-    <None Include="Objects\Collections\AppListCollection.cs" />
-    <None Include="Objects\Collections\TagCollection.cs" />
-    <Compile Include="Objects\Interfaces\Interfaces.cs" />
-    <None Include="Objects\Apps\AppIconSetting.cs" />
-    <None Include="Objects\Collections\AppSettingCollection.cs" />
-    <None Include="Objects\Collections\BaseMuiCollection.cs" />
-    <Compile Include="Objects\Items\ChangeableItem.cs" />
-    <Compile Include="Objects\Items\FilterTag.cs" />
     <Compile Include="Models\EditorManager.cs" />
-    <None Include="Objects\Settings_Old\SettingsEditor.cs" />
     <Compile Include="Models\SettingsJson.cs" />
     <Page Include="EditTags.xaml">
       <SubType>Designer</SubType>
@@ -147,7 +133,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <None Include="Objects\Apps\AppListItem.cs" />
     <Compile Include="MUI.xaml.cs">
       <DependentUpon>MUI.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -158,7 +143,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Objects\ToggleTag.cs" />
+    <Compile Include="Models\ToggleTag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using ManagementUI.Functionality.Executable;
 using ManagementUI.Functionality.Executable.Extensions;
+using ManagementUI.Functionality.Events;
 using ManagementUI.Functionality.Models.Converters;
 
 namespace ManagementUI.Functionality.Models
@@ -19,12 +20,14 @@ namespace ManagementUI.Functionality.Models
     public class AppModel : LaunchableBase, IComparable<AppModel>, IEquatable<AppModel>, INotifyPropertyChanged,
         ILaunchable
     {
-        private SortedSet<UserTag> _tagSet = new SortedSet<UserTag>();
+        private readonly SortedSet<UserTag> _tagSet = new SortedSet<UserTag>();
         private string _arguments;
         private string _exePath;
         private string _name;
         private uint _iconIndex;
         private string _iconPath;
+
+        public event IconChangedEventHandler IconIndexUpdated;
 
         [JsonProperty("arguments", Order = 3)]
         public override string Arguments
@@ -64,13 +67,17 @@ namespace ManagementUI.Functionality.Models
             get => _iconIndex;
             set
             {
+                uint current = _iconIndex;
+
                 if (value < 0)
                     _iconIndex = 0;
 
                 else
                     _iconIndex = value;
 
-                this.NotifyOfChange(nameof(IconIndex));
+                this.NotifyOfChange(nameof(this.IconIndex));
+                if (current != value)
+                    this.IconIndexUpdated?.Invoke(this, new IconChangedEventArgs(value));
             }
         }
 
@@ -164,25 +171,37 @@ namespace ManagementUI.Functionality.Models
         }
         public void UpdateTags(ISet<UserTag> toAdd, ISet<UserTag> toRemove)
         {
-            if (toAdd.Count <= 0 && toRemove.Count <= 0)
-                return;
+            _ = ConsolidateTags(toAdd, toRemove);
 
-            if (toRemove.Overlaps(toAdd))
-                toRemove.SymmetricExceptWith(toAdd);
-
-            _tagSet.ExceptWith(toRemove);
-            _tagSet.UnionWith(toAdd);
+            PerformTagManip(toRemove,   (x) => _tagSet.ExceptWith(x));
+            PerformTagManip(toAdd,      (x) => _tagSet.UnionWith(x));
             this.NotifyOfChange(nameof(Tags));
         }
-
-        protected Bitmap GetBitmap(IntPtr appHandle)
+        private static bool ConsolidateTags(ISet<UserTag> toAdd, ISet<UserTag> toRemove)
         {
-            if (string.IsNullOrWhiteSpace(this.IconPath) || !File.Exists(this.IconPath))
+            bool result = false;
+            if (null != toAdd && null != toRemove && toRemove.Count > 0)
+            {
+                toRemove.SymmetricExceptWith(toAdd);
+                result = true;
+            }
+
+            return result;
+        }
+        private static void PerformTagManip(ISet<UserTag> tags, Action<ISet<UserTag>> action)
+        {
+            if (tags.Count > 0)
+                action(tags);
+        }
+
+        protected static Bitmap GetBitmap(IntPtr appHandle, string iconPath, uint iconIndex)
+        {
+            if (string.IsNullOrWhiteSpace(iconPath) || !File.Exists(iconPath))
                 return null;
 
             Bitmap bitMap = null;
 
-            IntPtr imageHandle = ExtractIconA(appHandle, this.IconPath, this.IconIndex);
+            IntPtr imageHandle = ExtractIconA(appHandle, iconPath, iconIndex);
             Icon appIcon = null;
             try
             {
@@ -190,7 +209,7 @@ namespace ManagementUI.Functionality.Models
             }
             catch (ArgumentException)
             {
-                appIcon = Icon.ExtractAssociatedIcon(this.IconPath);
+                appIcon = Icon.ExtractAssociatedIcon(iconPath);
             }
 
             if (null != appIcon)
@@ -200,6 +219,7 @@ namespace ManagementUI.Functionality.Models
 
             return bitMap;
         }
+
 
         [DllImport("gdi32.dll")]
         protected static extern bool DeleteObject(IntPtr hObject);

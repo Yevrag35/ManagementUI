@@ -71,8 +71,10 @@ namespace ManagementUI.Models
         }
         public AppItem Clone()
         {
-            return new AppItem()
+            var app = new AppItem()
             {
+                Name = this.Name,
+                ExePath = this.ExePath,
                 Arguments = this.Arguments,
                 DontShow = this.DontShow,
                 IconIndex = this.IconIndex,
@@ -80,8 +82,21 @@ namespace ManagementUI.Models
                 Image = this.Image?.Clone(),
                 Tags = this.Tags
             };
+
+            app.Initialize();
+            return app;
         }
         object ICloneable.Clone() => this.Clone();
+        public void MergeFrom(AppItem other)
+        {
+            this.Arguments = other.Arguments;
+            this.ExePath = other.ExePath;
+            this.IconIndex = other.IconIndex;
+            this.IconPath = other.IconPath;
+            this.Name = other.Name;
+            this.Image = other.Image.Clone();
+            this.Image.Freeze();
+        }
         public void Initialize()
         {
             if (this.Initialized)
@@ -89,10 +104,12 @@ namespace ManagementUI.Models
 
             if (null == this.Image)
             {
-                Bitmap bitMap = this.GetBitmap(App.MyHandle);
+                Bitmap bitMap = GetBitmap(App.MyHandle, this.IconPath, this.IconIndex);
                 this.Image = this.Bitmap2BitmapImage(bitMap);
-                this.Image?.Freeze();
             }
+
+            if (null != this.Image && !this.Image.IsFrozen)
+                this.Image.Freeze();
 
             this.Initialized = true;
         }

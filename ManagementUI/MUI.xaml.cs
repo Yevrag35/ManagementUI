@@ -1,17 +1,12 @@
 ﻿using Ookii.Dialogs.Wpf;
 using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics;
-using System.DirectoryServices;
-using System.IO;
+using System.ComponentModel;
 using System.Linq;
-using System.Net;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
+using System.Windows.Threading;
 using ManagementUI.Functionality.Auth;
 using ManagementUI.Functionality.Executable;
 using ManagementUI.Functionality.Models;
@@ -27,14 +22,17 @@ namespace ManagementUI
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MUI : Window
+    public partial class MUI : Window, INotifyPropertyChanged
     {
         #region PROPERTIES/FIELDS
         private bool _overItem;
+        private RunAsDisplay _runAs;
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private AppsList AppList => this.JsonAppsRead.Apps;
         private JsonAppsFile JsonAppsRead { get; set; }
-        public static RunAsDisplay RunAsUser { get; set; }
+        public string RunAsUser => _runAs?.DisplayPrincipal;
         private SettingsJson Settings { get; set; }
         private TagCollection Tags { get; set; }
 
@@ -42,13 +40,12 @@ namespace ManagementUI
 
         public MUI()
         {
-            RunAsUser = new RunAsDisplay();
             this.ReadSettings();
-            
 
             this.InitializeComponent();
             this.Settings.EditorManager.EditorExited += this.Editor_Closed;
             LaunchFactory.Initialize(this.Settings.EditorManager);
+            this.Set(nameof(this.RunAsUser), new RunAsDisplay(), (rad) => _runAs = rad);
         }
 
         private Task OnLoad()
@@ -82,49 +79,67 @@ namespace ManagementUI
 
         #endregion
 
-        private void NewAppButton_Click(object sender, RoutedEventArgs e)
+        private async Task AddAppToList(NewApp window)
         {
-            var newApp = new NewApp
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                AppItem app = window.GetFinalizedApp();
+                this.AppList.Add(app);
+            });
+
+            await this.SaveApps();
+        }
+        private async void NewAppButton_Click(object sender, RoutedEventArgs e)
+        {
+            var newApp = new NewApp(App.MyHandle)
             {
                 Owner = this
             };
             bool? result = newApp.ShowDialog();
-            if (result.HasValue && result.Value)
+            if (result.GetValueOrDefault())
             {
-                Console.WriteLine("hey");
-                //await this.WriteAppToFile(newApp.CreatedApp);
-                //AppList.Add(newApp.CreatedApp);
+                await this.AddAppToList(newApp);
+            }
+        }
+        private async void EditAppBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.AppListView.SelectedItem is AppItem ai)
+            {
+                var newApp = new NewApp(App.MyHandle, ai)
+                {
+                    Owner = this
+                };
+
+                if (newApp.ShowDialog().GetValueOrDefault())
+                {
+                    _ = newApp.GetFinalizedApp();
+                    await this.SaveApps();
+                }
             }
         }
         private async void ALMIRemove_Click(object sender, RoutedEventArgs e)
         {
-            await this.Dispatcher.InvokeAsync(() =>
+            bool result = await this.Dispatcher.InvokeAsync(() =>
             {
+                bool resultInner = false;
                 if (this.AppListView.SelectedItem is AppItem ai)
                 {
                     if (PromptFactory.DoYesNoPrompt(this, Strings.Prompt_AppDeleteTitle, TaskDialogIcon.Warning, true, 
                         (dialog) =>
                         {
                             dialog.MainInstruction = Strings.Prompt_AppDeleteMainInstruction;
-                            dialog.AddContent(Strings.Prompt_AppDeleteContent, ai.Name, Environment.NewLine);
+                            _ = dialog.AddContent(Strings.Prompt_AppDeleteContent, ai.Name, Environment.NewLine);
                         }))
                     {
-                        _ = this.AppList.Remove(ai);
+                        resultInner = this.AppList.Remove(ai);
                     }
                 }
+
+                return resultInner;
             });
-        }
-        private void AppListView_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            //if (e.Key == System.Windows.Input.Key.Delete)
-            //{
-            //    var click = new RoutedEventArgs(Button.ClickEvent);
-            //    await this.Dispatcher.InvokeAsync(() =>
-            //    {
-            //        var ali = ((MUI)Application.Current.MainWindow).AppListView.SelectedItem as AppIconSetting;
-            //        //((MUI)Application.Current.MainWindow).AppList.Remove(ali);
-            //    });
-            //}
+
+            if (result)
+                await this.SaveApps();
         }
 
         #region CHECKBOX EVENTS
@@ -212,11 +227,11 @@ namespace ManagementUI
                 {
                     if (box.ShowDialog())
                     {
-                        UserIdentity userId = new UserIdentity(box.UserName, box.GetPassword());
+                        var userId = new UserIdentity(box.UserName, box.GetPassword());
                         if (userId.IsValid())
                         {
                             LaunchFactory.AddCredentials(userId);
-                            RunAsUser.ApplyFromCreds(userId);
+                            this.SetRunAsUser(userId);
                         }
                         else
                         {
@@ -225,13 +240,12 @@ namespace ManagementUI
                         }
                     }
                 }
-
             });
+        }
 
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-
-            });
+        private void SetRunAsUser(IUserIdentity identity)
+        {
+            this.Set(nameof(this.RunAsUser), identity, (id) => _runAs.ApplyFromCreds(id));
         }
 
         #endregion
@@ -247,13 +261,20 @@ namespace ManagementUI
 
         private async Task EditAppTags(AppItem ai)
         {
-            await this.Dispatcher.InvokeAsync(() =>
+            var editTags = new EditTags(ai, this.Tags.ToEditCollection())
             {
-                var editTags = new EditTags(ai, this.Tags.ToEditCollection())
+                Owner = this
+            };
+
+            if (editTags.ShowDialog().GetValueOrDefault())
+            {
+                Task saveTask = null;
+                if (editTags.IsModified)
                 {
-                    Owner = this
-                };
-                if (editTags.ShowDialog().GetValueOrDefault())
+                    saveTask = this.SaveApps();
+                }
+
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     if (!this.Tags.SetEquals(editTags.Tags))
                     {
@@ -268,8 +289,10 @@ namespace ManagementUI
                         else if (ai.DontShow && ai.Tags.IsSupersetOf(this.Tags.EnabledTags))
                             ai.DontShow = false;
                     }
-                }
-            });
+                });
+
+                await saveTask;
+            }
         }
 
         private async void RemoveTag_Click(object sender, RoutedEventArgs e)
@@ -313,7 +336,7 @@ namespace ManagementUI
                 {
                     if (!LaunchFactory.Execute(ai, out Exception caughtException))
                     {
-                        ShowErrorMessage(caughtException, false);
+                        _ = ShowErrorMessage(caughtException, false);
                     }
                 }
             });
@@ -321,7 +344,7 @@ namespace ManagementUI
 
         #endregion
 
-        #region RELAUNCH
+        #region RELAUNCH - OBSOLETE
         //private void RelaunchBtn_Click(object sender, RoutedEventArgs e)
         //{
         //    //AppDomain appId = AppDomain.CurrentDomain;
@@ -365,8 +388,8 @@ namespace ManagementUI
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                string key = this.Settings.Editor.ToString();
-                var editor = this.Settings.EditorManager[key];
+                string key = this.Settings.Editor;
+                IEditor editor = this.Settings.EditorManager[key];
                 if (!editor.IsUsable())
                 {
                     editor = this.Settings.EditorManager.FirstOrDefault(x => x.Value.IsUsable()).Value;
@@ -383,7 +406,6 @@ namespace ManagementUI
 
         #endregion
 
-        
         private async void FilterTags_LostFocus(object sender, RoutedEventArgs e)
         {
             await this.Dispatcher.InvokeAsync(() =>
@@ -393,6 +415,6 @@ namespace ManagementUI
                     this.FilterTags.UnselectAll();
                 }
             });
-        }
+        }  
     }
 }

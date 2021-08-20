@@ -51,6 +51,7 @@ namespace ManagementUI
             {
                 JsonAppsFile jsonAppsFile = new JsonAppsFile();
                 jsonAppsFile.Read();
+                //jsonAppsFile.Apps.Changed += this.OnAppsListChanged;
                 this.JsonAppsRead = jsonAppsFile;
                 this.AppList.CreateView();
 
@@ -66,15 +67,6 @@ namespace ManagementUI
             {
                 this.Settings = settings;
             });
-            //string rawJson = ReadFile(SettingsJson.GetFullPath());
-            //JsonSerializerSettings settings = this.GetSerializerSettings(
-            //    (s) => s.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy())));
-
-            //this.Dispatcher.Invoke(() =>
-            //{
-            //    this.Settings = JsonConvert.DeserializeObject<SettingsJson>(rawJson, settings);
-
-            //});
         }
         private async Task ReadSettingsAsync()
         {
@@ -90,10 +82,6 @@ namespace ManagementUI
             }, DispatcherPriority.Send);
         }
 
-        private static string ReadFile(string filePath)
-        {
-            return File.ReadAllText(filePath, SettingsJson.GetEncoding());
-        }
         private static async Task<string> ReadFileAsync(string filePath)
         {
             using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))

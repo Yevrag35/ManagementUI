@@ -15,6 +15,17 @@ namespace ManagementUI
 {
     public partial class MUI
     {
+        public ICommand DeleteAppCommand
+        {
+            get
+            {
+                return new Command((o) =>
+                {
+                    var click = MenuItem.ClickEvent;
+                    this.ALMIRemove.RaiseEvent(new RoutedEventArgs(click));
+                });
+            }
+        }
         public ICommand EditTagsCommand
         {
             get

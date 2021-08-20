@@ -13,6 +13,8 @@ namespace ManagementUI.Collections
 {
     public class AppsList : ObservableViewBase<AppItem>
     {
+        public event EventHandler Changed;
+
         protected override Predicate<object> Filter => x => x is AppItem ai && !ai.DontShow;
         public bool IsFiltered { get; private set; }
         protected override string[] LiveFilteringProperties => new string[1] { nameof(AppItem.DontShow) };
@@ -21,6 +23,27 @@ namespace ManagementUI.Collections
         public AppsList(IEnumerable<AppItem> apps)
             : base(apps)
         {
+        }
+
+        protected override bool Add(AppItem item, bool adding)
+        {
+            bool result = base.Add(item, adding);
+            if (result)
+            {
+                this.Changed?.Invoke(this, EventArgs.Empty);
+            }
+
+            return result;
+        }
+        protected override bool Remove(AppItem item, bool removing)
+        {
+            bool result = base.Remove(item, removing);
+            if (result)
+            {
+                this.Changed?.Invoke(this, EventArgs.Empty);
+            }
+
+            return result;
         }
 
         public void EnableByTags(IEnumerable<UserTag> tagsToEnable)
