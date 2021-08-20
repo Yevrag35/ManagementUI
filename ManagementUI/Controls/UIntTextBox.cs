@@ -4,27 +4,27 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 
+using Strings = ManagementUI.Properties.Resources;
+
 namespace ManagementUI.Controls
 {
     public class UIntTextBox : TextBox
     {
         private const string UNICODE_TEXT = "UnicodeText";
-
-        public static readonly DependencyProperty MinimumProperty =
-            DependencyProperty.Register(nameof(Minimum), typeof(uint), typeof(UIntTextBox));
+        private const uint MINIMUM = 0u;
+        private const uint DEFAULT_MAXIMUM = 50u;
 
         public static readonly DependencyProperty MaximumProperty =
             DependencyProperty.Register(nameof(Maximum), typeof(uint), typeof(UIntTextBox));
-
-        public uint Minimum
-        {
-            get => (uint)base.GetValue(MinimumProperty);
-            set => base.SetValue(MinimumProperty, value);
-        }
         public uint Maximum
         {
             get => (uint)base.GetValue(MaximumProperty);
-            set => base.SetValue(MaximumProperty, value);
+            set
+            {
+                base.SetValue(MaximumProperty, value);
+                if (string.IsNullOrWhiteSpace(base.ToolTip as string))
+                    this.ToolTip = string.Format(Strings.IconIdexTooltip, this.Maximum);
+            }
         }
 
         public UIntTextBox()
@@ -32,21 +32,21 @@ namespace ManagementUI.Controls
         {
         }
 
-        private static bool IsTextValid(IDataObject obj, uint low, uint high)
+        private static bool IsTextValid(IDataObject obj, uint high)
         {
-            return obj.GetData(UNICODE_TEXT) is string text && IsTextValid(text, low, high);
+            return obj.GetData(UNICODE_TEXT) is string text && IsTextValid(text, high);
         }
-        private static bool IsTextValid(string text, uint low, uint high)
+        private static bool IsTextValid(string text, uint high)
         {
             return uint.TryParse(text, out uint found) &&
-                low <= found && high >= found;
+                MINIMUM <= found && high >= found;
         }
 
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            if (this.Maximum < this.Minimum)
-                this.Maximum = this.Minimum + 1u;
+            if (this.Maximum == MINIMUM)
+                this.Maximum = DEFAULT_MAXIMUM;
 
             this.MaxLength = this.Maximum.ToString().Length;
 
@@ -56,7 +56,7 @@ namespace ManagementUI.Controls
 
         private void PastingEventHandler(object sender, DataObjectPastingEventArgs e)
         {
-            if (!IsTextValid(e.DataObject, this.Minimum, this.Maximum))
+            if (!IsTextValid(e.DataObject, this.Maximum))
             {
                 e.CancelCommand();
                 e.Handled = true;
@@ -67,9 +67,9 @@ namespace ManagementUI.Controls
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                if (!IsTextValid(this.Text, this.Minimum, this.Maximum))
+                if (!IsTextValid(this.Text, this.Maximum))
                 {
-                    this.Text = 0.ToString();
+                    this.Text = MINIMUM.ToString();
                 }
             });
         }

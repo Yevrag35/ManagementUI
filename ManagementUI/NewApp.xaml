@@ -117,7 +117,8 @@
                Click="FindIconBtn_Click"/>
 
         <controls:UIntTextBox x:Name="iconIndexBox"
-                              Maximum="999" Minimum="0"
+                              Maximum="99"
+                              ToolTip="Enter a number between 0 and 99"
                  Text="{Binding IconIndex, Converter={StaticResource UIntToStringConverter}}"
                  Grid.Column="5" Grid.Row="5" Style="{StaticResource FieldBoxStyle}"/>
         

@@ -115,6 +115,15 @@ namespace ManagementUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enter a number between 0 and {0}.
+        /// </summary>
+        internal static string IconIdexTooltip {
+            get {
+                return ResourceManager.GetString("IconIdexTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to EDIT.
         /// </summary>
         internal static string NewApp_BtnContent_EDIT {
