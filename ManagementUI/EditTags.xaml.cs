@@ -1,6 +1,6 @@
-﻿using ManagementUI.Editing;
-using ManagementUI.Extensions;
+﻿using ManagementUI.Extensions;
 using Microsoft.VisualBasic;
+using Ookii.Dialogs.Wpf;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,82 +12,172 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using ManagementUI.Functionality.Models;
+using ManagementUI.Models;
+using ManagementUI.Collections;
 
 namespace ManagementUI
 {
     /// <summary>
     /// Interaction logic for EditTags.xaml
-    /// TO DO - FIND A WAY TO LOAD THE EXISTING APPLIED EASILY
     /// </summary>
     public partial class EditTags : Window
     {
-        public HashSet<FilterTag> AllFilterTags { get; }
-        public EditTagList AllTags { get; }
-        public AppIconSetting Application { get; }
+        public AppItem ChosenApp { get; }
+        public bool IsModified { get; private set; }
+        public HashSet<UserTag> OriginalTags { get; }
+        public EditTagCollection Tags { get; }
+        public HashSet<UserTag> PendingAdd { get; }
+        private HashSet<UserTag> PendingRemove { get; }
+        public string WindowName { get; set; }
 
-        public EditTags(AppIconSetting chosenApp, IEnumerable<FilterTag> allTags)
+        public EditTags(AppItem chosenApp, EditTagCollection tags)
         {
-            this.AllFilterTags = new HashSet<FilterTag>(allTags);
-            this.Application = chosenApp;
-            this.AllTags = new EditTagList(allTags, chosenApp);
-            this.InitializeComponent();
-
-            this.AppliedTagsList.ItemsSource = this.AllTags.Applied;
-            this.AvailableTagsList.ItemsSource = this.AllTags.Available;
-        }
-
-        private async void RemoveTagBtn_Click(object sender, RoutedEventArgs e)
-        {
-            await this.Dispatcher.InvokeAsync(() =>
+            this.OriginalTags = new HashSet<UserTag>(chosenApp.Tags);
+            this.PendingAdd = new HashSet<UserTag>(tags.Count);
+            this.PendingRemove = new HashSet<UserTag>(tags.Count);
+            this.WindowName = chosenApp.Name;
+            this.Tags = tags;
+            this.ChosenApp = chosenApp;
+            this.Tags.ForEach((t) =>
             {
-                foreach (EditTagItem eti in this.AppliedTagsList.SelectedItems)
+                if (chosenApp.Tags.Contains(t.UserTag))
                 {
-                    eti.Status = EditingStatus.Available;
+                    t.IsChecked = true;
                 }
             });
+
+            this.InitializeComponent();
+
+            this.AvailableTagsList.ItemsSource = this.Tags.Available;
+            this.AppliedTagsList.ItemsSource = this.Tags.Applied;
         }
 
         private async void ApplyTagBtn_Click(object sender, RoutedEventArgs e)
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                foreach (EditTagItem eti in this.AvailableTagsList.SelectedItems)
+                if (this.AvailableTagsList.SelectedItems.Count > 0)
                 {
-                    eti.Status = EditingStatus.Applied;
+                    foreach (ToggleTag tag in this.AvailableTagsList.SelectedItems)
+                    {
+                        tag.IsChecked = true;
+                        this.PendingAdd.Add(tag.UserTag);
+                        this.PendingRemove.Remove(tag.UserTag);
+                    }
                 }
             });
         }
 
-        private void OKBtn_Click(object sender, RoutedEventArgs e)
+        private async void RemoveTagBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.Application.Tags.Clear();
-            this.Application.Tags.UnionWith(this.AllTags.Where(x => x.Status == EditingStatus.Applied).Select(x => x.Title));
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.AppliedTagsList.SelectedItems.Count > 0)
+                {
+                    foreach (ToggleTag tag in this.AppliedTagsList.SelectedItems)
+                    {
+                        tag.IsChecked = false;
+                        this.PendingAdd.Remove(tag.UserTag);
+                        this.PendingRemove.Add(tag.UserTag);
+                    }
+                }
+            });
+        }
+
+        private async void InputBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (e.NewValue is bool isVis && !isVis)
+                {
+                    this.InputTextBox.Clear();
+                }
+
+                this.FlipDefaults();
+
+            });
+        }
+
+        private async void OKBtn_Click(object sender, RoutedEventArgs e)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.ChosenApp.UpdateTags(this.PendingAdd, this.PendingRemove);
+                if (this.Tags.IsModified || !this.OriginalTags.SetEquals(this.ChosenApp.Tags))
+                {
+                    this.IsModified = true;
+                }
+            });
+
             this.DialogResult = true;
             this.Close();
         }
 
-        private void NewTagBtn_Click(object sender, RoutedEventArgs e)
+        private void ExitBtn_Click(object sender, RoutedEventArgs e)
         {
-            var newTag = Interaction.InputBox(
-                "Enter the name of a new tag:",
-                "New Tag",
-                "<new tag>"
-            );
-            if (!string.IsNullOrWhiteSpace(newTag) && newTag != "<new tag>")
+            this.PendingAdd.Clear();
+            this.PendingRemove.Clear();
+            this.Tags.Clear();
+            this.DialogResult = false;
+            this.Close();
+        }
+
+        private async void NewTagBtn_Click(object sender, RoutedEventArgs e)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                var ft = new EditTagItem
+                this.InputBox.Visibility = Visibility.Visible;
+            });
+        }
+
+        private async void YesButton_Click(object sender, RoutedEventArgs e)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                string newTag = this.InputTextBox.Text.Trim();
+                if (this.Tags.ContainsText(newTag))
                 {
-                    IsChecked = false,
-                    Status = EditingStatus.Available,
-                    Title = newTag
-                };
-                this.Dispatcher.Invoke(() =>
+                    if (MUI.ShowErrorMessage(new ArgumentException(string.Format("{0} already exists as a tag", newTag)), true))
+                    {
+                        e.Handled = true;
+                        this.InputTextBox.Focus();
+                        this.InputTextBox.SelectAll();
+                        return;
+                    }
+                }
+                else
                 {
-                    this.AllTags.Add(ft);
-                    this.AllFilterTags.Add(ft.Title);
-                    this.AllTags.Available.Refresh();
-                    this.AllTags.Applied.Refresh();
-                });
+                    int index = this.Tags.Add(newTag);
+                    if (index > -1)
+                    {
+                        this.PendingAdd.Add(this.Tags.GetTag(index).UserTag);
+                    }
+                }
+
+                InputBox.Visibility = Visibility.Collapsed;
+            });
+        }
+        private async void NoButton_Click(object sender, RoutedEventArgs e)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                InputBox.Visibility = Visibility.Collapsed;
+            });
+        }
+        private void FlipDefaults()
+        {
+            this.OKBtn.IsDefault = !this.OKBtn.IsDefault;
+            this.YesButton.IsDefault = !this.YesButton.IsDefault;
+
+            this.ExitBtn.IsCancel = !this.ExitBtn.IsCancel;
+            this.NoButton.IsCancel = !this.NoButton.IsCancel;
+        }
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            if (this.NoButton.IsCancel)
+            {
+                e.Cancel = true;
             }
         }
     }

@@ -8,6 +8,7 @@
         xmlns:local="clr-namespace:ManagementUI"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Loaded="Window_Loaded"
+        Closing="Window_Closing"
         mc:Ignorable="d"
         Title="Management UI" Height="450" Width="800">
     <Window.Background>
@@ -21,6 +22,12 @@
             </LinearGradientBrush.GradientStops>
         </LinearGradientBrush>
     </Window.Background>
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding DeleteAppCommand}" Key="Delete" />
+        <KeyBinding Command="{Binding OpenAppsCommand}" Key="A" Modifiers="Shift"/>
+        <KeyBinding Command="{Binding OpenSettingsCommand}" Key="O" Modifiers="Shift"/>
+        <KeyBinding Command="{Binding EditTagsCommand}" Key="E"/>
+    </Window.InputBindings>
     <Window.Resources>
         <!--Control colors.-->
         <Color x:Key="ControlNormalColor">#000000</Color>
@@ -28,6 +35,206 @@
         <Color x:Key="DisabledControlColor">#FFF2F2F2</Color>
         <Color x:Key="DisabledForegroundColor">#909098</Color>
         <Color x:Key="ControlPressedColor">#878787</Color>
+        <Color x:Key="ControlDarkColor">#000000</Color>
+
+        <Style x:Key="{x:Type ContextMenu}" TargetType="{x:Type ContextMenu}">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ContextMenu}">
+                        <Border BorderThickness="1">
+                            <Border.BorderBrush>
+                                <LinearGradientBrush StartPoint="0,0"
+                                    EndPoint="0,1">
+                                    <LinearGradientBrush.GradientStops>
+                                        <GradientStopCollection>
+                                            <GradientStop Color="{DynamicResource BorderLightColor}"
+                                                Offset="0.0" />
+                                            <GradientStop Color="{DynamicResource BorderDarkColor}"
+                                                Offset="1.0" />
+                                        </GradientStopCollection>
+                                    </LinearGradientBrush.GradientStops>
+                                </LinearGradientBrush>
+                            </Border.BorderBrush>
+                            <Border.Background>
+                                <SolidColorBrush Color="{StaticResource ControlDarkColor}"/>
+                                <!--<LinearGradientBrush EndPoint="0.5,1"
+                                 StartPoint="0.5,0">
+                                    <GradientStop Color="{DynamicResource BorderLightColor}"
+                                        Offset="0" />
+                                    <GradientStop Color="{DynamicResource ControlMediumColor}"
+                                        Offset="1" />
+                                </LinearGradientBrush>-->
+                            </Border.Background>
+                            <StackPanel ClipToBounds="True"
+                                Orientation="Vertical"
+                                IsItemsHost="True" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="{x:Type Separator}">
+            <Setter Property="Height" Value="0.25" />
+            <Setter Property="Margin" Value="0,2,0,2" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Separator}">
+                        <Border BorderThickness="1">
+                            <Border.BorderBrush>
+                                <SolidColorBrush Color="{DynamicResource BorderMediumColor}" />
+                            </Border.BorderBrush>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <ControlTemplate x:Key="{x:Static MenuItem.SubmenuItemTemplateKey}"
+                 TargetType="{x:Type MenuItem}">
+            <Border x:Name="Border"
+          BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"
+                          SharedSizeGroup="Icon" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto"
+                          SharedSizeGroup="Shortcut" />
+                        <ColumnDefinition Width="13" />
+                    </Grid.ColumnDefinitions>
+                    <ContentPresenter x:Name="Icon"
+                        Margin="6,0,6,0"
+                        VerticalAlignment="Center"
+                        ContentSource="Icon" />
+                    <Border x:Name="Check"
+              Width="13"
+              Height="13"
+              Visibility="Collapsed"
+              Margin="6,0,6,0"
+              BorderThickness="1">
+                        <Border.BorderBrush>
+                            <LinearGradientBrush StartPoint="0,0"
+                               EndPoint="0,1">
+                                <LinearGradientBrush.GradientStops>
+                                    <GradientStopCollection>
+                                        <GradientStop Color="{DynamicResource BorderLightColor}" Offset="0.0" />
+                                        <GradientStop Color="{DynamicResource BorderDarkColor}" Offset="1.0" />
+                                    </GradientStopCollection>
+                                </LinearGradientBrush.GradientStops>
+                            </LinearGradientBrush>
+
+                        </Border.BorderBrush>
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0"
+                               EndPoint="0,1">
+                                <LinearGradientBrush.GradientStops>
+                                    <GradientStopCollection>
+                                        <GradientStop Color="{DynamicResource ControlLightColor}" />
+                                        <GradientStop Color="{DynamicResource ControlMediumColor}"
+                              Offset="1.0" />
+                                    </GradientStopCollection>
+                                </LinearGradientBrush.GradientStops>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Path x:Name="CheckMark"
+                          Width="7"
+                          Height="7"
+                          Visibility="Hidden"
+                          SnapsToDevicePixels="False"
+                          StrokeThickness="2"
+                          Data="M 0 0 L 7 7 M 0 7 L 7 0">
+                            <Path.Stroke>
+                                <SolidColorBrush Color="{DynamicResource GlyphColor}" />
+                            </Path.Stroke>
+                        </Path>
+                    </Border>
+                    <ContentPresenter x:Name="HeaderHost"
+                        Grid.Column="1"
+                        ContentSource="Header"
+                        RecognizesAccessKey="True" />
+                    <TextBlock x:Name="InputGestureText"
+                 Grid.Column="2"
+                 Text="{TemplateBinding InputGestureText}"
+                 Margin="5,2,0,2"
+                 DockPanel.Dock="Right" />
+                </Grid>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="ButtonBase.Command"
+             Value="{x:Null}" />
+                <Trigger Property="Icon"
+             Value="{x:Null}">
+                    <Setter TargetName="Icon"
+              Property="Visibility"
+              Value="Hidden" />
+                </Trigger>
+                <Trigger Property="IsChecked"
+             Value="true">
+                    <Setter TargetName="CheckMark"
+              Property="Visibility"
+              Value="Visible" />
+                </Trigger>
+                <Trigger Property="IsCheckable"
+             Value="true">
+                    <Setter TargetName="Check"
+              Property="Visibility"
+              Value="Visible" />
+                    <Setter TargetName="Icon"
+              Property="Visibility"
+              Value="Hidden" />
+                </Trigger>
+                <Trigger Property="IsHighlighted" Value="true">
+                    <Setter Property="Background" TargetName="Border">
+                        <Setter.Value>
+                            <LinearGradientBrush EndPoint="0.5,1"
+                               StartPoint="0.5,0">
+                                <GradientStop Color="Transparent" Offset="0" />
+                                <GradientStop Color="{DynamicResource ControlMouseOverColor}" Offset="1" />
+                            </LinearGradientBrush>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="BorderBrush" TargetName="Border">
+                        <Setter.Value>
+                            <LinearGradientBrush EndPoint="0.5,1"
+                               StartPoint="0.5,0">
+                                <GradientStop Color="{DynamicResource BorderMediumColor}" Offset="0" />
+                                <GradientStop Color="Black" Offset="1" />
+                            </LinearGradientBrush>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="false">
+                    <Setter Property="Foreground">
+                        <Setter.Value>
+                            <SolidColorBrush Color="{StaticResource DisabledForegroundColor}" />
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <!-- MenuItem Style -->
+        <Style x:Key="{x:Type MenuItem}" TargetType="{x:Type MenuItem}">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Foreground">
+                <Setter.Value>
+                    <SolidColorBrush Color="White"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="Role" Value="SubmenuItem">
+                    <Setter Property="Template" Value="{StaticResource {x:Static MenuItem.SubmenuItemTemplateKey}}" />
+                </Trigger>
+                <Trigger Property="IsHighlighted" Value="True">
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
         <Style x:Key="ButtonFocusVisual">
             <Setter Property="Control.Template">
@@ -49,6 +256,7 @@
             <!--<Setter Property="MinHeight" Value="29px" />
             <Setter Property="MinWidth"  Value="103px" />-->
             <Setter Property="Foreground" Value="#FFFFFFFF" />
+            <Setter Property="FontSize" Value="12"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -96,11 +304,22 @@
                             <ContentPresenter Margin="2"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            RecognizesAccessKey="True" />
+                            RecognizesAccessKey="True">
+                            </ContentPresenter>
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="FontSize" Value="13"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="False">
+                    <Setter Property="FontSize" Value="12"/>
+                    <Setter Property="FontWeight" Value="Normal"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </Window.Resources>
     <Grid>
@@ -119,18 +338,18 @@
             <ColumnDefinition Width="100"/>
             <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
-        
-        <!-- SETTING UPDATE AND RELAUNCH HIDDEN BUTTONS -->
-        <Button x:Name="SettingsUpdateBtn" Height="0" Width="0" Click="SettingsUpdateBtn_Click"/>
-        <Button x:Name="RelaunchBtn" Height="0" Width="0" Click="RelaunchBtn_Click"/>
-        
+
         <!-- IDENTITY BANNER -->
-        <Label x:Name="IdentityLbl" Content="Current User:" Grid.Row="1" Grid.Column="1" 
+        <Label
+               x:Name="IdentityLbl" Content="RunAs User:"
+               Grid.Row="1" Grid.Column="1"
                FontFamily="Global Sans Serif" FontSize="14" VerticalContentAlignment="Center"/>
-        <TextBox x:Name="IdentityBlock" Text="ReplaceMe" Grid.Column="2" Grid.Row="1" Width="200"
+        <TextBox x:Name="IdentityBlock" Text="{Binding RunAsUser, Mode=OneWay}"
+                 Grid.Column="2" Grid.Row="1" Width="200"
                HorizontalAlignment="Left" BorderThickness="0"
                FontFamily="Global Sans Serif" FontSize="15" VerticalContentAlignment="Center"
-               Background="Transparent" BorderBrush="Transparent" FontWeight="Bold" IsReadOnly="True"/>
+               Background="Transparent" BorderBrush="Transparent" FontWeight="Bold" IsReadOnly="True"
+               MouseDoubleClick="IdentityBlock_MouseDoubleClick"/>
 
         <!-- Credential Grid -->
         <Grid Grid.Column="3" Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="2">
@@ -166,7 +385,24 @@
                    HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                    Grid.Row="0"/>
 
-            <ListView x:Name="FilterTags" Grid.Row="1" Grid.RowSpan="3">
+            <ListView x:Name="FilterTags" Grid.Row="1" Grid.RowSpan="3" 
+                      LostFocus="FilterTags_LostFocus" Background="Transparent"
+                      BorderBrush="Transparent" BorderThickness="0"
+                      PreviewMouseRightButtonUp="ContextMenu_PreviewMouseRightButtonUp">
+                <ListView.ContextMenu>
+                    <ContextMenu x:Name="FilterTagsContextMenu">
+                        <Separator/>
+                        <MenuItem x:Name="RemoveTag" Header="Delete..." Click="RemoveTag_Click"/>
+                        <Separator/>
+                    </ContextMenu>
+                </ListView.ContextMenu>
+                <ListView.Resources>
+                    <Style TargetType="{x:Type ListViewItem}">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <EventSetter Event="MouseEnter" Handler="ListViewItem_MouseEnter"/>
+                        <EventSetter Event="MouseLeave" Handler="ListViewItem_MouseLeave"/>
+                    </Style>
+                </ListView.Resources>
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -176,9 +412,14 @@
                                     <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
                                 <CheckBox IsChecked="{Binding IsChecked}" Grid.Column="0" Checked="CheckBox_Checked"
-                                          Unchecked="CheckBox_Unchecked"/>
-                                <TextBlock Text="{Binding Tag}" Grid.Column="1"
-                                         Background="Transparent" Focusable="False" />
+                                          Unchecked="CheckBox_Unchecked">
+                                    <CheckBox.LayoutTransform>
+                                        <ScaleTransform ScaleX="1.25" ScaleY="1.25" CenterX="2"/>
+                                    </CheckBox.LayoutTransform>
+                                </CheckBox>
+                                <TextBlock Text="{Binding Value}" Grid.Column="1" FontWeight="Bold"
+                                         Background="Transparent" Focusable="False">
+                                </TextBlock>
                             </Grid>
                         </StackPanel>
                     </DataTemplate>
@@ -193,9 +434,25 @@
                 <ColumnDefinition Width="26"/>
                 <ColumnDefinition Width="10"/>
             </Grid.ColumnDefinitions>
-            <ListView x:Name="AppListView" Grid.Column="0" Background="Transparent" BorderBrush="Transparent" BorderThickness="0"
-                      MouseRightButtonUp="AppListView_MouseRightButtonUp" KeyDown="AppListView_KeyDown">
+            <ListView x:Name="AppListView" Grid.Column="0" Background="Transparent" BorderBrush="Transparent" 
+                      BorderThickness="0"
+                      PreviewMouseRightButtonUp="ContextMenu_PreviewMouseRightButtonUp">
+                <!--<d:ListView.ItemsSource>
+                    <x:Array Type="{x:Type mock:MockAppItem}">
+                        <mock:MockAppItem Name="Hi There" DontShow="False" ExePath="C:\Windows\notepad.exe"
+                                          Arguments="your mom" IconIndex="0" IconPath="C:\Windows\notepad.exe"
+                                          />
+                    </x:Array>
+                </d:ListView.ItemsSource>-->
                 <ListView.Resources>
+
+                    <SolidColorBrush x:Key="Item.MouseOver.Background" Color="Gold"/>
+                    <SolidColorBrush x:Key="Item.MouseOver.Border" Color="#a826A0Da"/>
+                    <SolidColorBrush x:Key="Item.SelectedInactive.Background" Color="#3DDADADA"/>
+                    <SolidColorBrush x:Key="Item.SelectedInactive.Border" Color="#FFDADADA"/>
+                    <SolidColorBrush x:Key="Item.SelectedActive.Background" Color="#3D26A0DA"/>
+                    <SolidColorBrush x:Key="Item.SelectedActive.Border" Color="#FF26A0DA"/>
+
                     <Style TargetType="{x:Type GridViewColumnHeader}">
                         <Setter Property="Template">
                             <Setter.Value>
@@ -220,25 +477,42 @@
                             </Setter.Value>
                         </Setter>
                     </Style>
+
                     <DataTemplate x:Key="CellTemplate">
-                        <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Horizontal" Background="Transparent">
                             <Image Source="{Binding Path=Image}"/>
                         </StackPanel>
                     </DataTemplate>
+
                     <Style TargetType="{x:Type ListViewItem}">
+                        <Setter Property="OverridesDefaultStyle" Value="False"/>
+                        <Setter Property="SnapsToDevicePixels" Value="True"/>
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                        <!--<Setter Property="ToolTip" Value="{Binding Path=Url}" />-->
                         <Setter Property="FontFamily" Value="Global Sans Serif" />
+                        <Setter Property="Foreground" Value="Black"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
                         <Setter Property="FontSize" Value="20" />
                         <Setter Property="Background" Value="Transparent"/>
                         <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"/>
+                        <EventSetter Event="MouseEnter" Handler="ListViewItem_MouseEnter"/>
+                        <EventSetter Event="MouseLeave" Handler="ListViewItem_MouseLeave"/>
                         <Style.Triggers>
-                            <Trigger Property="ItemsControl.AlternationIndex" Value="0">
-                                <Setter Property="Background" Value="White" />
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="DarkGray"/>
+                                <Setter Property="Foreground" Value="Black"/>
                             </Trigger>
-                            <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-                                <Setter Property="Background" Value="LightGray" />
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="Black"/>
+                                <Setter Property="Foreground" Value="WhiteSmoke"/>
                             </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="False"/>
+                                    <Condition Property="IsSelected" Value="False"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Foreground" Value="Black"/>
+                            </MultiTrigger>
                         </Style.Triggers>
                     </Style>
                 </ListView.Resources>
@@ -246,19 +520,20 @@
                     <GridView>
                         <GridView.Columns>
                             <GridViewColumn Header="" CellTemplate="{StaticResource CellTemplate}" />
-                            <GridViewColumn Header="Application Name" DisplayMemberBinding="{Binding Path=Name}" 
-                                            ctrl:ProportionalColumn.Width="1"/>
-                            <!--<GridViewColumn Header="Tags" DisplayMemberBinding="{Binding Path=Tags}"
-                                            ctrl:FixedColumn.Width="300"/>-->
+                            <GridViewColumn Header="Application Name" DisplayMemberBinding="{Binding Path=Name}"
+                                            ctrl:ProportionalColumn.Width="1" />
                         </GridView.Columns>
                     </GridView>
                 </ListView.View>
                 <ListView.ContextMenu>
-                    <ContextMenu x:Name="AppListContextMenu">
-                        <MenuItem x:Name="EditTagsBtn" Header="Edit Tags..." InputGestureText="E" Click="EditTagsBtn_Click"/>
-                        
-                        <MenuItem x:Name="ALMIRemove" Header="Remove from List"
-                                  InputGestureText="Delete" Click="ALMIRemove_Click"/>
+                    <ContextMenu x:Name="AppListContextMenu" PreviewMouseRightButtonUp="ContextMenu_PreviewMouseRightButtonUp">
+                        <Separator/>
+                        <MenuItem x:Name="EditAppBtn" Header="Edit..." Click="EditAppBtn_Click"/>
+                        <Separator/>
+                        <MenuItem x:Name="EditTagsBtn" Header="Edit Tags..." Click="EditTagsBtn_Click"/>
+                        <Separator/>
+                        <MenuItem x:Name="ALMIRemove" Header="Delete..." Click="ALMIRemove_Click"/>
+                        <Separator/>
                     </ContextMenu>
                 </ListView.ContextMenu>
             </ListView>

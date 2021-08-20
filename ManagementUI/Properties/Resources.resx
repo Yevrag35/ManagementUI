@@ -46,7 +46,7 @@
     
     mimetype: application/x-microsoft.net.object.binary.base64
     value   : The object must be serialized with 
-            : System.Serialization.Formatters.Binary.BinaryFormatter
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
     
     mimetype: application/x-microsoft.net.object.soap.base64
@@ -60,6 +60,7 @@
             : and then encoded with base64 encoding.
     -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
@@ -68,9 +69,10 @@
               <xsd:sequence>
                 <xsd:element name="value" type="xsd:string" minOccurs="0" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="name" use="required" type="xsd:string" />
               <xsd:attribute name="type" type="xsd:string" />
               <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
@@ -85,9 +87,10 @@
                 <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
                 <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
               <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
               <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
@@ -109,9 +112,72 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Apps_FileName" xml:space="preserve">
+    <value>apps.json</value>
+  </data>
+  <data name="Apps_SchemaUrl" xml:space="preserve">
+    <value>https://json.yevrag35.com/uimanagement-apps/v1.1.0/schema.json</value>
+  </data>
+  <data name="CredBox_Content" xml:space="preserve">
+    <value>Enter the credentials to relaunch Management UI as:</value>
+  </data>
+  <data name="CredBox_MainInstruction" xml:space="preserve">
+    <value>Relaunch Credentials</value>
+  </data>
+  <data name="CredBox_Target" xml:space="preserve">
+    <value>MUI</value>
+  </data>
+  <data name="CredBox_WindowTitle" xml:space="preserve">
+    <value>ManagementUI Credentials</value>
+  </data>
+  <data name="NewApp_BtnContent_EDIT" xml:space="preserve">
+    <value>EDIT</value>
+  </data>
+  <data name="NewApp_DefaultButtonContent" xml:space="preserve">
+    <value>Browse...</value>
+  </data>
+  <data name="NewApp_Title_EDIT" xml:space="preserve">
+    <value>Edit {0}...</value>
+  </data>
+  <data name="Prompt_AppDeleteContent" xml:space="preserve">
+    <value>{0}{1}{1}Are you sure you want to delete this app?</value>
+  </data>
+  <data name="Prompt_AppDeleteMainInstruction" xml:space="preserve">
+    <value>Permanently Delete App</value>
+  </data>
+  <data name="Prompt_AppDeleteTitle" xml:space="preserve">
+    <value>Management UI</value>
+  </data>
+  <data name="Prompt_TagDeleteContent" xml:space="preserve">
+    <value>{0}{1}{1}Are you you want to delete these tags?</value>
+  </data>
+  <data name="Prompt_TagDeleteMainInstruction" xml:space="preserve">
+    <value>Delete Tag(s)</value>
+  </data>
+  <data name="Prompt_TagDeleteTitle" xml:space="preserve">
+    <value>Management UI</value>
+  </data>
+  <data name="SettingsFileName" xml:space="preserve">
+    <value>settings.json</value>
+  </data>
+  <data name="SettingsFileName_Debug" xml:space="preserve">
+    <value>settings_debug.json</value>
+  </data>
+  <data name="SettingsPath" xml:space="preserve">
+    <value>%LOCALAPPDATA%\Mike Garvey\ManagementUI</value>
+  </data>
+  <data name="Settings_DefaultEditor" xml:space="preserve">
+    <value>notepad</value>
+  </data>
+  <data name="Settings_SchemaUrl" xml:space="preserve">
+    <value>https://json.yevrag35.com/uimanagement/v1.1.0/schema.json</value>
+  </data>
+  <data name="Settings_Version" xml:space="preserve">
+    <value>1.1</value>
+  </data>
 </root>

@@ -46,18 +46,21 @@
     <ApplicationIcon>gear.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Itenso.Windows.Controls.ListViewLayout, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WPF.ListViewLayoutManager.1.3.0\lib\net30\Itenso.Windows.Controls.ListViewLayout.dll</HintPath>
+    <Reference Include="Itenso.Windows.Controls.ListViewLayout, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WPF.ListViewLayoutManager.2.0.0\lib\net40\Itenso.Windows.Controls.ListViewLayout.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="MG.Settings.Json, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MG.Settings.Json.1.1.1\lib\netstandard1.3\MG.Settings.Json.dll</HintPath>
+    <Reference Include="MG.Settings.Json, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MG.Settings.Json.2.2.0\lib\net462\MG.Settings.Json.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="Ookii.Dialogs.Wpf, Version=1.0.0.0, Culture=neutral, PublicKeyToken=66aa232afad40158, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ookii.Dialogs.Wpf.1.1.0\lib\net45\Ookii.Dialogs.Wpf.dll</HintPath>
+    <Reference Include="Ookii.Dialogs.Wpf, Version=3.0.35.0, Culture=neutral, PublicKeyToken=66aa232afad40158, processorArchitecture=MSIL">
+      <HintPath>Assemblies\Ookii.Dialogs.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
@@ -75,8 +78,8 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="WpfAnimatedGif, Version=1.4.18.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WpfAnimatedGif.1.4.18\lib\net\WpfAnimatedGif.dll</HintPath>
+    <Reference Include="WpfAnimatedGif, Version=2.0.0.0, Culture=neutral, PublicKeyToken=9e7cd3b544a090dc, processorArchitecture=MSIL">
+      <HintPath>..\packages\WpfAnimatedGif.2.0.0\lib\net40\WpfAnimatedGif.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -84,42 +87,40 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Collections\EditTagCollection.cs" />
+    <Compile Include="Collections\ObservableViewBase.cs" />
+    <Compile Include="Collections\TagCollection.cs" />
+    <Compile Include="Commands\Commands.cs" />
+    <Compile Include="Controls\UIntTextBox.cs" />
     <Compile Include="EditTags.xaml.cs">
       <DependentUpon>EditTags.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Extensions\ListExtensions.cs" />
+    <Compile Include="File\ReadOperations.cs" />
+    <Compile Include="File\WriteOperations.cs" />
+    <Compile Include="Helpers\LaunchFactory.cs" />
+    <Compile Include="Helpers\PropertyManager.cs" />
+    <Compile Include="Models\AppItem.cs" />
+    <Compile Include="Collections\AppsList.cs" />
+    <Compile Include="Models\Converters\UIntToStringConverter.cs" />
+    <Compile Include="Models\JsonAppsFile.cs" />
     <Compile Include="NewApp.xaml.cs">
       <DependentUpon>NewApp.xaml</DependentUpon>
     </Compile>
-    <Compile Include="src\Auth\ADCreds.cs" />
-    <Compile Include="src\EditTags\EditTagItem.cs" />
-    <Compile Include="src\Helpers\AppListItemEquality.cs" />
-    <Compile Include="src\Helpers\FilterTagEquality.cs" />
-    <Compile Include="src\Objects\Collections\EditTagList.cs" />
-    <Compile Include="src\Objects\Converters\JsonFilterTagConverter.cs" />
-    <Compile Include="src\MUIExtensions\ListSortDirectionExtensions.cs" />
-    <Compile Include="src\MUIExtensions\SortDescriptionCollectionExtensions.cs" />
-    <Compile Include="src\Objects\Collections\AppListViewCollection.cs" />
-    <Compile Include="src\Objects\Collections\BaseViewCollection.cs" />
-    <Compile Include="src\Objects\Collections\ObservableSortedList.cs" />
-    <Compile Include="src\Objects\Collections\TagList.cs" />
-    <Compile Include="src\Objects\Collections\TagViewCollection.cs" />
-    <Compile Include="src\Objects\Converters\FilterTagConverter.cs" />
-    <Compile Include="src\Objects\Interfaces\ICreatesProcessStartInfo.cs" />
-    <Compile Include="src\MUIExtensions\CredentialBox.cs" />
-    <Compile Include="src\MUIExtensions\ErrorHandling.cs" />
-    <Compile Include="src\MUIExtensions\LoadIcons.cs" />
-    <None Include="src\Objects\Collections\AppListCollection.cs" />
-    <None Include="src\Objects\Collections\TagCollection.cs" />
-    <Compile Include="src\Objects\Interfaces\Interfaces.cs" />
-    <Compile Include="src\Objects\Items\AppIconSetting.cs" />
-    <None Include="src\Objects\Collections\AppSettingCollection.cs" />
-    <Compile Include="src\Objects\Collections\BaseMuiCollection.cs" />
-    <Compile Include="src\Objects\Items\ChangeableItem.cs" />
-    <Compile Include="src\Objects\Items\FilterTag.cs" />
-    <Compile Include="src\Helpers\StartInfoFactory.cs" />
-    <Compile Include="src\Objects\Settings\Settings.cs" />
-    <Compile Include="src\Objects\Settings\SettingsEditor.cs" />
-    <Compile Include="src\Objects\Settings\SettingsJson.cs" />
+    <Compile Include="Helpers\IconPreviewer.cs" />
+    <Compile Include="Models\IToggleTagComparer.cs" />
+    <Compile Include="Prompts\PromptFactory.cs" />
+    <Compile Include="Prompts\TaskDialogExtensions.cs" />
+    <Compile Include="ViewModels\MockAppItem.cs" />
+    <Compile Include="Models\Converters\EditorManagerConverter.cs" />
+    <Compile Include="Extensions\ListSortDirectionExtensions.cs" />
+    <Compile Include="Extensions\SortDescriptionCollectionExtensions.cs" />
+    <Compile Include="ViewModels\CredentialBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Extensions\ErrorHandling.cs" />
+    <Compile Include="Models\EditorManager.cs" />
+    <Compile Include="Models\SettingsJson.cs" />
     <Page Include="EditTags.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -132,7 +133,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="src\Objects\Items\AppListItem.cs" />
     <Compile Include="MUI.xaml.cs">
       <DependentUpon>MUI.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -143,6 +143,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\ToggleTag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -151,20 +152,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -185,6 +177,18 @@
   <ItemGroup>
     <Resource Include="Media\RightArrow2.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\ManagementUI.Functionality\Functionality.csproj">
+      <Project>{3ff637c9-fb78-4f64-902a-396bea4fd21f}</Project>
+      <Name>Functionality</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Assemblies\" />
+    <Folder Include="WindowBehavior\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
