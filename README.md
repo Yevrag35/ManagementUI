@@ -22,7 +22,7 @@ Apps can be added, edited, and removed from the UI
 * __Add__ - Clicking the "New App" button.
 * __Edit, Remove__ - Right-clicking the app in the list.
 
-Tags used for filtering can be added to an applications.  Right-click the app and select "Edit Tags...".
+Tags used for filtering can be added to any applications.  Right-click the app and select "Edit Tags...".
 
 ### Keyboard Shortcuts
 
@@ -30,9 +30,9 @@ Tags used for filtering can be added to an applications.  Right-click the app an
 
 * __DEL__ - Shortcut for deleting an application from the list.
 
-* __CTRL+A__ - Opens the text file (in JSON) that contains the application definitions. *Any changes made require a restart of the app to be reflected*
+* __Shift+A__ - Opens the text file (in JSON) that contains the application definitions. *Any changes made require a restart of the app to be reflected*
 
-* __CTRL+O__ - Opens the Settings json text file (same as clicking the 'Settings' button).
+* __Shift+O__ - Opens the Settings json text file (same as clicking the 'Settings' button).
 
 ## Example Screenshots
 
