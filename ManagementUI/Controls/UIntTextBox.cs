@@ -19,12 +19,7 @@ namespace ManagementUI.Controls
         public uint Maximum
         {
             get => (uint)base.GetValue(MaximumProperty);
-            set
-            {
-                base.SetValue(MaximumProperty, value);
-                if (string.IsNullOrWhiteSpace(base.ToolTip as string))
-                    this.ToolTip = string.Format(Strings.IconIdexTooltip, this.Maximum);
-            }
+            set => this.SetValue(MaximumProperty, value);
         }
 
         public UIntTextBox()

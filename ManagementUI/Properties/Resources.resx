@@ -135,9 +135,6 @@
   <data name="CredBox_WindowTitle" xml:space="preserve">
     <value>ManagementUI Credentials</value>
   </data>
-  <data name="IconIdexTooltip" xml:space="preserve">
-    <value>Enter a number between 0 and {0}</value>
-  </data>
   <data name="NewApp_BtnContent_EDIT" xml:space="preserve">
     <value>EDIT</value>
   </data>
