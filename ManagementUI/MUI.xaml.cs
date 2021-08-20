@@ -79,13 +79,15 @@ namespace ManagementUI
 
         #endregion
 
-        private DispatcherOperation AddAppToList(NewApp window)
+        private async Task AddAppToList(NewApp window)
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 AppItem app = window.GetFinalizedApp();
                 this.AppList.Add(app);
             });
+
+            await this.SaveApps();
         }
         private async void NewAppButton_Click(object sender, RoutedEventArgs e)
         {
@@ -99,7 +101,7 @@ namespace ManagementUI
                 await this.AddAppToList(newApp);
             }
         }
-        private void EditAppBtn_Click(object sender, RoutedEventArgs e)
+        private async void EditAppBtn_Click(object sender, RoutedEventArgs e)
         {
             if (this.AppListView.SelectedItem is AppItem ai)
             {
@@ -108,13 +110,18 @@ namespace ManagementUI
                     Owner = this
                 };
 
-                _ = newApp.ShowDialog();
+                if (newApp.ShowDialog().GetValueOrDefault())
+                {
+                    _ = newApp.GetFinalizedApp();
+                    await this.SaveApps();
+                }
             }
         }
         private async void ALMIRemove_Click(object sender, RoutedEventArgs e)
         {
-            await this.Dispatcher.InvokeAsync(() =>
+            bool result = await this.Dispatcher.InvokeAsync(() =>
             {
+                bool resultInner = false;
                 if (this.AppListView.SelectedItem is AppItem ai)
                 {
                     if (PromptFactory.DoYesNoPrompt(this, Strings.Prompt_AppDeleteTitle, TaskDialogIcon.Warning, true, 
@@ -124,10 +131,15 @@ namespace ManagementUI
                             _ = dialog.AddContent(Strings.Prompt_AppDeleteContent, ai.Name, Environment.NewLine);
                         }))
                     {
-                        _ = this.AppList.Remove(ai);
+                        resultInner = this.AppList.Remove(ai);
                     }
                 }
+
+                return resultInner;
             });
+
+            if (result)
+                await this.SaveApps();
         }
 
         #region CHECKBOX EVENTS

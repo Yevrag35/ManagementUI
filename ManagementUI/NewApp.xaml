@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ManagementUI"
+        xmlns:controls="clr-namespace:ManagementUI.Controls"
         xmlns:converters="clr-namespace:ManagementUI.Models.Converters"
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
@@ -115,8 +116,8 @@
         <Button x:Name="findIconBtn" Content="{Binding IconPath, Mode=OneWay}" Grid.Column="5" Grid.Row="4" Grid.ColumnSpan="3" FontSize="15" FontWeight="SemiBold"
                Click="FindIconBtn_Click"/>
 
-        <TextBox x:Name="iconIndexBox"
-                 LostKeyboardFocus="IconIndexBox_LostKeyboardFocus"
+        <controls:UIntTextBox x:Name="iconIndexBox"
+                              Maximum="999" Minimum="0"
                  Text="{Binding IconIndex, Converter={StaticResource UIntToStringConverter}}"
                  Grid.Column="5" Grid.Row="5" Style="{StaticResource FieldBoxStyle}"/>
         

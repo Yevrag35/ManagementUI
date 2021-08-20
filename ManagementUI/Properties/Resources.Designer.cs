@@ -115,11 +115,29 @@ namespace ManagementUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to EDIT.
+        /// </summary>
+        internal static string NewApp_BtnContent_EDIT {
+            get {
+                return ResourceManager.GetString("NewApp_BtnContent_EDIT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Browse....
         /// </summary>
         internal static string NewApp_DefaultButtonContent {
             get {
                 return ResourceManager.GetString("NewApp_DefaultButtonContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit {0}....
+        /// </summary>
+        internal static string NewApp_Title_EDIT {
+            get {
+                return ResourceManager.GetString("NewApp_Title_EDIT", resourceCulture);
             }
         }
         

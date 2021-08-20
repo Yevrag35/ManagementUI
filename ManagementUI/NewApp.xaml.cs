@@ -30,11 +30,10 @@ namespace ManagementUI
     /// </summary>
     public partial class NewApp : Window, INotifyPropertyChanged
     {
-        private uint _currentIndex;
         private AppItem _editItem;
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public AppItem CreatedApp { get; set; }
+        public AppItem CreatedApp { get; private set; }
         private bool IsEditOperation => null != _editItem;
         public string Arguments
         {
@@ -63,11 +62,15 @@ namespace ManagementUI
                 ? IOPath.GetFileName(this.CreatedApp.IconPath)
                 : Strings.NewApp_DefaultButtonContent;
         }
+        public IconPreviewer IconPreviewer { get; }
         public BitmapSource Image
         {
             get => this.CreatedApp.Image;
             set
             {
+                if (null == value)
+                    return;
+
                 if (value.CanFreeze && !value.IsFrozen)
                     value.Freeze();
 
@@ -75,8 +78,6 @@ namespace ManagementUI
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Image)));
             }
         }
-
-        public IconPreviewer IconPreviewer { get; }
 
         #region CONSTRUCTORS
         public NewApp(IntPtr appHandle)
@@ -90,6 +91,9 @@ namespace ManagementUI
             this.IconPreviewer = new IconPreviewer(appHandle);
             this.SetApp(appToEdit);
             this.InitializeComponent();
+
+            this.Title = string.Format(Strings.NewApp_Title_EDIT, appToEdit.Name);
+            this.createBtn.Content = Strings.NewApp_BtnContent_EDIT;
             _ = this.NotifyProperties(nameof(this.Arguments), nameof(this.ExePath), nameof(this.IconIndex),
                 nameof(this.IconPath));
         }
@@ -129,14 +133,6 @@ namespace ManagementUI
             {
                 await this.OnFileDialogOkAsync(this.CreatedApp.IconPath, e.NewIndex.Value);
             }
-            //await this.Dispatcher.InvokeAsync(() =>
-            //{
-            //    if (e.NewIndex.HasValue && !string.IsNullOrEmpty(this.CreatedApp.IconPath))
-            //    {
-            //        this.Image = this.IconPreviewer.Preview(this.CreatedApp.IconPath, e.NewIndex.Value);
-            //        _currentIndex = e.NewIndex.Value;
-            //    }
-            //});
         }
 
         public AppItem GetFinalizedApp()
@@ -164,16 +160,15 @@ namespace ManagementUI
                 });
             });
         }
-        private static bool NotNullEmptyOrBrowse(string str)
-        {
-            return !string.IsNullOrEmpty(str) && !Strings.NewApp_DefaultButtonContent.Equals(str, StringComparison.CurrentCultureIgnoreCase);
-        }
+        //private static bool NotNullEmptyOrBrowse(string str)
+        //{
+        //    return !string.IsNullOrEmpty(str) && !Strings.NewApp_DefaultButtonContent.Equals(str, StringComparison.CurrentCultureIgnoreCase);
+        //}
         private DispatcherOperation OnFileDialogOkAsync(string iconPath, uint iconIndex)
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
                 this.Image = this.IconPreviewer.Preview(iconPath, iconIndex);
-                _currentIndex = iconIndex;
             });
         }
 
@@ -182,15 +177,6 @@ namespace ManagementUI
         {
             if (sender is TextBox tb && !string.IsNullOrEmpty(tb.Text))
                 tb.SelectAll();
-        }
-        private void IconIndexBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        {
-            //if (!string.IsNullOrWhiteSpace(this.CreatedApp.IconPath) &&
-            //    uint.TryParse(this.iconIndexBox.Text, out uint isUnit) &&
-            //    _currentIndex != isUnit)
-            //{
-            //    await this.OnFileDialogOkAsync(this.CreatedApp.IconPath, isUnit);
-            //}
         }
         private void TextBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -225,8 +211,10 @@ namespace ManagementUI
                 DefaultExt = "exe",
                 Filter = "EXE Programs (*.exe)|*.exe",
                 Multiselect = false,
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                RestoreDirectory = true,
+                InitialDirectory = string.IsNullOrEmpty(this.CreatedApp.ExePath)
+                    ? Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
+                    : IOPath.GetDirectoryName(this.CreatedApp.ExePath),
+                RestoreDirectory = false,
                 Title = "Choose a program"
             };
 

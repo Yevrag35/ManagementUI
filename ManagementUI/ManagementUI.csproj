@@ -91,6 +91,7 @@
     <Compile Include="Collections\ObservableViewBase.cs" />
     <Compile Include="Collections\TagCollection.cs" />
     <Compile Include="Commands\Commands.cs" />
+    <Compile Include="Controls\UIntTextBox.cs" />
     <Compile Include="EditTags.xaml.cs">
       <DependentUpon>EditTags.xaml</DependentUpon>
     </Compile>
