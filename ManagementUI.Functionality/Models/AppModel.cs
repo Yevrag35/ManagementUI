@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using ManagementUI.Functionality.Executable;
 using ManagementUI.Functionality.Executable.Extensions;
+using ManagementUI.Functionality.Events;
 using ManagementUI.Functionality.Models.Converters;
 
 namespace ManagementUI.Functionality.Models
@@ -25,6 +26,8 @@ namespace ManagementUI.Functionality.Models
         private string _name;
         private uint _iconIndex;
         private string _iconPath;
+
+        public event IconChangedEventHandler IconIndexUpdated;
 
         [JsonProperty("arguments", Order = 3)]
         public override string Arguments
@@ -64,13 +67,17 @@ namespace ManagementUI.Functionality.Models
             get => _iconIndex;
             set
             {
+                uint current = _iconIndex;
+
                 if (value < 0)
                     _iconIndex = 0;
 
                 else
                     _iconIndex = value;
 
-                this.NotifyOfChange(nameof(IconIndex));
+                this.NotifyOfChange(nameof(this.IconIndex));
+                if (current != value)
+                    this.IconIndexUpdated?.Invoke(this, new IconChangedEventArgs(value));
             }
         }
 

@@ -87,6 +87,16 @@ namespace ManagementUI.Models
             return app;
         }
         object ICloneable.Clone() => this.Clone();
+        public void MergeFrom(AppItem other)
+        {
+            this.Arguments = other.Arguments;
+            this.ExePath = other.ExePath;
+            this.IconIndex = other.IconIndex;
+            this.IconPath = other.IconPath;
+            this.Name = other.Name;
+            this.Image = other.Image.Clone();
+            this.Image.Freeze();
+        }
         public void Initialize()
         {
             if (this.Initialized)

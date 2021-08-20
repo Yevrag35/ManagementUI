@@ -49,6 +49,7 @@
     <Compile Include="Auth\RunAsDisplay.cs" />
     <Compile Include="Auth\UserIdentity.cs" />
     <Compile Include="Auth\PrincipalInfo.cs" />
+    <Compile Include="Events\IconChangedEventArgs.cs" />
     <Compile Include="Executable\InvalidCredentialException.cs" />
     <Compile Include="Executable\EditorEventHandler.cs" />
     <Compile Include="Executable\Extensions\StartInfoExtensions.cs" />

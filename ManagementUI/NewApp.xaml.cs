@@ -1,5 +1,4 @@
-﻿using ManagementUI.Models;
-using Ookii.Dialogs.Wpf;
+﻿using Ookii.Dialogs.Wpf;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,7 +17,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using ManagementUI.Functionality.Events;
+using ManagementUI.Models;
 
+using Strings = ManagementUI.Properties.Resources;
 using IOPath = System.IO.Path;
 
 namespace ManagementUI
@@ -29,10 +31,11 @@ namespace ManagementUI
     public partial class NewApp : Window, INotifyPropertyChanged
     {
         private uint _currentIndex;
-
+        private AppItem _editItem;
         public event PropertyChangedEventHandler PropertyChanged;
 
         public AppItem CreatedApp { get; set; }
+        private bool IsEditOperation => null != _editItem;
         public string Arguments
         {
             get => this.CreatedApp.Arguments;
@@ -45,12 +48,9 @@ namespace ManagementUI
         }
         public string ExePath
         {
-            get => IOPath.GetFileName(this.CreatedApp.ExePath);
-            set
-            {
-                //this.CreatedApp.ExePath = value;
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ExePath)));
-            }
+            get => !string.IsNullOrEmpty(this.CreatedApp.ExePath)
+                ? IOPath.GetFileName(this.CreatedApp.ExePath)
+                : Strings.NewApp_DefaultButtonContent;
         }
         public uint IconIndex
         {
@@ -59,7 +59,9 @@ namespace ManagementUI
         }
         public string IconPath
         {
-            get => IOPath.GetFileName(this.CreatedApp.IconPath);
+            get => !string.IsNullOrEmpty(this.CreatedApp.IconPath)
+                ? IOPath.GetFileName(this.CreatedApp.IconPath)
+                : Strings.NewApp_DefaultButtonContent;
         }
         public BitmapSource Image
         {
@@ -74,41 +76,102 @@ namespace ManagementUI
             }
         }
 
-        public IconPreviewer IconPreviewer { get; set; }
+        public IconPreviewer IconPreviewer { get; }
 
         #region CONSTRUCTORS
         public NewApp(IntPtr appHandle)
         {
-            //if (null == IconPreviewer)
-            IconPreviewer = new IconPreviewer(appHandle);
-
-            //else
-            //    IconPreviewer.ClearImage();
-
-            this.CreatedApp = new AppItem();
-
+            this.IconPreviewer = new IconPreviewer(appHandle);
+            this.SetApp(null);
             this.InitializeComponent();
+        }
+        public NewApp(IntPtr appHandle, AppItem appToEdit)
+        {
+            this.IconPreviewer = new IconPreviewer(appHandle);
+            this.SetApp(appToEdit);
+            this.InitializeComponent();
+            _ = this.NotifyProperties(nameof(this.Arguments), nameof(this.ExePath), nameof(this.IconIndex),
+                nameof(this.IconPath));
         }
 
         #endregion
 
         #region WINDOW EVENTS
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            _ = this.displayNameBox.Focus();
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (!this.IsEditOperation)
+                    _ = this.displayNameBox.Focus();
+            });
         }
 
         #endregion
 
-        public AppItem GetFinalizedApp()
+        public void SetApp(AppItem editApp)
         {
-            AppItem newApp = this.CreatedApp.Clone();
-            return newApp;
+            if (null != editApp)
+            {
+                _editItem = editApp;
+                this.CreatedApp = _editItem.Clone();
+            }
+            else
+            {
+                this.CreatedApp = new AppItem();
+            }
+
+            this.CreatedApp.IconIndexUpdated += this.CreatedApp_IconIndexUpdated;
         }
 
+        private async void CreatedApp_IconIndexUpdated(object sender, IconChangedEventArgs e)
+        {
+            if (e.NewIndex.HasValue)
+            {
+                await this.OnFileDialogOkAsync(this.CreatedApp.IconPath, e.NewIndex.Value);
+            }
+            //await this.Dispatcher.InvokeAsync(() =>
+            //{
+            //    if (e.NewIndex.HasValue && !string.IsNullOrEmpty(this.CreatedApp.IconPath))
+            //    {
+            //        this.Image = this.IconPreviewer.Preview(this.CreatedApp.IconPath, e.NewIndex.Value);
+            //        _currentIndex = e.NewIndex.Value;
+            //    }
+            //});
+        }
+
+        public AppItem GetFinalizedApp()
+        {
+            AppItem appItem = null;
+            if (!this.IsEditOperation)
+            {
+                appItem = this.CreatedApp.Clone();
+            }
+            else
+            {
+                _editItem.MergeFrom(this.CreatedApp);
+                appItem = _editItem;
+            }
+
+            return appItem;
+        }
+        private async Task NotifyProperties(params string[] names)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                Array.ForEach(names, (n) =>
+                {
+                    this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(n));
+                });
+            });
+        }
+        private static bool NotNullEmptyOrBrowse(string str)
+        {
+            return !string.IsNullOrEmpty(str) && !Strings.NewApp_DefaultButtonContent.Equals(str, StringComparison.CurrentCultureIgnoreCase);
+        }
         private DispatcherOperation OnFileDialogOkAsync(string iconPath, uint iconIndex)
         {
-            return this.Dispatcher.InvokeAsync(() => {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
                 this.Image = this.IconPreviewer.Preview(iconPath, iconIndex);
                 _currentIndex = iconIndex;
             });
@@ -120,12 +183,14 @@ namespace ManagementUI
             if (sender is TextBox tb && !string.IsNullOrEmpty(tb.Text))
                 tb.SelectAll();
         }
-        private async void IconIndexBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        private void IconIndexBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            if (_currentIndex != this.IconIndex && !string.IsNullOrWhiteSpace(this.IconPath))
-            {
-                await this.OnFileDialogOkAsync(this.IconPath, this.IconIndex);
-            }
+            //if (!string.IsNullOrWhiteSpace(this.CreatedApp.IconPath) &&
+            //    uint.TryParse(this.iconIndexBox.Text, out uint isUnit) &&
+            //    _currentIndex != isUnit)
+            //{
+            //    await this.OnFileDialogOkAsync(this.CreatedApp.IconPath, isUnit);
+            //}
         }
         private void TextBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -224,6 +289,15 @@ namespace ManagementUI
                 this.findIconBtn.Content = IOPath.GetFileName(iconPath);
                 if (this.IconIndex != 0u)
                     this.Set(nameof(this.IconIndex), 0u, (ii) => this.CreatedApp.IconIndex = ii);
+            });
+        }
+        private DispatcherOperation SetIcon(string iconPath, uint iconIndex)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                this.Set(nameof(this.IconPath), iconPath, (ip) => this.CreatedApp.IconPath = ip);
+                this.findIconBtn.Content = IOPath.GetFileName(iconPath);
+                this.Set(nameof(this.IconIndex), iconIndex, (ii) => this.CreatedApp.IconIndex = ii);
             });
         }
 

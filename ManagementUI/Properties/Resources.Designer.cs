@@ -115,6 +115,15 @@ namespace ManagementUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Browse....
+        /// </summary>
+        internal static string NewApp_DefaultButtonContent {
+            get {
+                return ResourceManager.GetString("NewApp_DefaultButtonContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0}{1}{1}Are you sure you want to delete this app?.
         /// </summary>
         internal static string Prompt_AppDeleteContent {

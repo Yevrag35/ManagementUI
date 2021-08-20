@@ -528,6 +528,8 @@
                 <ListView.ContextMenu>
                     <ContextMenu x:Name="AppListContextMenu" PreviewMouseRightButtonUp="ContextMenu_PreviewMouseRightButtonUp">
                         <Separator/>
+                        <MenuItem x:Name="EditAppBtn" Header="Edit..." Click="EditAppBtn_Click"/>
+                        <Separator/>
                         <MenuItem x:Name="EditTagsBtn" Header="Edit Tags..." Click="EditTagsBtn_Click"/>
                         <Separator/>
                         <MenuItem x:Name="ALMIRemove" Header="Delete..." Click="ALMIRemove_Click"/>

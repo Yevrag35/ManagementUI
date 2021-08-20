@@ -99,6 +99,18 @@ namespace ManagementUI
                 await this.AddAppToList(newApp);
             }
         }
+        private void EditAppBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.AppListView.SelectedItem is AppItem ai)
+            {
+                var newApp = new NewApp(App.MyHandle, ai)
+                {
+                    Owner = this
+                };
+
+                _ = newApp.ShowDialog();
+            }
+        }
         private async void ALMIRemove_Click(object sender, RoutedEventArgs e)
         {
             await this.Dispatcher.InvokeAsync(() =>
@@ -382,6 +394,6 @@ namespace ManagementUI
                     this.FilterTags.UnselectAll();
                 }
             });
-        }
+        }  
     }
 }
