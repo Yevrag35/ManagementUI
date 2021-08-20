@@ -8,6 +8,14 @@ The list of applications and settings are stored as JSON files in:
 
 _%LOCALAPPDATA%\Mike Garvey\ManagementUI_
 
+## __* NOTICE *__
+
+__This app NEVER stores credentials physically, 'anywhere'.  Credentials used for the RunAs account are held in memory (with the passwords as [SecureStrings](https://docs.microsoft.com/en-us/dotnet/api/system.security.securestring?view=netframework-4.8)) until the application stops.__  
+
+They must be manually entered every time Management UI launches.
+
+---
+
 ## Basic Usage
 
 Apps can be added, edited, and removed from the UI
