@@ -171,8 +171,7 @@ namespace ManagementUI.Functionality.Models
         }
         public void UpdateTags(ISet<UserTag> toAdd, ISet<UserTag> toRemove)
         {
-            if (!ConsolidateTags(toAdd, toRemove))
-                return;
+            _ = ConsolidateTags(toAdd, toRemove);
 
             PerformTagManip(toRemove,   (x) => _tagSet.ExceptWith(x));
             PerformTagManip(toAdd,      (x) => _tagSet.UnionWith(x));

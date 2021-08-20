@@ -261,13 +261,20 @@ namespace ManagementUI
 
         private async Task EditAppTags(AppItem ai)
         {
-            await this.Dispatcher.InvokeAsync(() =>
+            var editTags = new EditTags(ai, this.Tags.ToEditCollection())
             {
-                var editTags = new EditTags(ai, this.Tags.ToEditCollection())
+                Owner = this
+            };
+
+            if (editTags.ShowDialog().GetValueOrDefault())
+            {
+                Task saveTask = null;
+                if (editTags.IsModified)
                 {
-                    Owner = this
-                };
-                if (editTags.ShowDialog().GetValueOrDefault())
+                    saveTask = this.SaveApps();
+                }
+
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     if (!this.Tags.SetEquals(editTags.Tags))
                     {
@@ -282,8 +289,10 @@ namespace ManagementUI
                         else if (ai.DontShow && ai.Tags.IsSupersetOf(this.Tags.EnabledTags))
                             ai.DontShow = false;
                     }
-                }
-            });
+                });
+
+                await saveTask;
+            }
         }
 
         private async void RemoveTag_Click(object sender, RoutedEventArgs e)
