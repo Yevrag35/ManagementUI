@@ -62,9 +62,11 @@ namespace ManagementUI
             this.IdentityBlock.SelectAll();
             e.Handled = true;
         }
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
             LaunchFactory.Deinitialize();
+            CursorManager.Dispose();
+            this.Settings.Dispose();
         }
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -250,18 +252,18 @@ namespace ManagementUI
                 {
                     if (box.ShowDialog())
                     {
-                        CursorManager.SetCursorStatus(OverrideCursorStatus.Wait);
+                        _ = CursorManager.SetCursorStatus(OverrideCursorStatus.Wait);
                         var userId = new UserIdentity(box.GetPrincipalInfo(), box.GetPassword());
-                        if (userId.IsValid())
+                        if (userId.SetPrincipal(this.Settings.AutoValidate))
                         {
                             LaunchFactory.AddCredentials(userId);
                             this.SetRunAsUser(userId);
-                            CursorManager.SetCursorStatus(OverrideCursorStatus.Normal);
+                            _ = CursorManager.SetCursorStatus(OverrideCursorStatus.Normal);
                         }
                         else
                         {
                             userId.Dispose();
-                            CursorManager.SetCursorStatus(OverrideCursorStatus.Normal);
+                            _ = CursorManager.SetCursorStatus(OverrideCursorStatus.Normal);
                             ShowErrorMessage(new InvalidCredentialException(userId.UserName, userId.Domain, null));
                         }
                     }

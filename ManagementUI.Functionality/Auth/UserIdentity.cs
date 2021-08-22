@@ -21,7 +21,6 @@ namespace ManagementUI.Functionality.Auth
         private const char PERIOD = (char)46;
 
         private bool _disposed;
-        private string _machineDomain;
         private PrincipalInfo _userId;
         private SecureString _password;
 
@@ -37,25 +36,19 @@ namespace ManagementUI.Functionality.Auth
         public string UserName => _userId.Value ?? string.Empty;
 
         #region CONSTRUCTORS
-        private UserIdentity()
-        {
-            //this.GetMachineNetBiosDomain();
-        }
         public UserIdentity(string userAndDomain, SecureString password)
-            : this()
         {
             _userId = (PrincipalInfo)userAndDomain;
             _password = password;
             //this.Principal = new NTAccount(_userId.Domain, _userId.Value);
-            this.NotifyOfChange(nameof(DisplayPrincipal));
+            this.NotifyOfChange(nameof(this.DisplayPrincipal));
         }
         public UserIdentity(PrincipalInfo pInfo, SecureString password)
-            : this()
         {
             _userId = pInfo;
             _password = password;
             //this.Principal = new NTAccount(_userId.Domain, _userId.Value);
-            this.NotifyOfChange(nameof(DisplayPrincipal));
+            this.NotifyOfChange(nameof(this.DisplayPrincipal));
         }
 
         #endregion
@@ -111,6 +104,18 @@ namespace ManagementUI.Functionality.Auth
         }
 
         #endregion
+
+        public bool SetPrincipal(bool andValidate = true)
+        {
+            bool result = true;
+            if (!andValidate && null == this.Principal)
+                this.Principal = new NTAccount(this.Domain, this.UserName);
+
+            else
+                result = this.IsValid();
+
+            return result;
+        }
 
         private bool Validate(PrincipalContext context)
         {
@@ -199,5 +204,7 @@ namespace ManagementUI.Functionality.Auth
                 _disposed = true;
             }
         }
+
+        
     }
 }

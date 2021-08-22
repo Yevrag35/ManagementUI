@@ -116,12 +116,6 @@ namespace ManagementUI
                 base.OnUserNameChanged(e);
         }
 
-        private static bool TryGetDomain(out string domain)
-        {
-            domain = Environment.UserDomainName;
-            return !string.IsNullOrWhiteSpace(domain);
-        }
-
         [DllImport("credui.dll", CharSet = CharSet.Unicode, EntryPoint = "CredUIParseUserNameW", SetLastError = true)]
         private static extern CredUIReturnCodes CredUIParseName(
             string userName,

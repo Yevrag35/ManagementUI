@@ -23,17 +23,35 @@ namespace ManagementUI
 {
     [Serializable]
     [JsonObject(MemberSerialization.OptIn)]
-    public class SettingsJson : JsonSettings
+    public class SettingsJson : JsonSettings, IDisposable
     {
+        [JsonIgnore]
+        private bool _disposed;
+        [JsonIgnore]
+        private EditorManager _editorManager;
+
         #region PROPERTIES
         [JsonProperty("$schema", Order = 1)]
         public string Schema { get; private set; }
 
         [JsonProperty("autoValidateCredentials")]
-        public bool AutoValidate { get; set; }
+        public bool AutoValidate { get; set; } = true;
 
         [JsonProperty("customEditors", Order = 4)]
-        public EditorManager EditorManager { get; set; }
+        public EditorManager EditorManager
+        {
+            get => _editorManager;
+            set
+            {
+                if (_disposed)
+                    throw new ObjectDisposedException(nameof(this.EditorManager));
+
+                else if (null != _editorManager)
+                    _editorManager.Dispose();
+
+                _editorManager = value;
+            }
+        }
 
         [JsonProperty("version", Order = 2)]
         public string Version { get; set; }
@@ -51,12 +69,22 @@ namespace ManagementUI
         #endregion
 
         #region PUBLIC METHODS
-        //private void Settings_Changed(object sender, NotifyCollectionChangedEventArgs e) => this.Save();
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
 
-        //public void Save(SettingChangedAction action = SettingChangedAction.Save)
-        //{
-        //    this.Save(((IJsonSettings)this).SettingsAsJson, action);
-        //}
+            if (disposing)
+            {
+                this.EditorManager?.Dispose();
+                _disposed = true;
+            }
+        }
 
         #endregion
 
