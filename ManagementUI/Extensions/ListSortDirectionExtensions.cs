@@ -7,8 +7,7 @@ namespace ManagementUI.Extensions
     {
         public static ListSortDirection ToOpposite(this ListSortDirection current)
         {
-            bool asBool = Convert.ToBoolean((int)current);
-            return (ListSortDirection)Convert.ToInt32(!asBool);
+            return (ListSortDirection)(((int)current - 1) * -1);
         }
     }
 }

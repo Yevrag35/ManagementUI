@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
+using ManagementUI.Extensions;
 using ManagementUI.Functionality.Models;
 using ManagementUI.Models;
 
@@ -44,6 +45,17 @@ namespace ManagementUI.Collections
             }
 
             return result;
+        }
+
+        public void ChangeSortOrder()
+        {
+            if (this.View.SortDescriptions.Count == 1)
+            {
+                var sd = this.View.SortDescriptions[0];
+                var newSd = new SortDescription(sd.PropertyName, sd.Direction.ToOpposite());
+                this.View.SortDescriptions.Remove(sd);
+                this.View.SortDescriptions.Add(newSd);
+            }
         }
 
         public void EnableByTags(IEnumerable<UserTag> tagsToEnable)
