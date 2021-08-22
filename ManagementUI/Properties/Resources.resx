@@ -130,16 +130,16 @@
     <value>ContentHeader</value>
   </data>
   <data name="CredBox_Content" xml:space="preserve">
-    <value>Enter the credentials to relaunch Management UI as:</value>
+    <value>Enter the credentials to start apps as:</value>
   </data>
   <data name="CredBox_MainInstruction" xml:space="preserve">
-    <value>Relaunch Credentials</value>
+    <value>RunAs Credentials</value>
   </data>
   <data name="CredBox_Target" xml:space="preserve">
     <value>MUI</value>
   </data>
   <data name="CredBox_WindowTitle" xml:space="preserve">
-    <value>ManagementUI Credentials</value>
+    <value>ManagementUI RunAs</value>
   </data>
   <data name="NewApp_BtnContent_EDIT" xml:space="preserve">
     <value>EDIT</value>

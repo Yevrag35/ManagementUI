@@ -33,7 +33,8 @@ namespace ManagementUI.Functionality.Auth
 
         public void ApplyFromCreds(IUserIdentity userId)
         {
-            this.Principal = new NTAccount(userId.Domain, userId.UserName);
+            //this.Principal = new NTAccount(userId.Domain, userId.UserName);
+            this.Principal = userId.Principal;
         }
     }
 }

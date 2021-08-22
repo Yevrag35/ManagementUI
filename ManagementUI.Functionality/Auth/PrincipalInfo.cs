@@ -26,6 +26,17 @@ namespace ManagementUI.Functionality.Auth
             _userName = userName;
             _contextType = contextType;
         }
+        public PrincipalInfo(string domain, string userName)
+        {
+            _domain = string.IsNullOrWhiteSpace(domain)
+                && !string.IsNullOrWhiteSpace(userName)
+                && userName.Contains(AT_SIGN)
+                    ? GetDomainFromUpn(userName)
+                    : domain;
+
+            _userName = userName;
+            _contextType = GetContextTypeFromDomain(_domain);
+        }
         private PrincipalInfo(string userName)
         {
             (string, string, ContextType) result = SeparateDomainAndUser(userName);
@@ -64,6 +75,14 @@ namespace ManagementUI.Functionality.Auth
         private static string FormatUser(IEnumerable<string> split, Func<IEnumerable<string>, IEnumerable<string>> transform)
         {
             return string.Join(string.Empty, transform(split));
+        }
+        private static string GetDomainFromUpn(string upn)
+        {
+            string[] splitUpn = SplitAtSign(upn);
+            if (null == splitUpn || splitUpn.Length <= 0)
+                return Environment.UserDomainName;
+
+            return splitUpn[splitUpn.Length - 1];
         }
         private static (string, string, ContextType) ProcessAtSign(string[] split)
         {
@@ -120,11 +139,16 @@ namespace ManagementUI.Functionality.Auth
             }
             else if (combined.Contains(AT_SIGN))
             {
-                string[] splitAt = combined.Split(new char[] { AT_SIGN }, OPTIONS);
+                string[] splitAt = SplitAtSign(combined);
                 return ProcessAtSign(splitAt);
             }
             else // we'll assume it's a local account
                 return (Environment.MachineName, combined, ContextType.Machine);
+        }
+
+        private static string[] SplitAtSign(string combined)
+        {
+            return combined.Split(new char[] { AT_SIGN }, OPTIONS);
         }
     }
 }
