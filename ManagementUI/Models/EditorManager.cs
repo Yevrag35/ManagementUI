@@ -10,7 +10,7 @@ namespace ManagementUI.Json
 {
     [JsonArray]
     [JsonConverter(typeof(EditorManagerConverter))]
-    public class EditorManager : EditorManagerBase
+    public class EditorManager : EditorManagerBase, IDisposable
     {
         public EditorManager()
             : base(GetFilePath())

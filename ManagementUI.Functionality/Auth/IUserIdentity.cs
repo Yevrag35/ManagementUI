@@ -10,5 +10,6 @@ namespace ManagementUI.Functionality.Auth
         NTAccount Principal { get; }
 
         bool IsValid();
+        bool SetPrincipal(bool andValidate);
     }
 }

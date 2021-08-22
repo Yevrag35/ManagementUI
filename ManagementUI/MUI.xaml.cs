@@ -32,6 +32,7 @@ namespace ManagementUI
 
         public string AppColumnHeaderName => Strings.ColumnHeaderName_Apps;
         private AppsList AppList => this.JsonAppsRead.Apps;
+        internal static ICursorManager CursorManager { get; set; }
         private JsonAppsFile JsonAppsRead { get; set; }
         public string RunAsUser => _runAs?.DisplayPrincipal;
         private SettingsJson Settings { get; set; }
@@ -44,6 +45,7 @@ namespace ManagementUI
             this.ReadSettings();
 
             this.InitializeComponent();
+            CursorManager = CursorFactory.Create();
             this.Settings.EditorManager.EditorExited += this.Editor_Closed;
             LaunchFactory.Initialize(this.Settings.EditorManager);
             this.Set(nameof(this.RunAsUser), new RunAsDisplay(), (rad) => _runAs = rad);
@@ -60,9 +62,11 @@ namespace ManagementUI
             this.IdentityBlock.SelectAll();
             e.Handled = true;
         }
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
             LaunchFactory.Deinitialize();
+            CursorManager.Dispose();
+            this.Settings.Dispose();
         }
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -244,19 +248,22 @@ namespace ManagementUI
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                using (var box = new CredentialBox())
+                using (var box = new CredentialBox(this))
                 {
                     if (box.ShowDialog())
                     {
-                        var userId = new UserIdentity(box.UserName, box.GetPassword());
-                        if (userId.IsValid())
+                        _ = CursorManager.SetCursorStatus(OverrideCursorStatus.Wait);
+                        var userId = new UserIdentity(box.GetPrincipalInfo(), box.GetPassword());
+                        if (userId.SetPrincipal(this.Settings.AutoValidate))
                         {
                             LaunchFactory.AddCredentials(userId);
                             this.SetRunAsUser(userId);
+                            _ = CursorManager.SetCursorStatus(OverrideCursorStatus.Normal);
                         }
                         else
                         {
                             userId.Dispose();
+                            _ = CursorManager.SetCursorStatus(OverrideCursorStatus.Normal);
                             ShowErrorMessage(new InvalidCredentialException(userId.UserName, userId.Domain, null));
                         }
                     }
@@ -266,7 +273,7 @@ namespace ManagementUI
 
         private void SetRunAsUser(IUserIdentity identity)
         {
-            this.Set(nameof(this.RunAsUser), identity, (id) => _runAs.ApplyFromCreds(id));
+            this.Set(nameof(this.RunAsUser), identity, (id) => _runAs.ApplyFromCreds(identity));
         }
 
         #endregion

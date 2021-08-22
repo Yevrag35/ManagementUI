@@ -97,7 +97,7 @@ namespace ManagementUI.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enter the credentials to relaunch Management UI as:.
+        ///   Looks up a localized string similar to Enter the credentials to start apps as:.
         /// </summary>
         internal static string CredBox_Content {
             get {
@@ -106,7 +106,7 @@ namespace ManagementUI.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Relaunch Credentials.
+        ///   Looks up a localized string similar to RunAs Credentials.
         /// </summary>
         internal static string CredBox_MainInstruction {
             get {
@@ -124,7 +124,7 @@ namespace ManagementUI.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ManagementUI Credentials.
+        ///   Looks up a localized string similar to ManagementUI RunAs.
         /// </summary>
         internal static string CredBox_WindowTitle {
             get {
