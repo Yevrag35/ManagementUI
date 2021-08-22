@@ -12,7 +12,8 @@ namespace ManagementUI.Functionality.Executable
     {
         public virtual string Arguments { get; set; }
         public virtual string ExePath { get; set; }
-        public virtual bool NoNewWindow { get; set; } = true;
+        public virtual bool LoadUserProfile { get; set; }
+        public virtual bool NoNewWindow { get; set; }
 
         public LaunchableBase()
             : base()
@@ -23,11 +24,15 @@ namespace ManagementUI.Functionality.Executable
         {
             this.ValidateParameters();
 
-            var proc = new Process { StartInfo = NewProcessStartInfo(parentIsElevated, runAs, credential, this.ExePath, this.Arguments, this.NoNewWindow) };
+            var proc = new Process {
+                StartInfo = NewProcessStartInfo(parentIsElevated, runAs, credential,
+                    this.ExePath, this.Arguments, this.NoNewWindow, this.LoadUserProfile)
+            };
+
             return proc;
         }
         private static ProcessStartInfo NewProcessStartInfo(bool parentIsElevated, bool runAs, IProcessCredential credential,
-            string exe, string arguments, bool noWindow)
+            string exe, string arguments, bool noWindow, bool loadUserProfile)
         {
             return StartInfoFactory
                 .Create()
@@ -35,6 +40,7 @@ namespace ManagementUI.Functionality.Executable
                     .CreateNoWindow(noWindow)
                     .AddArguments(arguments)
                     .AddRunAs(runAs)
+                    .LoadUserProfile(loadUserProfile)
                     .UseShellExecute(!parentIsElevated)
                     .AddCredentials(credential);
         }

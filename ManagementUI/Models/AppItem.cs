@@ -93,9 +93,11 @@ namespace ManagementUI.Models
             this.ExePath = other.ExePath;
             this.IconIndex = other.IconIndex;
             this.IconPath = other.IconPath;
+            this.LoadUserProfile = other.LoadUserProfile;
+            this.NoNewWindow = other.NoNewWindow;
             this.Name = other.Name;
-            this.Image = other.Image.Clone();
-            this.Image.Freeze();
+            this.Image = other.Image?.Clone();
+            this.Image?.Freeze();
         }
         public void Initialize()
         {
