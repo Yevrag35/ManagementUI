@@ -30,6 +30,7 @@ namespace ManagementUI
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public string AppColumnHeaderName => Strings.ColumnHeaderName_Apps;
         private AppsList AppList => this.JsonAppsRead.Apps;
         private JsonAppsFile JsonAppsRead { get; set; }
         public string RunAsUser => _runAs?.DisplayPrincipal;
@@ -65,6 +66,9 @@ namespace ManagementUI
         }
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            if (null == this.AppColumnHeaderName)
+                throw new InvalidOperationException(string.Format("{0} cannot be null.  Exiting application.", nameof(this.AppColumnHeaderName)));
+
             App.MyHandle = new WindowInteropHelper(this).Handle;
 
             await this.OnLoad();
@@ -199,21 +203,38 @@ namespace ManagementUI
                 }
             });
         }
-        private async void ListViewItem_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        private async void ShouldRightClickOnMouseEnterOrLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                _overItem = true;
+                _overItem = IsOverItem(e?.Device?.Target, this.AppColumnHeaderName);
 
-            }, System.Windows.Threading.DispatcherPriority.Send);
+            }, DispatcherPriority.Send);
         }
-        private async void ListViewItem_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        private static bool IsOverItem(IInputElement element, string appColumnName)
         {
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                _overItem = false;
-
-            }, System.Windows.Threading.DispatcherPriority.Send);
+            return
+                null != element
+                &&
+                (
+                    (
+                        element is Border border
+                        &&
+                        (
+                            border.DataContext is AppItem
+                            ||
+                            border.DataContext is ToggleTag
+                        )
+                    )
+                    ||
+                    (
+                        element is TextBlock tb
+                        &&
+                        Strings.ContentHeaderUid.Equals(tb?.Name)
+                        &&
+                        appColumnName.Equals(tb.Text)
+                    )
+                );
         }
 
         #endregion
@@ -415,6 +436,30 @@ namespace ManagementUI
                     this.FilterTags.UnselectAll();
                 }
             });
-        }  
+        }
+
+        private void GridViewColumnHeader_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (sender is GridViewColumnHeader header && null == header.Content)
+            {
+                e.Handled = true;
+                return;
+            }
+        }
+        private async void GridViewColumnHeader_Click(object sender, RoutedEventArgs e)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.AppList.ChangeSortOrder();
+            });
+        }
+
+        private async void ResetSortOrder_Click(object sender, RoutedEventArgs e)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.AppList.View.SortDescriptions.Clear();
+            });
+        }
     }
 }

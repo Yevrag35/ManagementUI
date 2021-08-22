@@ -79,6 +79,24 @@ namespace ManagementUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Application Name.
+        /// </summary>
+        internal static string ColumnHeaderName_Apps {
+            get {
+                return ResourceManager.GetString("ColumnHeaderName_Apps", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ContentHeader.
+        /// </summary>
+        internal static string ContentHeaderUid {
+            get {
+                return ResourceManager.GetString("ContentHeaderUid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enter the credentials to relaunch Management UI as:.
         /// </summary>
         internal static string CredBox_Content {

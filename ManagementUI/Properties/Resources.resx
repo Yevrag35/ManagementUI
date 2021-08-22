@@ -123,6 +123,12 @@
   <data name="Apps_SchemaUrl" xml:space="preserve">
     <value>https://json.yevrag35.com/uimanagement-apps/v1.1.0/schema.json</value>
   </data>
+  <data name="ColumnHeaderName_Apps" xml:space="preserve">
+    <value>Application Name</value>
+  </data>
+  <data name="ContentHeaderUid" xml:space="preserve">
+    <value>ContentHeader</value>
+  </data>
   <data name="CredBox_Content" xml:space="preserve">
     <value>Enter the credentials to relaunch Management UI as:</value>
   </data>
