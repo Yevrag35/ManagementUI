@@ -24,7 +24,6 @@ namespace ManagementUI.Functionality.Auth
         private PrincipalInfo _userId;
         private SecureString _password;
 
-        public string ComputerName { get; private set; }
         public ContextType ContextType => _userId.ContextType;
         public string DisplayPrincipal
         {
@@ -41,14 +40,12 @@ namespace ManagementUI.Functionality.Auth
         {
             _userId = (PrincipalInfo)userAndDomain;
             _password = password;
-            //this.Principal = new NTAccount(_userId.Domain, _userId.Value);
             this.NotifyOfChange(nameof(this.DisplayPrincipal));
         }
         public UserIdentity(PrincipalInfo pInfo, SecureString password)
         {
             _userId = pInfo;
             _password = password;
-            //this.Principal = new NTAccount(_userId.Domain, _userId.Value);
             this.NotifyOfChange(nameof(this.DisplayPrincipal));
         }
 
