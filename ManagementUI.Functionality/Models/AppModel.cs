@@ -97,7 +97,10 @@ namespace ManagementUI.Functionality.Models
             }
         }
 
-        [JsonProperty("noWindow")]
+        [JsonProperty("loadUserProfile", Order = 6)]
+        public override bool LoadUserProfile { get; set; } = true;
+
+        [JsonProperty("noWindow", Order = 7)]
         public override bool NoNewWindow { get; set; } = true;
 
         [JsonProperty("name", Order = 1)]
@@ -116,7 +119,7 @@ namespace ManagementUI.Functionality.Models
             }
         }
 
-        [JsonProperty("tags", Order = 6)]
+        [JsonProperty("tags", Order = 8)]
         [JsonConverter(typeof(UserTagConverter))]
         public SortedSet<UserTag> Tags
         {

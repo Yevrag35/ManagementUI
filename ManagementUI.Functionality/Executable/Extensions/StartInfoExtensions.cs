@@ -49,6 +49,11 @@ namespace ManagementUI.Functionality.Executable.Extensions
             psi.CreateNoWindow = toggle;
             return psi;
         }
+        public static ProcessStartInfo LoadUserProfile(this ProcessStartInfo psi, bool toggle = true)
+        {
+            psi.LoadUserProfile = toggle;
+            return psi;
+        }
         public static ProcessStartInfo UseShellExecute(this ProcessStartInfo psi, bool toggle = false)
         {
             psi.UseShellExecute = toggle;

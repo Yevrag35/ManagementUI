@@ -9,7 +9,7 @@ namespace ManagementUI.Functionality.Executable
     public interface ILaunchable
     {
         /// <summary>
-        /// The program arguments used when starting the <see cref="Process"/>.
+        /// The set of command-line arguments used when starting the <see cref="Process"/>.
         /// </summary>
         string Arguments { get; }
         /// <summary>
@@ -17,6 +17,15 @@ namespace ManagementUI.Functionality.Executable
         /// </summary>
         string ExePath { get; }
 
+        /// <summary>
+        /// Indicates whether the Windows user profile is to be loaded from the registry when launched.
+        /// </summary>
+        bool LoadUserProfile { get; }
+
+        /// <summary>
+        /// Indicates to launch the process without creating a new window to contain it or if a new window
+        /// is to be created.
+        /// </summary>
         bool NoNewWindow { get; }
 
         /// <summary>
