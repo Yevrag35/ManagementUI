@@ -21,9 +21,6 @@ namespace ManagementUI
         public static void AddCredentials(IUserIdentity userId)
         {
             Deinitialize();
-            if (null == userId.Principal)
-
-
             _userId = userId;
         }
         public static void Deinitialize()

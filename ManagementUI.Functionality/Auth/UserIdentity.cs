@@ -28,9 +28,10 @@ namespace ManagementUI.Functionality.Auth
         public ContextType ContextType => _userId.ContextType;
         public string DisplayPrincipal
         {
-            get => this.Principal.Value ?? string.Empty;
+            get => this.Principal?.Value ?? string.Empty;
         }
         public string Domain => _userId.Domain ?? string.Empty;
+        public bool IsUserPrincipalName => (this.UserName?.Contains(AT_SIGN)).GetValueOrDefault();
         public bool IsValidated { get; private set; }
         public NTAccount Principal { get; private set; }
         public string UserName => _userId.Value ?? string.Empty;
@@ -60,7 +61,9 @@ namespace ManagementUI.Functionality.Auth
                 throw new ArgumentNullException(nameof(startInfo));
 
             startInfo.UserName = this.UserName;
-            startInfo.Domain = this.Domain;
+            startInfo.Domain = !this.IsUserPrincipalName 
+                ? this.Domain
+                : null;
             startInfo.Password = _password;
             return startInfo;
         }
