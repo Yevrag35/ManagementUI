@@ -49,12 +49,20 @@ namespace ManagementUI.Collections
 
         public void ChangeSortOrder()
         {
-            if (this.View.SortDescriptions.Count == 1)
+            if (this.View.SortDescriptions.Count >= 1)
             {
                 var sd = this.View.SortDescriptions[0];
+
                 var newSd = new SortDescription(sd.PropertyName, sd.Direction.ToOpposite());
-                this.View.SortDescriptions.Remove(sd);
-                this.View.SortDescriptions.Add(newSd);
+                if (this.View.SortDescriptions.Remove(sd))
+                {
+                    this.View.SortDescriptions.Clear();
+                    this.View.SortDescriptions.Add(newSd);
+                }
+            }
+            else
+            {
+                this.View.SortDescriptions.Add(new SortDescription(nameof(AppItem.Name), ListSortDirection.Ascending));
             }
         }
 

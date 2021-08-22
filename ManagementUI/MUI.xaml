@@ -399,8 +399,8 @@
                 <ListView.Resources>
                     <Style TargetType="{x:Type ListViewItem}">
                         <Setter Property="Background" Value="Transparent"/>
-                        <EventSetter Event="MouseEnter" Handler="ListViewItem_MouseEnter"/>
-                        <EventSetter Event="MouseLeave" Handler="ListViewItem_MouseLeave"/>
+                        <EventSetter Event="MouseEnter" Handler="ShouldRightClickOnMouseEnterOrLeave"/>
+                        <EventSetter Event="MouseLeave" Handler="ShouldRightClickOnMouseEnterOrLeave"/>
                     </Style>
                 </ListView.Resources>
                 <ListView.ItemTemplate>
@@ -437,13 +437,6 @@
             <ListView x:Name="AppListView" Grid.Column="0" Background="Transparent" BorderBrush="Transparent" 
                       BorderThickness="0"
                       PreviewMouseRightButtonUp="ContextMenu_PreviewMouseRightButtonUp">
-                <!--<d:ListView.ItemsSource>
-                    <x:Array Type="{x:Type mock:MockAppItem}">
-                        <mock:MockAppItem Name="Hi There" DontShow="False" ExePath="C:\Windows\notepad.exe"
-                                          Arguments="your mom" IconIndex="0" IconPath="C:\Windows\notepad.exe"
-                                          />
-                    </x:Array>
-                </d:ListView.ItemsSource>-->
                 <ListView.Resources>
 
                     <SolidColorBrush x:Key="Item.MouseOver.Background" Color="Gold"/>
@@ -457,7 +450,7 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type GridViewColumnHeader}">
-                                    <Border BorderThickness="0,0,0,0" BorderBrush="Transparent">
+                                    <Border BorderThickness="0,0,0,0" BorderBrush="Transparent" x:Name="ColumnBorder">
                                         <Border.Background>
                                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                                 <LinearGradientBrush.GradientStops>
@@ -469,13 +462,24 @@
                                                 </LinearGradientBrush.GradientStops>
                                             </LinearGradientBrush>
                                         </Border.Background>
+                                        <Border.ContextMenu>
+                                            <ContextMenu x:Name="HeaderRightClickMenu">
+                                                <Separator/>
+                                                <MenuItem x:Name="ResetSortOrder" Header="Reset Sort Order..." Click="ResetSortOrder_Click"/>
+                                                <Separator/>
+                                            </ContextMenu>
+                                        </Border.ContextMenu>
                                         <TextBlock x:Name="ContentHeader" Text="{TemplateBinding Content}" Foreground="White"
                                                FontFamily="Trebuchet MS" FontSize="16" VerticalAlignment="Bottom"
-                                               Padding="5,5,5,0" Width="{TemplateBinding Width}" TextAlignment="Center" />
+                                               Padding="5,5,5,0" Width="{TemplateBinding Width}" TextAlignment="Center"/>
                                     </Border>
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
+                        <EventSetter Event="PreviewMouseLeftButtonDown" Handler="GridViewColumnHeader_PreviewMouseLeftButtonUp"/>
+                        <EventSetter Event="Click" Handler="GridViewColumnHeader_Click"/>
+                        <EventSetter Event="MouseEnter" Handler="ShouldRightClickOnMouseEnterOrLeave"/>
+                        <EventSetter Event="MouseLeave" Handler="ShouldRightClickOnMouseEnterOrLeave"/>
                     </Style>
 
                     <DataTemplate x:Key="CellTemplate">
@@ -494,8 +498,8 @@
                         <Setter Property="FontSize" Value="20" />
                         <Setter Property="Background" Value="Transparent"/>
                         <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"/>
-                        <EventSetter Event="MouseEnter" Handler="ListViewItem_MouseEnter"/>
-                        <EventSetter Event="MouseLeave" Handler="ListViewItem_MouseLeave"/>
+                        <EventSetter Event="MouseEnter" Handler="ShouldRightClickOnMouseEnterOrLeave"/>
+                        <EventSetter Event="MouseLeave" Handler="ShouldRightClickOnMouseEnterOrLeave"/>
                         <Style.Triggers>
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter Property="Background" Value="DarkGray"/>
@@ -520,7 +524,7 @@
                     <GridView>
                         <GridView.Columns>
                             <GridViewColumn Header="" CellTemplate="{StaticResource CellTemplate}" />
-                            <GridViewColumn Header="Application Name" DisplayMemberBinding="{Binding Path=Name}"
+                            <GridViewColumn Header="{Binding AppColumnHeaderName, Mode=OneTime}" DisplayMemberBinding="{Binding Path=Name}"
                                             ctrl:ProportionalColumn.Width="1" />
                         </GridView.Columns>
                     </GridView>
