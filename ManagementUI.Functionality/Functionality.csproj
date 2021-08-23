@@ -50,6 +50,9 @@
     <Compile Include="Auth\UserIdentity.cs" />
     <Compile Include="Auth\PrincipalInfo.cs" />
     <Compile Include="Events\IconChangedEventArgs.cs" />
+    <Compile Include="Executable\ArgumentEntry.cs" />
+    <Compile Include="Executable\ArgumentLibrary.cs" />
+    <Compile Include="Executable\Parser.cs" />
     <Compile Include="Executable\InvalidCredentialException.cs" />
     <Compile Include="Executable\EditorEventHandler.cs" />
     <Compile Include="Executable\Extensions\StartInfoExtensions.cs" />
@@ -60,6 +63,11 @@
     <Compile Include="Models\Collections\TagIdDictionary.cs" />
     <Compile Include="Models\Converters\UserTagConverter.cs" />
     <Compile Include="Models\UserTag.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Settings\CustomEditor.cs" />
     <Compile Include="Settings\EditorBase.cs" />
     <Compile Include="Models\EditorManagerBase.cs" />
@@ -77,6 +85,11 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

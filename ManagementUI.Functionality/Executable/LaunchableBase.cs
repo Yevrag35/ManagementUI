@@ -34,7 +34,7 @@ namespace ManagementUI.Functionality.Executable
         private static ProcessStartInfo NewProcessStartInfo(bool parentIsElevated, bool runAs, IProcessCredential credential,
             string exe, string arguments, bool noWindow, bool loadUserProfile)
         {
-            return StartInfoFactory
+            ProcessStartInfo psi = StartInfoFactory
                 .Create()
                     .AddExe(exe)
                     .CreateNoWindow(noWindow)
@@ -43,6 +43,13 @@ namespace ManagementUI.Functionality.Executable
                     .LoadUserProfile(loadUserProfile)
                     .UseShellExecute(!parentIsElevated)
                     .AddCredentials(credential);
+
+            string elevateParams = Parser.GetElevateArguments(psi);
+            psi.FileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "elevate.exe");
+            psi.Arguments = elevateParams;
+            psi.CreateNoWindow = false;
+           
+            return psi;
         }
 
         /// <summary>

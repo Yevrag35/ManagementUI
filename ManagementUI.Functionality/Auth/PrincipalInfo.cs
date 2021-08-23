@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace ManagementUI.Functionality.Auth
 {
     public struct PrincipalInfo
     {
         private const char AT_SIGN = (char)64;
-        private const char BACKSLASH = (char)92;
-        private const StringSplitOptions OPTIONS = StringSplitOptions.RemoveEmptyEntries;
-        private const char PERIOD = (char)46;
 
         private ContextType _contextType;
         private string _domain;
@@ -18,6 +17,7 @@ namespace ManagementUI.Functionality.Auth
 
         public ContextType ContextType => _contextType;
         public string Domain => _domain;
+        public bool IsUpn => _userName.Contains(AT_SIGN);
         public string Value => _userName;
 
         private PrincipalInfo(string domain, string userName, ContextType contextType)
@@ -28,28 +28,14 @@ namespace ManagementUI.Functionality.Auth
         }
         public PrincipalInfo(string domain, string userName)
         {
-            _domain = string.IsNullOrWhiteSpace(domain)
-                && !string.IsNullOrWhiteSpace(userName)
-                && userName.Contains(AT_SIGN)
-                    ? GetDomainFromUpn(userName)
-                    : domain;
-
+            _domain = domain;
             _userName = userName;
-            _contextType = GetContextTypeFromDomain(_domain);
-        }
-        private PrincipalInfo(string userName)
-        {
-            (string, string, ContextType) result = SeparateDomainAndUser(userName);
-            _domain = result.Item1 != PERIOD.ToString()
-                ? result.Item1
-                : Environment.MachineName;
-            _userName = result.Item2;
-            _contextType = result.Item3;
+            _contextType = GetContextTypeFromDomain(_domain, IsUserPrincipalName(userName));
         }
 
-        public static explicit operator PrincipalInfo(string userName)
+        private static bool IsUserPrincipalName(string userName)
         {
-            return new PrincipalInfo(userName);
+            return (userName?.Contains(AT_SIGN)).GetValueOrDefault();
         }
 
         #region PUBLIC METHODS
@@ -60,95 +46,70 @@ namespace ManagementUI.Functionality.Auth
 
         #endregion
 
-        private static ContextType GetContextTypeFromDomain(string domain)
+        private static ContextType GetContextTypeFromDomain(string domain, bool valueIsUpn)
         {
             ContextType context = ContextType.Domain;
-
-            if (Environment.MachineName.Equals(domain, StringComparison.CurrentCultureIgnoreCase)
-                || (domain.Length == 1 && domain[0] == PERIOD))
+            if (!valueIsUpn)
             {
-                context = ContextType.Machine;
+                string computerName = Environment.GetEnvironmentVariable("COMPUTERNAME");
+                if (string.IsNullOrWhiteSpace(computerName))
+                {
+                    computerName = TryGetMachineName(out string nbName)
+                        ? nbName
+                        : string.Empty;
+                }
+
+                if (computerName.Equals(domain, StringComparison.CurrentCultureIgnoreCase))
+                    context = ContextType.Machine;
             }
 
             return context;
         }
-        private static string FormatUser(IEnumerable<string> split, Func<IEnumerable<string>, IEnumerable<string>> transform)
-        {
-            return string.Join(string.Empty, transform(split));
-        }
-        private static string GetDomainFromUpn(string upn)
-        {
-            string[] splitUpn = SplitAtSign(upn);
-            if (null == splitUpn || splitUpn.Length <= 0)
-                return Environment.UserDomainName;
 
-            return splitUpn[splitUpn.Length - 1];
-        }
-        private static (string, string, ContextType) ProcessAtSign(string[] split)
+        #region NETBIOS NAME RESOLUTION
+        private static bool TryGetMachineName(out string nbName)
         {
-            if (null == split || split.Length <= 0)
-                return default;
+            nbName = null;
+            IntPtr pBuffer = IntPtr.Zero;
 
-            else if (split.Length == 1)
-            {
-                return ProcessNoDomain(split);
-            }
-            else
-            {
-                string domain = split.LastOrDefault();
-                string user = FormatUser(split, x => x);
-                return (
-                    domain,
-                    user,
-                    GetContextTypeFromDomain(domain)
-                );
-            }
-        }
-        private static (string, string, ContextType) ProcessBackslash(string[] split)
-        {
-            if (null == split || split.Length <= 0)
-                return default;
+            WKSTA_INFO_100 info;
 
-            else if (split.Length == 1)
+            try
             {
-                return ProcessNoDomain(split);
+                int retVal = NetWkstaGetInfo(null, 100, out pBuffer);
+                if (retVal != 0)
+                    throw new Win32Exception(retVal);
+
+                info = (WKSTA_INFO_100)Marshal.PtrToStructure(pBuffer, typeof(WKSTA_INFO_100));
+                nbName = info.wki100_computername;
             }
-            else
+            catch { }
+            finally
             {
-                string user = FormatUser(split, x => x.Skip(1));
-                string domain = split[0];
-                return (
-                    domain,
-                    user,
-                    GetContextTypeFromDomain(domain)
-                );
+                NetApiBufferFree(pBuffer);
             }
-        }
-        private static (string, string, ContextType) ProcessNoDomain(string[] split)
-        {
-            string domain = Environment.UserDomainName;
-            return (domain, split[0], GetContextTypeFromDomain(domain));
+
+            return !string.IsNullOrWhiteSpace(nbName);
         }
 
-        private static (string, string, ContextType) SeparateDomainAndUser(string combined)
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        private class WKSTA_INFO_100
         {
-            if (combined.Contains(BACKSLASH))
-            {
-                string[] splitBack = combined.Split(new char[] { BACKSLASH }, OPTIONS);
-                return ProcessBackslash(splitBack);
-            }
-            else if (combined.Contains(AT_SIGN))
-            {
-                string[] splitAt = SplitAtSign(combined);
-                return ProcessAtSign(splitAt);
-            }
-            else // we'll assume it's a local account
-                return (Environment.MachineName, combined, ContextType.Machine);
+            public int wki100_platform_id;
+            [MarshalAs(UnmanagedType.LPWStr)]
+            public string wki100_computername;
+            [MarshalAs(UnmanagedType.LPWStr)]
+            public string wki100_langroup;
+            public int wki100_ver_major;
+            public int wki100_ver_minor;
         }
 
-        private static string[] SplitAtSign(string combined)
-        {
-            return combined.Split(new char[] { AT_SIGN }, OPTIONS);
-        }
+        [DllImport("netapi32.dll", CharSet = CharSet.Auto)]
+        private static extern int NetWkstaGetInfo(string server, int level, out IntPtr info);
+
+        [DllImport("netapi32.dll")]
+        private static extern int NetApiBufferFree(IntPtr pBuf);
+
+        #endregion
     }
 }

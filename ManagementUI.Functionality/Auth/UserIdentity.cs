@@ -30,18 +30,11 @@ namespace ManagementUI.Functionality.Auth
             get => this.Principal?.Value ?? string.Empty;
         }
         public string Domain => _userId.Domain ?? string.Empty;
-        public bool IsUserPrincipalName => (this.UserName?.Contains(AT_SIGN)).GetValueOrDefault();
         public bool IsValidated { get; private set; }
         public NTAccount Principal { get; private set; }
         public string UserName => _userId.Value ?? string.Empty;
 
         #region CONSTRUCTORS
-        public UserIdentity(string userAndDomain, SecureString password)
-        {
-            _userId = (PrincipalInfo)userAndDomain;
-            _password = password;
-            this.NotifyOfChange(nameof(this.DisplayPrincipal));
-        }
         public UserIdentity(PrincipalInfo pInfo, SecureString password)
         {
             _userId = pInfo;
@@ -58,10 +51,18 @@ namespace ManagementUI.Functionality.Auth
                 throw new ArgumentNullException(nameof(startInfo));
 
             startInfo.UserName = this.UserName;
-            startInfo.Domain = !this.IsUserPrincipalName 
-                ? this.Domain
-                : null;
+            startInfo.Domain = this.Domain;
             startInfo.Password = _password;
+            startInfo.UseShellExecute = false;
+            // Testing
+
+            string original = startInfo.FileName;
+            string originalArgs = startInfo.Arguments;
+            string newArgs = string.Format("/c \"{0}\" {1}", original, originalArgs);
+            startInfo.FileName = "cmd.exe";
+            startInfo.Arguments = newArgs;
+
+            // end testing
             return startInfo;
         }
 
@@ -72,27 +73,20 @@ namespace ManagementUI.Functionality.Auth
                 this.IsValidated = this.Validate(prinContext);
                 if (this.IsValidated)
                 {
-                    using (var foundUser = UserPrincipal.FindByIdentity(prinContext, this.UserName))
+                    if (!_userId.IsUpn)
                     {
-                        if (null != foundUser)
+                        using (var foundUser = UserPrincipal.FindByIdentity(prinContext, this.UserName))
                         {
-                            string domain = null;
-                            switch (this.ContextType)
+                            if (null != foundUser)
                             {
-                                case ContextType.Domain:
-                                    domain = prinContext.ContextType == ContextType.Domain
-                                            && TryGetMachineNetBiosDomain(this.Domain, out string nbName)
-                                        ? nbName
-                                        : this.Domain;
-                                    break;
-
-                                default:
-                                    domain = this.Domain.ToUpper();
-                                    break;
+                                string domain = this.Domain.ToUpper();
+                                this.Principal = new NTAccount(domain, foundUser.SamAccountName);
                             }
-
-                            this.Principal = new NTAccount(domain, foundUser.SamAccountName);
                         }
+                    }
+                    else
+                    {
+                        this.Principal = new NTAccount(this.UserName);
                     }
                 }
             }
@@ -142,51 +136,7 @@ namespace ManagementUI.Functionality.Auth
             }
         }
 
-        #region NETBIOS NAME RESOLUTION
-        private static bool TryGetMachineNetBiosDomain(string domain, out string nbName)
-        {
-            nbName = null;
-            IntPtr pBuffer = IntPtr.Zero;
-
-            WKSTA_INFO_100 info;
-            
-            try
-            {
-                int retVal = NetWkstaGetInfo(domain, 100, out pBuffer);
-                if (retVal != 0)
-                    throw new Win32Exception(retVal);
-
-                info = (WKSTA_INFO_100)Marshal.PtrToStructure(pBuffer, typeof(WKSTA_INFO_100));
-                nbName = info.wki100_langroup;
-            }
-            catch { }
-            finally
-            {
-                NetApiBufferFree(pBuffer);
-            }
-
-            return !string.IsNullOrWhiteSpace(nbName);
-        }
-
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-        private class WKSTA_INFO_100
-        {
-            public int wki100_platform_id;
-            [MarshalAs(UnmanagedType.LPWStr)]
-            public string wki100_computername;
-            [MarshalAs(UnmanagedType.LPWStr)]
-            public string wki100_langroup;
-            public int wki100_ver_major;
-            public int wki100_ver_minor;
-        }
-
-        [DllImport("netapi32.dll", CharSet = CharSet.Auto)]
-        private static extern int NetWkstaGetInfo(string server, int level, out IntPtr info);
-
-        [DllImport("netapi32.dll")]
-        private static extern int NetApiBufferFree(IntPtr pBuf);
-
-        #endregion
+        
 
         public void Dispose()
         {
@@ -204,7 +154,5 @@ namespace ManagementUI.Functionality.Auth
                 _disposed = true;
             }
         }
-
-        
     }
 }
